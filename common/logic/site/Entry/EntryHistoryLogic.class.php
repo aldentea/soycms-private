@@ -92,16 +92,25 @@ class EntryHistoryLogic extends SOY2LogicBase{
 	 */
 	public function onRemove($entryId){
 		$bean = $this->getLastHistory($entryId);
-
-		$bean->setActionType(EntryHistory::ACTION_DELETE);
-		$bean->setActionTarget(0);
-		$bean->setChangeTitle(0);
-		$bean->setChangeContent(0);
-		$bean->setChangeMore(0);
-		$bean->setChangeAdditional(0);
-		$bean->setChangeIsPublished(0);
-
-		$id = $this->dao->insert($bean);
+		
+		$id = null;
+		
+		if(!is_null($bean)){
+			$bean->setActionType(EntryHistory::ACTION_REMOVE);
+			$bean->setActionTarget(0);
+			$bean->setChangeTitle(0);
+			$bean->setChangeContent(0);
+			$bean->setChangeMore(0);
+			$bean->setChangeAdditional(0);
+			$bean->setChangeIsPublished(0);
+			
+			try{
+				$id = $this->dao->insert($bean);
+			}catch(Exception $e){
+				//
+			}
+		}
+		
 		return $id;
 	}
 
@@ -114,7 +123,7 @@ class EntryHistoryLogic extends SOY2LogicBase{
 	public function onCopy(Entry $to, $fromId){
 
 		$bean = $this->createEntryHistory($to);
-
+		
 		//更新
 		$bean->setActionType(EntryHistory::ACTION_COPY);
 		//コピー元のIDを入れておく
