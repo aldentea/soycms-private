@@ -2,7 +2,10 @@
 
 error_reporting(0); // Set E_ALL for debuging
 
-//ログインしていなければ、elfinderを実行させない
+//GETの値がなければelfinderを実行させない
+if(!isset($_GET["site_id"])) exit;
+
+//ログインしていなければelfinderを実行させない
 include_once("../../../../common/common.inc.php");
 SOY2::import("util.UserInfoUtil");
 if(!UserInfoUtil::isLoggined()) exit;
@@ -41,7 +44,12 @@ SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
 SOY2DAOConfig::user(ADMIN_DB_USER);
 SOY2DAOConfig::pass(ADMIN_DB_PASS);
 $siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
-$site = $siteDAO->getBySiteId($_GET["site_id"]);
+try{
+	$site = $siteDAO->getBySiteId($_GET["site_id"]);
+}catch(Exception $e){
+	exit;
+}
+
 $opts = array(
 	// 'debug' => true,
 	'roots' => array(

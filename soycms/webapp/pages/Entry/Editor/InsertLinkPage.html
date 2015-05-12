@@ -34,8 +34,9 @@
 		<!--button type="button" onclick="toggle_Filemanager();return false;" class="sub">ファイルマネージャ起動</button-->
 		<input class="soycms_custom_button" type="checkbox" name="targeType" id="targetType">別ウィンドウで開く
 	</div>
-	<div>
-		<input type="button" class="soycms_custom_button" value="リンク追加" class="soycms_custom_button" onclick="return checkURL();">
+	<div style="padding-top: 15px;">
+		<input type="button" class="soycms_custom_button" value="リンク追加" class="soycms_custom_button" onclick="return checkURL();">&nbsp;&nbsp;
+		<button class="soycms_custom_button" onclick="toggle_Filemanager();return false;" type="button">ファイルマネージャー起動</button>
 	</div>
 </div>
 <div id="filemanager" style="display:none" soy:id="file_manager_iframe">

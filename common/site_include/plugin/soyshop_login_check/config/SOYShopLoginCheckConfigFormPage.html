@@ -1,0 +1,17 @@
+<h4>連携するSOY Shopのサイトを選択してください。</h4>
+<form soy:id="form">
+	<select soy:id="shop_list"></select>&nbsp;
+	<input type="submit" value="選択">
+</form>
+
+<h3>テンプレートへの記述例</h3>
+<pre style="border:1px solid #000000;padding:5px 20px;margin:0 35px;">
+&lt;!-- ページ内 --&gt;
+<strong>&lt;!-- s_block:id="is_login" /--&gt;</strong>
+<strong>&lt;!-- s_block:id="no_login" /--&gt;</strong>
+
+&lt;!-- ブロックの記事の箇所(block:idやb_block:idで囲った箇所) --&gt;
+<strong>&lt;!-- cms:id="is_login" /--&gt;</strong>
+<strong>&lt;!-- cms:id="no_login" /--&gt;</strong>
+<strong>&lt;a cms:id="login_link"&gt;ログインページ&lt;/a&gt;</strong>
+</pre>

@@ -32,6 +32,9 @@ class CustomField{
 
 	//どの属性値に出力するかの設定
 	private $output;
+	
+	//フィールドの説明文
+	private $description;
 
 	//初期値設定
 	private $defaultValue;
@@ -95,6 +98,12 @@ class CustomField{
 	function setOutput($output) {
 		$this->output = $output;
 	}
+	function getDescription(){
+		return $this->description;
+	}
+	function setDescription($description){
+		$this->description = $description;
+	}
 	function getFormName(){
 		return 'custom_field['.$this->getId().']';
 	}
@@ -135,6 +144,7 @@ class CustomField{
 		         .( ($pluginObj->displayID) ? ' ('.htmlspecialchars($this->getId(),ENT_QUOTES,"UTF-8").')' : '' )
 		         .'</label>'
 		         .'';
+		$title .= (strlen($this->getDescription())) ? '<br /><span>' . $this->getDescription() . '</span>' : "";
 
 		switch($this->getType()){
 			case "checkbox":

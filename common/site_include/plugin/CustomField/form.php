@@ -203,7 +203,7 @@ class FieldList extends HTMLList{
 			"link" => "javascript:void(0)",
 			"text" => "高度な設定",
 			"onclick" => '$(\'#field_config_'.$i.'\').toggle();',
-			"style" => (!$entity->getShowInput() OR $entity->getLabelId() OR $entity->getDefaultValue() OR $entity->getEmptyValue()) ? "background-color:yellow;" : ""
+			"style" => (!$entity->getShowInput() OR $entity->getLabelId() OR $entity->getDefaultValue() OR $entity->getEmptyValue() OR $entity->getDescription()) ? "background-color:yellow;" : ""
 		));
 
 		$this->createAdd("field_config","HTMLModel",array(
@@ -261,6 +261,11 @@ class FieldList extends HTMLList{
 		$this->createAdd("output","HTMLInput",array(
 			"name" => "config[output]",
 			"value" => $entity->getOutput()
+		));
+		
+		$this->createAdd("description","HTMLInput",array(
+			"name" => "config[description]",
+			"value" => $entity->getDescription()
 		));
 
 		$this->createAdd("use_extra", "HTMLModel", array(

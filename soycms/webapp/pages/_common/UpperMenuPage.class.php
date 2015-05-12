@@ -9,18 +9,18 @@ class UpperMenuPage extends CMSHTMLPageBase{
     function execute(){
     	
     	//sitePath
-		$this->createAdd("sitepath","HTMLLink",array(
+		$this->addLink("sitepath", array(
 			"text" => "/" . UserInfoUtil::getSite()->getSiteId(),
 			"link" => UserInfoUtil::getSiteUrl(),
 			"style" => "text-decoration:none;color:black;"
 		));
 		
-		$this->createAdd("sitename","HTMLLabel",array(
+		$this->addLabel("sitename", array(
 			"text" => UserInfoUtil::getSite()->getSiteName()
 		));
 		
 		//管理者名
-		$this->createAdd("adminname","HTMLLabel",array(
+		$this->addLabel("adminname", array(
 			"text" => UserInfoUtil::getUserName(),
 			"width" => 18,
 			"title" => UserInfoUtil::getUserName(),
@@ -30,12 +30,12 @@ class UpperMenuPage extends CMSHTMLPageBase{
 		$messages = CMSMessageManager::getMessages();
 		$error  = CMSMessageManager::getErrorMessages();
 				
-		$this->createAdd("message","HTMLLabel",array(
-			"html" => implode("",$error) . implode("",$messages)
+		$this->addLabel("message", array(
+			"html" => implode("", $error) . implode("", $messages)
 		));
 		
-		$this->createAdd("popup","HTMLModel",array(
-			"style" => (count($error)>0 || count($messages)>0) ? "" : "display:none;"
+		$this->addModel("popup", array(
+			"style" => (count($error) > 0 || count($messages) > 0) ? "" : "display:none;"
 		));
 		
 		//SOY InquiryかSOY Mailのデータベースがサイト側に存在している場合、新しいinlineを表示する
@@ -64,7 +64,22 @@ class UpperMenuPage extends CMSHTMLPageBase{
 			"link" => SOYAppUtil::createAppLink("mail")
 		));
 		
-		$this->createAdd("account_link","HTMLLink",array(
+		//エクストラモード周り 権限まわりの二重チェック config.ext.phpでも行っている
+		$extMode = false;
+		$extConfigFilePath = dirname(SOY2HTMLConfig::PageDir()) . "/config.ext.php";
+		if(file_exists($extConfigFilePath) && defined("EXT_MODE_DERECTORY_NAME")){
+			$extDir = dirname(SOY2HTMLConfig::PageDir()) . "/" . EXT_MODE_DERECTORY_NAME;
+			if(file_exists($extDir)){
+				$extMode = true;
+			}
+		}
+
+		//config.ext.phpがあり、extモード用のディレクトリがあることを確認してからリンクを表示する
+		$this->addModel("display_ext_link", array(
+			"visible" => ($extMode)
+		));
+		
+		$this->addLink("account_link", array(
 			"link" => (defined("SOYCMS_ASP_MODE")) ? 
 						 SOY2PageController::createLink("Login.UserInfo")
 						:SOY2PageController::createRelativeLink("../admin/index.php/Account")

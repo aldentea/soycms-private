@@ -1,10 +1,6 @@
 <?php
-$obj = CMSPlugin::loadPluginConfig(SOYShopConnectorPlugin::PLUGIN_ID);
-if(is_null($obj)){
-	$obj = new SOYShopConnectorPlugin();
-}
-CMSPlugin::addPlugin(SOYShopConnectorPlugin::PLUGIN_ID,array($obj,"init"));
 
+SOYShopConnectorPlugin::register();
 class SOYShopConnectorPlugin{
 
 	const PLUGIN_ID = "soyshop_connector";
@@ -13,7 +9,7 @@ class SOYShopConnectorPlugin{
 		return self::PLUGIN_ID;
 	}
 	
-	private $siteId;
+	private $siteId = "shop";
 
 	function init(){
 		CMSPlugin::addPluginMenu($this->getId(),array(
@@ -32,10 +28,10 @@ class SOYShopConnectorPlugin{
 
 			//activeな時だけロード
 			CMSPlugin::setEvent('onPageLoad'
-			,$this->getId()
-			,array($this,"onPageLoad")
-			,array("filter" => "all")
-		);
+				,$this->getId()
+				,array($this,"onPageLoad")
+				,array("filter" => "all")
+			);
 		}
 
 	}
@@ -90,6 +86,16 @@ class SOYShopConnectorPlugin{
 		
 		return $html;
 	}
+	
+	public static function register(){
+		
+		$obj = CMSPlugin::loadPluginConfig(self::PLUGIN_ID);
+		if(!$obj){
+			$obj = new SOYShopConnectorPlugin();
+		}
+			
+		CMSPlugin::addPlugin(self::PLUGIN_ID, array($obj, "init"));
+	}
 }
 
 
@@ -119,7 +125,6 @@ class SOYCMS_SOYShopPageModulePlugin extends PluginBase{
 		$siteId = $config["siteId"];
 		$confDir = SOYSHOP_WEBAPP . "conf/shop/";
 	
-//		include_once($confDir . $siteId . ".admin.conf.php");
 		include_once($confDir . $siteId . ".conf.php");
 		
 		SOY2DAOConfig::DaoDir($config["rootDir"] . "domain/");
@@ -150,7 +155,6 @@ class SOYCMS_SOYShopPageModulePlugin extends PluginBase{
 		
 		//必須クラスはここで読み込む
 		if($isFirst){
-			SOY2::import("domain.config.SOYShop_DataSets");
 			SOY2::import("domain.config.SOYShop_DataSets");
 			SOY2::import("logic.plugin.SOYShopPlugin");
 			SOY2::import("logic.cart.CartLogic");
