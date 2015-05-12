@@ -86,7 +86,8 @@ class blog_list_component extends HTMLList{
 			"value" => true,
 			"selected" => $config["flg"],
 			"isBoolean" => true,
-			"elementId" => "blog_checkbox_". $entity->getId()
+			"elementId" => "blog_checkbox_". $entity->getId(),
+			"onClick" => "toggle_area(". $entity->getId(). ")"
 		));
 		
 		//label
@@ -112,6 +113,14 @@ class blog_list_component extends HTMLList{
 			"value" => (isset($config["mail_content"])) ? $config["mail_content"] : "",
 		));
 		
+		/* toggle関係 */
+		$this->addModel("toggle_area", array(
+			"attr:id" => "toggle_area_". $entity->getId()
+		));
+		
+		$this->addLabel("toggle_id", array(
+			"text" => $entity->getId()
+		));
 	}
 	
 	public function getBlogConfig() {

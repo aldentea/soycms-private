@@ -26,9 +26,10 @@
 			form.attr("method","POST");
 			form.css("display","none");
 			
-			ids.each(function(ele){
+			
+			$.each(ids,function(ele){
 				var input = $("<input/>");
-				input.attry("type","hidden");
+				input.attr("type","hidden");
 				input.val(ele);
 				input.attr("name","entries[]");
 				form.append(input);
@@ -50,25 +51,25 @@
 			var input = $("<input/>");
 			input.attr("type","hidden");
 			input.val($("#display_title").val());
-			input.attr("name",$("#display_title").attr("name");
+			input.attr("name",$("#display_title").attr("name"));
 			form.append(input);
 			
 			var input = $("<input/>");
 			input.attr("type","hidden");
 			input.val($("#display_type").val());
-			input.attr("name",$("#display_type").attr("name");
+			input.attr("name",$("#display_type").attr("name"));
 			form.append(input);
 			
 			var input = $("<input/>");
 			input.attr("type","hidden");
 			input.val($("#display_number").val());
-			input.attr("name",$("#display_number").attr("name");
+			input.attr("name",$("#display_number").attr("name"));
 			form.append(input);
 			
 			var input = $("<input/>");
 			input.attr("type","hidden");
 			input.val($("#display_alias").val());
-			input.attr("name",$("#display_alias").attr("name");
+			input.attr("name",$("#display_alias").attr("name"));
 			form.append(input);
 			
 			//CSRF対策
@@ -80,7 +81,7 @@
 			
 			//エイリアスのチェック（すでに使用されているか）
 			try{
-				$H(alias_list).each(function(pair){
+				$.each(alias_list, function(pair){
 					if(pair.value === $("#display_alias").val() && pair.key != treeId){
 						throw "別名「"+pair.value+"」はすでに使用されています。";
 					}
