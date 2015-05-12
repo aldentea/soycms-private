@@ -6,6 +6,7 @@ include_once(CMS_COMMON."common.inc.php");
 include_once(CMS_APPLICATION_ROOT_DIR . "webapp/base/CMSApplication.class.php");
 
 CMSApplication::import("util.CMSUtil");
+CMSApplication::import("util.UserInfoUtil");
 CMSApplication::import("util.SOYShopUtil");
 
 //メッセージ

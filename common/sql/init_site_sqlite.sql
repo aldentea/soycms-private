@@ -1,5 +1,5 @@
 create table Entry(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	title varchar(255),
 	alias varchar(255),
 	content varchar(4000),
@@ -15,7 +15,7 @@ create table Entry(
 );
 
 create table EntryHistory(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	entry_id integer,
 	title varchar,
 	content varchar,
@@ -36,7 +36,7 @@ create table EntryHistory(
 create index entry_history_entry_id on EntryHistory(entry_id);
 
 create table EntryComment(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	entry_id integer references Entry(id),
 	title varchar(255),
 	author varchar(255),
@@ -48,7 +48,7 @@ create table EntryComment(
 );
 
 create table EntryTrackback(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	entry_id integer references Entry(id),
 	title varchar(255),
 	url varchar(255),
@@ -59,7 +59,7 @@ create table EntryTrackback(
 );
 
 create table Label(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	caption varchar(255),
 	description varchar(4000),
 	alias varchar(255),
@@ -77,14 +77,14 @@ create table EntryLabel(
 );
 
 create table Template(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	name varchar(255),
 	contents varchar(255),
 	create_date date
 );
 
 create table Page(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	title varchar(255),
 	parentPageId INTEGER,
 	template varchar(4000),
@@ -101,14 +101,14 @@ create table Page(
 );
 
 create table TemplateHistory(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	page_id integer references Page(id),
 	contents varchar(4000),
 	update_date date
 );
 
 create table Block(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	soy_id varchar(255),
 	page_id integer references Page(id),
 	class varchar(255),
@@ -126,7 +126,7 @@ create table SiteConfig(
 create index entry_udate on Entry(udate desc);
 
 create table soycms_data_sets(
-	id integer primary key,
+	id integer primary key AUTOINCREMENT,
 	class_name varchar unique,
 	object_data text
 );

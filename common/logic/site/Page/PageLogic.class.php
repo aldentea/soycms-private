@@ -12,6 +12,7 @@ class PageLogic extends SOY2LogicBase{
 
     /**
      * pageIdを親に持つ子を再帰的にすべて取得します
+     * @return array 子ページと自身のページのidの配列
      */
     function getAllChildIds($pageId){
     	$ret_val = array();
@@ -59,6 +60,7 @@ class PageLogic extends SOY2LogicBase{
      * 一つでも削除できないものがあるとロールバックされfalseが返る
      */
     function removePage($pageId){
+    	//自身も含まれる
     	$ids = $this->getAllChildIds($pageId);
     	//外部キー制約を満たすためにarrayを逆順にする
     	array_reverse($ids);
@@ -68,8 +70,8 @@ class PageLogic extends SOY2LogicBase{
     	foreach($ids as $id){
     		$page = $dao->getById($id);
     		if($page->isDeletable()){
+    			//ページを削除
     			$dao->delete($id);
-
     			//Blockも削除する
     			$blockDao->deleteByPageId($id);
     		}else{
@@ -77,12 +79,6 @@ class PageLogic extends SOY2LogicBase{
     			return false;
     		}
     	}
-
-    	/*
-    	 * @TODO Blockの削除
-    	 */
-
-    	$dao->delete($pageId);
     	$dao->commit();
     	return true;
     }

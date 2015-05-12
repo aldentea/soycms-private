@@ -70,21 +70,13 @@ class DefaultLoginAction extends SOY2Action{
 	 * 転送先が指定されている場合はそこへ
 	 */
     function redirectToCMS($siteRole){
-		//ここは1つのサイトの権限を持っている人のみ
-		$this->getUserSession()->setAttribute("hasOnlyOneRole",true);
-		$this->getUserSession()->setAttribute("onlyOneSiteAdministor",true);
-
-		//権限周りの値
-		$this->getUserSession()->setAttribute("isSiteAdministrator",$siteRole->isSiteAdministrator());
-		$this->getUserSession()->setAttribute("isEntryAdministor",$siteRole->isEntryAdministrator());
-		$this->getUserSession()->setAttribute("isEntryPublisher",$siteRole->isEntryPublisher());
-
-		//ログイン先のサイトの情報
-		$site = $this->getSiteById($siteRole->getSiteId());
-		if( !$site ){
+		try{
+			//ここは1つのサイトの権限を持っている人のみなので第２引数はtrue
+			//自動ログインなので第３引数もtrue
+			UserInfoUtil::loginSite($siteRole, true, true);
+		}catch(Exception $e){
 			return false;
 		}
-		$this->getUserSession()->setAttribute("Site",$site);
 
 		if(strlen($this->redirect) >0 && CMSAdminPageController::isAllowedPath($this->redirect, "../soycms/")){
 			SOY2PageController::redirect($this->redirect);
@@ -100,9 +92,8 @@ class DefaultLoginAction extends SOY2Action{
 	 * 転送先が指定されている場合はそこへ
 	 */
     function redirectToApp($appId){
-		//ここは1つのAppの権限を持っている人のみ
-		$this->getUserSession()->setAttribute("hasOnlyOneRole",true);
-		$this->getUserSession()->setAttribute("onlyOneAppAdministor",true);
+		//自動ログインなので第1引数はtrue
+		UserInfoUtil::loginApp(true);
 
 		if(strlen($this->redirect) >0 && CMSAdminPageController::isAllowedPath($this->redirect, "../app/index.php/" . $appId)){
 			SOY2PageController::redirect($this->redirect);

@@ -10,57 +10,32 @@ class LoginAction extends SOY2Action{
 
 	function execute(){
 
-		/*
-		 * サイトの権限持ってるかどうかチェック
-		 */
 		$userId = UserInfoUtil::getUserId();
+		$siteRoleDao = SOY2DAOFactory::create("admin.SiteRoleDAO");
 
-		//基本的には全てfalse
-		$isSiteAdministrator = false;
-		$isEntryAdministrator = false;
-		$isEntryPublisher = false;
-
+		/*
+		 * サイトの権限を取得する
+		 */
 		if(UserInfoUtil::isDefaultUser()){
-			//初期管理者は全権限を持つ
-			$isSiteAdministrator = true;
-			$isEntryAdministrator = true;
-			$isEntryPublisher = true;
+			//初期管理者は一般管理者と同等
+			$siteRole = new SiteRole();
+			$siteRole->setUserId($userId);
+			$siteRole->setSiteId($this->siteId);
+			$siteRole->setSiteRole(SiteRole::SITE_SUPER_USER);
 		}else{
-			$siteRoleDao = SOY2DAOFactory::create("admin.SiteRoleDAO");
-
 			try{
-				$siteRoles = $siteRoleDao->getByUserId($userId);
+				$siteRole = $siteRoleDao->getSiteRole($this->siteId, $userId);
 			}catch(Exception $e){
-				//
-			}
-
-			$flag = false;
-			foreach($siteRoles as $siteRole){
-
-				if($siteRole->getSiteId() == $this->siteId){
-					$flag = true;
-					$isSiteAdministrator = $siteRole->isSiteAdministrator();
-					$isEntryAdministrator = $siteRole->isEntryAdministrator();
-					$isEntryPublisher = $siteRole->isEntryPublisher();
-					break;
-				}
-			}
-
-			if($flag != true){
 				return SOY2Action::FAILED;
 			}
 		}
 
-		$dao = SOY2DAOFactory::create("admin.SiteDAO");
-		$site = $dao->getById($this->siteId);
-
-		$this->getUserSession()->setAttribute("Site",$site);
-		$this->getUserSession()->setAttribute("isSiteAdministrator",$isSiteAdministrator);
-		$this->getUserSession()->setAttribute("isEntryAdministor",$isEntryAdministrator);
-		$this->getUserSession()->setAttribute("isEntryPublisher",$isEntryPublisher);
-		$this->getUserSession()->setAttribute("onlyOneSiteAdministor",false);//ここに来てる時点で複数の管理サイトの権限を持っている
-
-		SOY2ActionSession::regenerateSessionId();
+		try{
+			//ここに来てる時点で複数の管理サイトの権限を持っているので第２引数はfalse
+			UserInfoUtil::loginSite($siteRole, false);
+		}catch(Exception $e){
+			return SOY2Action::FAILED;
+		}
 
 		return SOY2Action::SUCCESS;
 	}

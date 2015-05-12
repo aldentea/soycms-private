@@ -491,54 +491,54 @@ class CMSApplication {
 
      	return ($only_one == true);
     }
-    
+
     //サイト側のデータベースを使っているかを調べる
     public static function checkUseSiteDb(){
-    	
+
     	$res = false;
     	$useSiteDb = false;
-    	
+
     	//SOY InquiryかSOY Mailのどちらかがサイト側のデータベースを使うことができる
     	if(APPLICATION_ID == "inquiry"){
     		$useSiteDb = (defined("SOYINQUIRY_USE_SITE_DB") && SOYINQUIRY_USE_SITE_DB);
     	}elseif(APPLICATION_ID == "mail"){
     		$useSiteDb = (defined("SOYMAIL_USE_SITE_DB") && SOYMAIL_USE_SITE_DB);
     	}
-    	
+
     	if($useSiteDb){
     		$session = SOY2ActionSession::getUserSession();
     		$site = $session->getAttribute("Site");
-    		
+
     		//サイトIDが取得できれば、ログインしていることになる
     		if(!is_null($site->getId())){
     			$res = true;
     		}
     	}
-    	
+
     	return $res;
     }
-    
+
     //サイト側のデータベースを使っている時にどのサイトにログインしているか？を調べる
     public static function getLoginedSiteId(){
     	$uri = null;
-    	
+
     	$session = SOY2ActionSession::getUserSession();
     	$site = $session->getAttribute("Site");
-    	
+
     	SOY2::import("admin.Site");
     	$siteType = $site->getSiteType();
-    	
+
     	if(!is_null($site->getId())){
     		//CMS側のサイトの場合:SOY CMSのサイトは1で、単純にサイトIDを返す
 	    	if($siteType == Site::TYPE_SOY_CMS){
 	    		$uri = (int)$site->getId();
-	    	
+
 	    	//Shop側のサイトの場合:SOY Shopのサイトは2で、サイトIDを0にした後、GETの値でサイトを指定する
 	    	}elseif($siteType == Site::TYPE_SOY_SHOP){
 	    		$uri = "0?site_id=" . $site->getSiteId();
 	    	}
     	}
-	    	
+
     	return $uri;
     }
 
@@ -550,24 +550,21 @@ class CMSApplication {
     private static function checkLogin($appId){
 
     	//ログインしているかどうか
-    	if(!SOY2ActionSession::getUserSession()->getAuthenticated()){
+    	if(!UserInfoUtil::isLoggined()){
     		return false;
     	}
 
     	//ディフォルトユーザなら無条件にtrue
-    	if(SOY2ActionSession::getUserSession()->getAttribute("isdefault")){
+    	if(UserInfoUtil::isDefaultUser()){
     		return true;
     	}
 
-    	$appAuth = SOY2ActionSession::getUserSession()->getAttribute("app_auth");
+		//App権限情報を取得
+		$appAuth = UserInfoUtil::getAppAuth();
 
     	//セッションに情報が無い場合、DBから取得する
     	if(is_null($appAuth)){
-
-			$old = SOY2::RootDir();
-    		SOY2::RootDir(CMS_COMMON);
-    		include_once(CMS_COMMON . "config/db/".SOYCMS_DB_TYPE.".php");
-    		SOY2::RootDir($old);
+			CMSApplication::import("config.db.".SOYCMS_DB_TYPE, ".php");
 
 			SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
 			SOY2DAOConfig::user(ADMIN_DB_USER);
@@ -577,25 +574,11 @@ class CMSApplication {
 			CMSApplication::import("domain.admin.AppRoleDAO");
 			CMSApplication::import("domain.admin.AppRole");
 
-			$userId = SOY2ActionSession::getUserSession()->getAttribute("userid");
+			//App権限をセッションに保持
+			UserInfoUtil::loginApp();
 
-			$dao = SOY2DAOFactory::create("AppRoleDAO");
-			$appRoles = $dao->getByUserId($userId);
-
-			$appAuth = array_keys($appRoles);
-
-			SOY2ActionSession::getUserSession()->setAttribute("app_auth",$appAuth);
-
-			$appRoleLevel = array();
-			$appRoleConfig = array();
-			foreach($appRoles as $appId => $appRole){
-				$appRoleLevel[$appId] = $appRole->getAppRole();
-				$appRoleConfig[$appId] = $appRole->getUnserializeConfig();
-
-			}
-
-			SOY2ActionSession::getUserSession()->setAttribute("app_auth_level",$appRoleLevel);
-			SOY2ActionSession::getUserSession()->setAttribute("app_auth_config",$appRoleConfig);
+			//App権限情報を再度取得
+			$appAuth = UserInfoUtil::getAppAuth();
     	}
 
     	return (in_array($appId,$appAuth));

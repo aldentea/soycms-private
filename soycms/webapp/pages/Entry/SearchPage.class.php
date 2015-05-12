@@ -159,6 +159,17 @@ class SearchPage extends CMSWebPageBase{
 		$this->createAdd("topPager","EntryPagerComponent",array(
 			"arguments"=> array($form->offset, $limit, $count, $currentLink .'?'. $form)
 		));
+		
+		//IE9対応
+		
+		$agent = getenv( "HTTP_USER_AGENT" );
+		
+		if(strstr($agent,"MSIE 9.0")||strstr($agent,"MSIE 8.0")){
+			$this->createAdd("if_ie9","HTMLModel",array(
+				"visible"=> false
+			));
+		}
+		
 
 		if($count == 0){
 			$this->addMessage("ENTRY_NO_ENTRY_IS_UNDER_THE_CONDITION");

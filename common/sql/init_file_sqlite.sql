@@ -1,5 +1,5 @@
 create table cmsfile(
-	id INTEGER PRIMARY key,
+	id INTEGER PRIMARY key AUTOINCREMENT,
 	name varchar,
 	path varchar,
 	url varchar,

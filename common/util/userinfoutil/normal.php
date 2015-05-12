@@ -7,14 +7,85 @@ class UserInfoUtil implements IUserInfoUtil{
 	 */
 	public static function logout(){
 		SOY2ActionSession::getUserSession()->setAuthenticated(false);
+
+		//@TODO clearAttributesするとすべてのUserSessionが消えてSOY ShopのMyPageも消えてしまうので問題
 		SOY2ActionSession::getUserSession()->clearAttributes();
+	}
+
+	/**
+	 * ログイン状態をセッションに保存する
+	 * @param Administrator
+	 */
+	public static function login($user){
+		$session = SOY2ActionSession::getUserSession();
+
+		$session->setAuthenticated(true);
+		$session->setAttribute('userid',$user->getId());
+		$session->setAttribute('loginid',$user->getUserId());
+
+		$name = $user->getName();
+		if(!$name)$name = $user->getUserId();
+		$session->setAttribute('username',$name);
+		$session->setAttribute('email',$user->getEmail());
+		$session->setAttribute('isdefault',(int)$user->getIsDefaultUser());
+
+		SOY2ActionSession::regenerateSessionId();
+	}
+
+	/**
+	 * サイトへログイン：権限をセッションに保存する
+	 * @param SiteRole
+	 * @param boolean 複数サイトのログイン権限があるかどうか
+	 * @param boolean ログイン先が１つのみで自動ログインしたかどうか
+	 * @throw Exception サイトがないとき
+	 */
+	public static function loginSite(SiteRole $siteRole, $onlyOneSiteAdministor, $hasOnlyOneRole = false){
+		$site = SOY2DAOFactory::create("admin.SiteDAO")->getById($siteRole->getSiteId());
+
+		$session = SOY2ActionSession::getUserSession();
+		$session->setAttribute("Site",$site);
+		$session->setAttribute("isSiteAdministrator",$siteRole->isSiteAdministrator());
+		$session->setAttribute("isEntryAdministor",$siteRole->isEntryAdministrator());
+		$session->setAttribute("isEntryPublisher",$siteRole->isEntryPublisher());
+		$session->setAttribute("onlyOneSiteAdministor",$onlyOneSiteAdministor);
+		$session->setAttribute("hasOnlyOneRole",$hasOnlyOneRole);
+
+		SOY2ActionSession::regenerateSessionId();
+	}
+
+	/**
+	 * Appへログイン：権限をセッションに保存する
+	 * @param boolean ログイン先が１つのみで自動ログインしたかどうか
+	 */
+	public static function loginApp($hasOnlyOneRole = false){
+		$session = SOY2ActionSession::getUserSession();
+
+		//app_auth
+		$appRoles = SOY2DAOFactory::create("AppRoleDAO")->getByUserId(self::getUserId());
+		$session->setAttribute("app_auth",array_keys($appRoles));
+
+		//app_auth_*
+		$appRoleLevel = array();
+		$appRoleConfig = array();
+		foreach($appRoles as $appId => $appRole){
+			$appRoleLevel[$appId] = $appRole->getAppRole();
+			$appRoleConfig[$appId] = $appRole->getUnserializeConfig();
+		}
+		$session->setAttribute("app_auth_level",$appRoleLevel);
+		$session->setAttribute("app_auth_config",$appRoleConfig);
+
+		//only one
+		$session->setAttribute("onlyOneAppAdministor",count(array_keys($appRoles)) >0);
+		$session->setAttribute("hasOnlyOneRole",$hasOnlyOneRole);
+
+		SOY2ActionSession::regenerateSessionId();
 	}
 
 	/**
 	 * 現在ログインしているかどうかを返す
 	 * SOY2Actionを利用
 	 */
-    public static function isLoggined(){
+	public static function isLoggined(){
 
 		if(defined("SOYCMS_LOGIN_LIFETIME") && SOYCMS_LOGIN_LIFETIME > 0){
 			//一定時間アクセスがなかったらログアウトする
@@ -26,14 +97,14 @@ class UserInfoUtil implements IUserInfoUtil{
 
 		SOY2ActionSession::getUserSession()->setAttribute("lastAccessTime",time());
 
-    	$isAuth = SOY2ActionSession::getUserSession()->getAuthenticated();
-    	if($isAuth){
+		$isAuth = SOY2ActionSession::getUserSession()->getAuthenticated();
+		if($isAuth){
 			return true;
-    	}else{
-    		self::logout();
-    		return false;
-    	}
-    }
+		}else{
+			self::logout();
+			return false;
+		}
+	}
 
     /**
      * 現在ログインユーザがデフォルトユーザ（初期管理者）であるかどうか
@@ -67,7 +138,7 @@ class UserInfoUtil implements IUserInfoUtil{
     }
 
     /**
-     * 現在ログインしているユーザのIDを返す
+     * 現在ログインしているユーザのID（User.id）を返す
      */
     public static function getUserId(){
     	return SOY2ActionSession::getUserSession()->getAttribute("userid");
@@ -206,6 +277,14 @@ class UserInfoUtil implements IUserInfoUtil{
     	}else{
     		return $url;
     	}
+    }
+
+    /**
+     * App権限情報を返す
+     * @return array
+     */
+    public static function getAppAuth(){
+    	return SOY2ActionSession::getUserSession()->getAttribute("app_auth");
     }
 }
 ?>

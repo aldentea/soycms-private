@@ -1,6 +1,6 @@
 
 CREATE TABLE Site (
-  id INTEGER primary key,
+  id INTEGER primary key AUTOINCREMENT,
   site_id VARCHAR unique,
   site_type number default 1,
   site_name VARCHAR,
@@ -11,7 +11,7 @@ CREATE TABLE Site (
 );
 
 CREATE TABLE Administrator (
-  id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id VARCHAR NULL unique,
   user_password VARCHAR NULL,
   default_user integer default 0,
@@ -22,7 +22,7 @@ CREATE TABLE Administrator (
 );
 
 CREATE TABLE SiteRole (
-  id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
   site_id INTEGER,
   is_limit INTEGER default 0,
@@ -34,7 +34,7 @@ CREATE TABLE SiteRole (
 );
 
 CREATE TABLE AppRole (
-  id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   app_id VARCHAR,
   user_id INTEGER,
   app_role INTEGER,
@@ -45,13 +45,13 @@ CREATE TABLE AppRole (
 );
 
 CREATE TABLE soycms_admin_data_sets(
-  id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   class_name VARCHAR UNIQUE,
   object_data TEXT
 );
 
 CREATE TABLE CookieLogin (
-  id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   token VARCHAR UNIQUE NOT NULL,
   expire INTEGER

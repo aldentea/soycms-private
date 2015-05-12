@@ -13,6 +13,22 @@ interface IUserInfoUtil {
 	public static function logout();
 
 	/**
+	 * ログイン：ログイン状態をセッションに保存する
+	 */
+	public static function login($user);
+
+	/**
+	 * サイトへログイン：権限をセッションに保存する
+	 */
+	public static function loginSite(SiteRole $siteRole, $onlyOneSiteAdministor);
+
+	/**
+	 * Appへログイン：権限をセッションに保存する
+	 * @param boolean ログイン先が１つのみで自動ログインしたかどうか
+	 */
+	public static function loginApp($hasOnlyOneRole = false);
+
+	/**
 	 * 現在ログインしているかどうかを返す
 	 * SOY2Actionを利用
 	 */
@@ -53,7 +69,7 @@ interface IUserInfoUtil {
      * 現在ログインしているユーザ名を返す
      */
     public static function getUserName();
-	
+
 	/**
      * 現在ログインしているユーザのメールアドレスを返す
      */
@@ -110,5 +126,12 @@ interface IUserInfoUtil {
      * サイトのIDからサイトのURLを取得
      */
     public static function getSiteURLBySiteId($siteId = null);
+
+    /**
+     * App権限情報を返す
+     * @return array
+     */
+    public static function getAppAuth();
+
 }
 ?>
