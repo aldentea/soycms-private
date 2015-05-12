@@ -3,6 +3,19 @@ var is_opera = (navigator.userAgent.toLowerCase().indexOf("opera") != -1);
 var is_ie = (navigator.appName=="Microsoft Internet Explorer");
 var is_safari = (navigator.userAgent.toLowerCase().indexOf("Safari") != -1);
 
+//ブラウザのバージョンハック
+if(is_ie){
+	/*@cc_on
+	@if (@_jscript_version == 10)
+	    is_ie = false;
+	  @elif (@_jscript_version == 9)
+	    is_ie = false;
+	  @else
+	    is_ie = true;
+	  @end
+	@*/
+}
+
 //高速化ハック
 /*@cc_on
 if (@_jscript_version < 9) {
