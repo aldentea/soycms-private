@@ -10,7 +10,5 @@ class CompletePage extends CMSWebPageBase{
 		if(!UserInfoUtil::isDefaultUser()){
 			SOY2PageController::jump("");
 		}
-
 	}
-
 }

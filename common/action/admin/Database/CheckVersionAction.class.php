@@ -13,17 +13,14 @@ class CheckVersionAction extends SOY2Action{
 		}
 
 		/*
-		 * @TODO
 		 * adminのDBバージョンチェック
-		 * @TODO チェック済み（バージョンアップ済み）を記録して何度もチェックしないようにする
 		 */
-//		if($this->hasUpdateForAdminDb()){
-//			SOY2PageController::jump("Upgrade.Admin");
-//		}
+		if($this->hasUpdateForAdminDb()){
+			SOY2PageController::jump("Upgrade.Admin");
+		}
 
 		/*
 		 * 各サイトのDBバージョンチェック（ショップは除く）
-		 * @TODO チェック済み（バージョンアップ済み）を記録して何度もチェックしないようにする
 		 */
 		if($this->hasUpdateForAllSiteDb()){
 			SOY2PageController::jump("Site.Upgrade");
