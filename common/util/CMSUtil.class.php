@@ -40,12 +40,12 @@ class CMSUtil {
 		$str = str_replace("%TITLE%", "[".$title."]", $str);
 		return "<button type=\"button\" class=\"cms_hidden_entry_id\" entryid=\"$entryId\" style=\"display:none;\">".$str."</button>";
 	}
-	
+
 	public static function getEntryAddHiddenInputHTML($labelId){
 		$str = CMSMessageManager::get("SOYCMS_PREVIEW_ADD_BUTTON");
 		return "<button type=\"button\" class=\"cms_hidden_entry_id\" labelid=\"$labelId\" style=\"display:none;\">".$str."</button>";
 	}
-	
+
 	/**
 	 * notifyUpdate
 	 */
@@ -216,7 +216,7 @@ class CMSUtil {
 		SOY2::import("util.ServerInfoUtil");
 		return ServerInfoUtil::checkZipEnable($expandOnly);
 	}
-	
+
 	/**
 	 * DSNをadminに切り替える
 	 */
@@ -224,11 +224,11 @@ class CMSUtil {
 		$old["dsn"] = SOY2DAOConfig::Dsn();
 		$old["user"] = SOY2DAOConfig::User();
 		$old["pass"] = SOY2DAOConfig::Pass();
-		
+
 		SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
 		SOY2DAOConfig::User(ADMIN_DB_USER);
 		SOY2DAOConfig::Pass(ADMIN_DB_PASS);
-		
+
 		return $old;
 	}
 

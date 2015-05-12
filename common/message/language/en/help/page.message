@@ -1,7 +1,7 @@
 //ページに表示するメッセージ
 
-HELP_PAGE_CREATE			=	<p>Click here to add new webpage.</p>
-HELP_PAGE_DISPLAY_TOGGLE	=	<p>Change display type of webpage list.List type, table type and tree type are available. It will be toggled click by ckick.</p>
+HELP_PAGE_CREATE			=	Click here to add new webpage.
+HELP_PAGE_DISPLAY_TOGGLE	=	Change display type of webpage list. List type, table type and tree type are available. It will be toggled click by ckick.
 
 HELP_PAGE_TITLE				=	String "%PAGE%" in title format will be replaced to webpage title.
 HELP_PAGE_URI				=	Used for the URL of this page, i.e. http://example.com/[Site ID]/[Page URI].<br>Keep this blank if this page should be the top page.<br><span style="color:red">URI must be unique in a website</span>

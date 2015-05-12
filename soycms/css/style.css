@@ -38,7 +38,7 @@ select option{
 	margin-right:10px;
 }
 
-input[type="text"]{margin:0.5em 0;border:1px solid #aaa;}
+input[type="text"]{margin:0.5em 0;border:1px solid #aaa;padding:1px 2px;}
 input[type="text"]:focus {border:1px solid #666;}
 
 /* -- main layout end -- */
@@ -171,6 +171,7 @@ td a{
 	width:25px;
 	height:73px;
 	float:left;
+	opacity: 0.95;
 }
 
 #popup_content {
@@ -179,8 +180,9 @@ td a{
 	height:73px;
 	width:600px;
 	overflow:hidden;
-	line-height:73px;
+	line-height:67px;
 	float:left;
+	opacity: 0.95;
 }
 
 #popup_right {
@@ -189,6 +191,7 @@ td a{
 	width:118px;
 	height:73px;
 	float:left;
+	opacity: 0.95;
 }
 
 #header_sitename h1,#header_sitename p{
@@ -400,10 +403,11 @@ td a{
 /*　ヘルプメッセージを表示するポップアップ */
 .help_popup {
 	position:absolute;
-	background-color:white;
-	border:3px green solid;
+	background-color:rgba(255,255,255,0.8);
+	border:2px rgba(0,127,0,0.8) solid;
+	border-radius: 6px;
 	z-index:400;
-	padding: 2px;
+	padding: 4px;
 	text-align:left;
 }
 

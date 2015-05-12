@@ -32,7 +32,7 @@ class CustomField{
 
 	//どの属性値に出力するかの設定
 	private $output;
-	
+
 	//フィールドの説明文
 	private $description;
 
@@ -252,7 +252,7 @@ class CustomField{
 							' />';
 					}
 				}
-				
+
 				break;
 			case "link":
 				$h_value = htmlspecialchars($fieldValue,ENT_QUOTES,"UTF-8");

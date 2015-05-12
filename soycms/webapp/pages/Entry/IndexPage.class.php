@@ -18,8 +18,9 @@ class IndexPage extends CMSUpdatePageBase{
 
 		//ラベル一覧を取得
 		$this->labelList = $this->getLabelList();
-		$this->createAdd("label_list","LabelList",array(
-			"list" => $this->labelList
+
+		$this->createAdd("label_categories","LabelCategoryList",array(
+			"list" => $this->getCategorizedLabelList(),
 		));
 
 		$list = $this->run("Label.RecentLabelListAction")->getAttribute("list");
@@ -105,6 +106,20 @@ class IndexPage extends CMSUpdatePageBase{
 	}
 
 	/**
+	 * 分類されたラベルオブジェクト一覧を取得
+	 */
+	function getCategorizedLabelList(){
+		$action = SOY2ActionFactory::createInstance("Label.CategorizedLabelListAction");
+    	$result = $action->run();
+
+    	if($result->success()){
+    		return $result->getAttribute("list");
+    	}else{
+    		return array();
+    	}
+	}
+
+	/**
 	 * 記事一覧を出力
 	 */
 	function outputEntryList(){
@@ -174,7 +189,7 @@ class IndexPage extends CMSUpdatePageBase{
 //			"type" => "text/javascript",
 //			"script"=> file_get_contents(dirname(__FILE__)."/script/entry_list.js")
 //		));
-		
+
 		HTMLHead::addScript("entry_list",array(
 			"type" => "text/javascript",
 			"script"=> file_get_contents(dirname(__FILE__)."/script/entry_list.js")
@@ -202,7 +217,32 @@ class IndexPage extends CMSUpdatePageBase{
 
 		return array($entities,$totalCount,min($offset,$totalCount));
 	}
+}
 
+class LabelCategoryList extends HTMLList{
+	function populateItem($entity, $key, $index){
+		$this->addLabel("label_category_name",array(
+			"text" => $key,
+			"visible" => !is_int($key) && strlen($key),
+		));
+
+		$toggleId = "label-".$index;
+		$this->addModel("toggle_opened",array(
+			"attr:id"      => "toggle_".$toggleId."_opened",
+			"attr:onclick" => "return toggle_label_list(this, '".$toggleId."');"
+		));
+		$this->addModel("toggle_closed",array(
+			"attr:id" => "toggle_".$toggleId."_closed",
+			"attr:onclick" => "return toggle_label_list(this, '".$toggleId."');"
+		));
+		$this->addModel("toggle_target",array(
+			"attr:id" => $toggleId,
+		));
+
+		$this->createAdd("label_list","LabelList",array(
+			"list" => $entity,
+		));
+	}
 }
 
 class LabelList extends HTMLList{
@@ -210,7 +250,9 @@ class LabelList extends HTMLList{
 	function populateItem($entity){
 
 		$this->createAdd("label_name","HTMLLabel",array(
-			"html"  => $entity->getDisplayCaption() ." <nobr> (".$entity->getEntryCount().")</nobr>",
+			//"html"  => $entity->getDisplayCaption() ." <nobr> (".(int)$entity->getEntryCount().")</nobr>",
+			"html"  =>  htmlspecialchars($entity->getBranchName(),ENT_QUOTES,"UTF-8")
+			          ." <nobr> (".(int)$entity->getEntryCount().")</nobr>",
 		));
 
 		$this->createAdd("label_icon","HTMLImage",array(

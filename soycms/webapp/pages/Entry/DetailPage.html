@@ -65,9 +65,10 @@
 					</div>
 				</div>
 				
+				<!-- soy:id="label_categories" -->
 				<div class="section entry_label">
-					<p class="sub">ラベル<img soy:message="HELP_ENTRY_LABEL"/></p>
-					
+					<p class="sub"><!-- soy:id="category_name" /--><img soy:message="HELP_ENTRY_LABEL"/></p>
+							
 					<div id="labels">
 						<div id="labels_wrapper">
 							<!-- soy:id="labels" -->
@@ -83,18 +84,20 @@
 						</div>
 					</div>				
 				</div>
+				<!-- /soy:id="label_categories" -->
 
 				<!-- soy:custom="Entry.Detail" -->
 				<!-- /soy:custom="Entry.Detail" -->
 				<div class="section">
-					<div style="float:left;">
-					
+					<div class="span-10">
 						<p class="sub">作成日<img soy:message="HELP_ENTRY_CREATE_DATE"/></p>
-						
 						<span soy:id="createdate_show" id="create_show"></span>
 						<button id="create_show_button" type="button" onclick="$('#create_show').hide();$('#create_input').show();$('#create_show_button').hide();">変更する</button>
-						
 						<input type="text" soy:id="createdate" id="create_input" style="display:none;" size="25">
+					</div>
+					<div class="span-11 last">
+						<p class="sub">最終更新日時</p>
+						<span soy:id="updatedate_show"></span>
 					</div>
 					<div style="clear:both;"><!--  --></div>
 				</div>

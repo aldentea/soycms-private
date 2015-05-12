@@ -137,6 +137,7 @@
 						<th>表示件数<img soy:message="HELP_BLOG_DISPLAY_NUMBER"/></th>
 						<th>URL<img soy:message="HELP_BLOG_PAGE_URL"/></th>
 						<th>タイトルフォーマット<img soy:message="HELP_BLOG_TITLE_FORMAT"/></th>
+						<th>表示順</th>
 					</tr>
 					<tr id="blog_config_top">
 						<td>ブログトップ<img soy:message="HELP_BLOG_TOP"/></td>
@@ -148,6 +149,7 @@
 							<span id="uri_prefix" soy:id="top_page_uri_prefix"></span><input soy:id="top_page_uri" id="top_page_uri" type="text">
 						</td>
 						<td class="blog_config_title_format"><input soy:id="top_title_format" type="text"></td>
+						<td><select soy:id="top_entry_sort"></select></td>
 					</tr>
 					<tr class="even" id="blog_config_entry">
 						<td>記事毎ページ<img soy:message="HELP_BLOG_ENTRY"/></td>
@@ -157,6 +159,7 @@
 							<span id="uri_prefix" soy:id="entry_page_uri_prefix"></span><input soy:id="entry_page_uri" id="entry_page_uri" type="text">/&lt;記事名&gt;
 						</td>
 						<td class="blog_config_title_format"><input soy:id="entry_title_format" type="text"></td>
+						<td>&nbsp;</td>
 					</tr>
 					<tr id="blog_config_top_archive">
 						<td>月別アーカイブページ<img soy:message="HELP_BLOG_ARCHIVE"/></td>
@@ -168,6 +171,7 @@
 							<span id="uri_prefix" soy:id="month_page_uri_prefix"></span><input soy:id="month_page_uri" id="month_page_uri" type="text">/YYYY/MM
 						</td>
 						<td class="blog_config_title_format"><input soy:id="month_title_format" type="text"></td>
+						<td><select soy:id="month_entry_sort"></select></td>
 					</tr>
 					<tr class="even" id="blog_config_category">
 						<td>カテゴリ別アーカイブページ<img soy:message="HELP_BLOG_CATEGORY"/></td>
@@ -179,6 +183,7 @@
 							<span id="uri-prefix-category" soy:id="category_page_uri_prefix"></span><input soy:id="category_page_uri" id="category_page_uri" type="text">/&lt;ラベル&gt;/
 						</td>
 						<td class="blog_config_title_format"><input soy:id="category_title_format" type="text"></td>
+						<td><select soy:id="category_entry_sort"></select></td>
 					</tr>
 					<tr id="blog_config_feed">
 						<td>フィード出力<img soy:message="HELP_BLOG_FEED"/></td>
@@ -190,6 +195,7 @@
 							<span id="uri_prefix" soy:id="rss_page_uri_prefix"></span><input soy:id="rss_page_uri" id="rss_page_uri" type="text">
 						</td>
 						<td class="blog_config_title_format"><input soy:id="feed_title_format" type="text"></td>
+						<td>&nbsp;</td>
 					</tr>
 				</table>
 			</div>

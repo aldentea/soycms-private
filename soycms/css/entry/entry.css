@@ -101,6 +101,15 @@ table.list tbody.entry_list td.labels {
 
 /* Label Table/List/Icon */
 
+.toggle_list{
+	cursor:pointer;
+}
+.toggle_list_opened{
+}
+.toggle_list_closed{
+	display:none;
+	margin-bottom:11px;
+}
 
 .icon{
 	float:left;

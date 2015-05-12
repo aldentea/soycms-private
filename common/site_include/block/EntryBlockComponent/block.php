@@ -274,7 +274,19 @@ class EntryBlockComponent_ViewPage extends HTMLList{
 			"soy2prefix"=>"cms",
 			"defaultFormat"=>"H:i"
 		));
-		
+
+		//1.7.5~
+		$this->createAdd("update_date","DateLabel",array(
+			"text"=>$entity->getUdate(),
+			"soy2prefix"=>"cms",
+		));
+
+		$this->createAdd("update_time","DateLabel",array(
+			"text"=>$entity->getUdate(),
+			"soy2prefix"=>"cms",
+			"defaultFormat"=>"H:i"
+		));
+
 		CMSPlugin::callEventFunc('onEntryOutput',array("entryId"=>$entity->getId(),"SOY2HTMLObject"=>$this,"entry"=>$entity));
 	}
 		

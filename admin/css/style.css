@@ -37,8 +37,9 @@ select option{
 /*　ヘルプメッセージを表示するポップアップ */
 .help_popup {
 	position:absolute;
-	background-color:white;
-	border:3px green solid;
+	background-color:rgba(255,255,255,0.8);
+	border:2px rgba(0,127,0,0.8) solid;
+	border-radius: 6px;
 	z-index:400;
 	padding: 2px;
 	text-align:left;

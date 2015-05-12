@@ -30,21 +30,24 @@ class CustomFieldPlugin{
 
 		if(CMSPlugin::activeCheck(CustomFieldPlugin::PLUGIN_ID)){
 
-			CMSPlugin::setEvent('onEntryUpdate', CustomFieldPlugin::PLUGIN_ID, array($this, "onEntryUpdate"));
-			CMSPlugin::setEvent('onEntryCreate', CustomFieldPlugin::PLUGIN_ID, array($this, "onEntryUpdate"));
-			CMSPlugin::setEvent('onEntryCopy', CustomFieldPlugin::PLUGIN_ID, array($this, "onEntryCopy"));
+			//公開画面側
+			if(defined("_SITE_ROOT_")){
+				CMSPlugin::setEvent('onEntryOutput', CustomFieldPlugin::PLUGIN_ID, array($this, "display"));
+			}else{
+				CMSPlugin::setEvent('onEntryUpdate', CustomFieldPlugin::PLUGIN_ID, array($this, "onEntryUpdate"));
+				CMSPlugin::setEvent('onEntryCreate', CustomFieldPlugin::PLUGIN_ID, array($this, "onEntryUpdate"));
+				CMSPlugin::setEvent('onEntryCopy', CustomFieldPlugin::PLUGIN_ID, array($this, "onEntryCopy"));
 
-			CMSPlugin::addCustomFieldFunction(CustomFieldPlugin::PLUGIN_ID, "Entry.Detail", array($this, "onCallCustomField"));
-			CMSPlugin::addCustomFieldFunction(CustomFieldPlugin::PLUGIN_ID, "Blog.Entry", array($this, "onCallCustomField_inBlog"));
-
-			CMSPlugin::setEvent('onEntryOutput', CustomFieldPlugin::PLUGIN_ID, array($this, "display"));
+				CMSPlugin::addCustomFieldFunction(CustomFieldPlugin::PLUGIN_ID, "Entry.Detail", array($this, "onCallCustomField"));
+				CMSPlugin::addCustomFieldFunction(CustomFieldPlugin::PLUGIN_ID, "Blog.Entry", array($this, "onCallCustomField_inBlog"));
+			}
 		}else{
 			CMSPlugin::setEvent('onActive', CustomFieldPlugin::PLUGIN_ID, array($this, "createTable"));
 		}
 	}
 
 	function display($arg){
-		
+
 		$entryId = $arg["entryId"];
 		$htmlObj = $arg["SOY2HTMLObject"];
 
@@ -60,20 +63,25 @@ class CustomFieldPlugin{
 				"html"       => $field->getValue(),
 				"soy2prefix" => "cms",
 			);
-			
+
 			//カスタムフィールドの設定が取れるときの動作（たとえば同じサイト内の場合）
 			if($master){
 				
+				//$attr["html"]に改めて値を入れ直す時に使用するフラグ
+				$resetFlag = true;
+
 				//タイプがリンクの場合はここで上書き
 				if($master->getType() == "link"){
 					$class = "HTMLLink";
 					$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
 					unset($attr["html"]);
+					$resetFlag = false;
 				//画像の場合
 				}else if($master->getType() == "image"){
 					$class = "HTMLImage";
 					$attr["src"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
 					unset($attr["html"]);
+					$resetFlag = false;
 				}
 
 				//値が設定されていないなら初期値を使う
@@ -93,35 +101,26 @@ class CustomFieldPlugin{
 				}
 
 				//上で空の時の値が入るかも知れず、下でunsetされる可能性があるのでここで設定し直す。
-				$attr["html"] = $field->getValue();
+				if($resetFlag){
+					$attr["html"] = $field->getValue();
+				}
 
 				//属性に出力
 				if(strlen($master->getOutput()) > 0){
-					
+
 					//リンクタイプ以外でhrefを使う場合
-					if($master->getOutput() == "href" && $master->getType() != "type"){
+					if($master->getOutput() == "href" && $master->getType() != "link"){
 						$class = "HTMLLink";
 						$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
-					
+
 					//下方互換
 					}else if($master->getType() == "image" && $master->getOutput() == "src"){
 						//上で処理をしているため何もしない
-					
+
 					//その他
 					}else{
 						$class = "HTMLModel";
 						$attr[$master->getOutput()] = $field->getValue();
-					}
-					
-					//追加属性を出力
-					
-					if(strlen($master->getExtraOutputs()) > 0){
-						$extraOutputs = explode("\n", str_replace(array("\r\n", "\r"), "\n", $master->getExtraOutputs()));
-						$extraValues = $field->getExtraValues();
-						foreach($extraOutputs as $key => $extraOutput){
-							$extraOutput = trim($extraOutput);
-							$attr[$extraOutput] = is_array($extraValues) && isset($extraValues[$extraOutput]) ? $extraValues[$extraOutput] : "";
-						}
 					}
 					/*
 					if(strlen($master->getExtraOutputs()) > 0 && is_array($field->getExtraValues())){
@@ -130,7 +129,18 @@ class CustomFieldPlugin{
 						}
 					}
 					*/
-					unset($attr["html"]);//HTMLModelなのでunsetしなくても出力されないはず
+					unset($attr["html"]);
+				}
+				
+				//追加属性を出力
+				if(strlen($master->getExtraOutputs()) > 0){
+					$extraOutputs = explode("\n", str_replace(array("\r\n", "\r"), "\n", $master->getExtraOutputs()));
+					$extraValues = $field->getExtraValues();
+					foreach($extraOutputs as $key => $extraOutput){
+						$extraOutput = trim($extraOutput);
+						$attr[$extraOutput] = is_array($extraValues) && isset($extraValues[$extraOutput]) ? $extraValues[$extraOutput] : "";
+					}
+					unset($attr["html"]);
 				}
 			}
 
@@ -148,7 +158,7 @@ class CustomFieldPlugin{
 				"soy2prefix" => "cms",
 				"visible" => (strlen($field->getValue()) === 0)
 			));
-			
+
 			//SOY2HTMLのデフォルトの _visibleがあるので、$field->getId()."_visible"より後にこれをやらないと表示されなくなる
 			$htmlObj->createAdd($field->getId(), $class, $attr);
 		}
@@ -190,7 +200,7 @@ class CustomFieldPlugin{
 			}else{
 				$field->setExtraValues(array());
 			}
-			
+
 			$saveCustomFields[] = $field;
 		}
 
@@ -323,7 +333,7 @@ class CustomFieldPlugin{
 
 		$arg = SOY2PageController::getArguments();
 		$entryId = (isset($arg[0])) ? (int)$arg[0] : null;
-		
+
 		$html = $this->getScripts();
 		$html .= '<div class="section custom_field">';
 		$db_arr = $this->getCustomFields($entryId);
@@ -337,7 +347,7 @@ class CustomFieldPlugin{
 		foreach($db_arr as $field){
 			$db_extra_values[$field->getId()] = $field->getExtraValues();
 		}
-		
+
 		foreach($this->customFields as $fieldId => $fieldObj){
 			$html .= $fieldObj->getForm($this, $db_values[$fieldId], $db_extra_values[$fieldId]);
 		}
@@ -364,7 +374,7 @@ class CustomFieldPlugin{
 		foreach($db_arr as $field){
 			$db_extra_values[$field->getId()] = $field->getExtraValues();
 		}
-		
+
 		foreach($this->customFields as $fieldId => $fieldObj){
 			$html .= $fieldObj->getForm($this, $db_values[$fieldId], $db_extra_values[$fieldId]);
 		}
@@ -382,7 +392,7 @@ class CustomFieldPlugin{
 		$script = str_replace("#FILE_UPLOAD_LINK#", SOY2PageController::createLink("Page.Editor.FileUpload"), $script);
 		$script = str_replace("#PUBLIC_URL#", UserInfoUtil::getSiteURLBySiteId(""), $script);
 		$script = str_replace("#SITE_URL#", UserInfoUtil::getSiteURL(), $script);
-		
+
 		return $script;
 	}
 
@@ -468,7 +478,7 @@ class CustomFieldPlugin{
 			$this->deleteField($field->getId());
 		}
 	}
-	
+
 	/**
 	 * エクスポート
 	 */
@@ -490,8 +500,12 @@ class CustomFieldPlugin{
 	}
 
 	public static function register(){
-		include_once(dirname(__FILE__)."/entity.php");
-		include_once(dirname(__FILE__)."/form.php");
+		if(!class_exists("CustomField")){
+			include(dirname(__FILE__)."/entity.php");
+		}
+		if(!class_exists("CustomFieldPluginFormPage")){
+			include(dirname(__FILE__)."/form.php");
+		}
 
 		$obj = CMSPlugin::loadPluginConfig(CustomFieldPlugin::PLUGIN_ID);
 		if(is_null($obj)){

@@ -1,6 +1,6 @@
 <div class="span-24 last">
 <div id="header_sitename" class="span-13">
-	<h1><a soy:id="sitepath"></a></h1>
+	<h1><a soy:id="sitepath" target="_blank"></a></h1>
 	<p soy:id="sitename"></p>
 </div>
 
@@ -11,7 +11,7 @@
 	<div class="span-7 last">
 		<ul class="inline">
 			<li><a onclick="return common_click_to_layer(this);" soy:id="account_link">Account</a></li>
-			<li><a onclick="return confirm('Logout OK?');" soy:link="Login.Logout">Logout</a></li>
+			<li><a soy:link="Login.Logout">Logout</a></li>
 		</ul>
 	</div>
 </div>
@@ -30,8 +30,8 @@
 
 <script type="text/javascript">
 //大豆君消去
-Event.observe(window,"load",function(){
+$.event.add(window,"load",function(){
 	setTimeout(common_hide_soy_boy,800);
-	$("soy_logo").onmouseover = function(){common_show_soy_boy(true);};
+	$("#soy_logo").mouseover(function(){common_show_soy_boy(true);});
 });
 </script>

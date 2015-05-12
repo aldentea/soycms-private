@@ -57,6 +57,9 @@ class UpdateBlogConfigActionForm extends SOY2ActionForm{
 	var $monthDisplayCount;
 	var $categoryDisplayCount;
 	var $rssDisplayCount;
+	var $topEntrySort;
+	var $monthEntrySort;
+	var $categoryEntrySort;
 	var $generateTopFlag;
 	var $generateEntryFlag;
 	var $generateMonthFlag;
@@ -177,7 +180,24 @@ class UpdateBlogConfigActionForm extends SOY2ActionForm{
     function setRssDisplayCount($rssDisplayCount) {
     	$this->rssDisplayCount = $rssDisplayCount;
     }
-
+    function getTopEntrySort(){
+    	return $this->topEntrySort;
+    }
+    function setTopEntrySort($topEntrySort){
+    	$this->topEntrySort = $topEntrySort;
+    }
+    function getMonthEntrySort(){
+    	return $this->monthEntrySort;
+    }
+    function setMonthEntrySort($monthEntrySort){
+    	$this->monthEntrySort = $monthEntrySort;
+    }
+    function getCategoryEntrySort(){
+    	return $this->categoryEntrySort;
+    }
+    function setCategoryEntrySort($categoryEntrySort){
+    	$this->categoryEntrySort = $categoryEntrySort;
+    }
     function getGenerateTopFlag() {
     	return $this->generateTopFlag;
     }

@@ -738,6 +738,11 @@ class CMSBlogPage extends CMSPage{
 		//表示件数を指定
 		$logic->setLimit($this->page->getTopDisplayCount());
 		$logic->setOffset($this->offset * $this->limit);
+		
+		//表示順の変更
+		if($this->page->getTopEntrySort() == BlogPage::ENTRY_SORT_ASC){
+			$logic->setReverse(true);
+		}
 
 		$entries = $logic->getOpenEntryByLabelIds(array($this->page->getBlogLabelId()));
 		$this->total = $logic->getTotalCount();
@@ -788,6 +793,11 @@ class CMSBlogPage extends CMSPage{
 		$logic->setLimit($this->page->getCategoryDisplayCount());
 		$logic->setOffset($this->offset * $this->limit);
 
+		//表示順の変更
+		if($this->page->getCategoryEntrySort() == BlogPage::ENTRY_SORT_ASC){
+			$logic->setReverse(true);
+		}
+
 		//ブログ用のラベルIdも同時に指定して絞込み
 		if($label->getid() == $this->page->getBlogLabelId()){
 			$entries = $logic->getOpenEntryByLabelIds(array($label->getId()));
@@ -814,6 +824,11 @@ class CMSBlogPage extends CMSPage{
 		//表示件数を指定
 		$logic->setLimit($this->page->getMonthDisplayCount());
 		$logic->setOffset($this->offset * $this->limit);
+		
+		//表示順の変更
+		if($this->page->getMonthEntrySort() == BlogPage::ENTRY_SORT_ASC){
+			$logic->setReverse(true);
+		}
 
 		//指定がないなら今月
 		if(!$year){

@@ -12,21 +12,21 @@ class CustomFieldPluginAdvanced{
 
 	//カスタムフィールドの項目設定
 	var $customFields = array();
-	
+
 	//アドバンス用のカスタムフィールドの項目設定
 	private $advancedCustomFields = array();
-	
+
 	//アドバンス用のフィールドで高度な設定のラベル紐づけを考慮したフィールドリストを毎回取得しないようにするフラグ
 	private $prevLabelId;
 	private $prevFieldIds = array();
-	
+
 	//表示の高速化
 	private $acceleration = 0;
-		
+
 	private $dao;
 
 	private $displayLogic;
-	
+
 	//設定
 	var $displayTitle = 0;//「カスタムフィールド」を表示する
 	var $displayID = 0;//IDを表示する
@@ -40,23 +40,23 @@ class CustomFieldPluginAdvanced{
 			"mail" => "soycms@soycms.net",
 			"version"=>"1.2"
 		));
-		
+
 		//プラグイン アクティブ
 		if(CMSPlugin::activeCheck(CustomFieldPluginAdvanced::PLUGIN_ID)){
 			$this->dao = SOY2DAOFactory::create("cms.EntryAttributeDAO");
-			
+
 			//管理側
 			if(!defined("_SITE_ROOT_")){
-				
+
 				CMSPlugin::addPluginConfigPage(CustomFieldPluginAdvanced::PLUGIN_ID, array(
 					$this,"config_page"
 				));
-			
+
 				CMSPlugin::setEvent('onEntryUpdate', CustomFieldPluginAdvanced::PLUGIN_ID, array($this, "onEntryUpdate"));
 				CMSPlugin::setEvent('onEntryCreate', CustomFieldPluginAdvanced::PLUGIN_ID, array($this, "onEntryUpdate"));
 				CMSPlugin::setEvent('onEntryCopy', CustomFieldPluginAdvanced::PLUGIN_ID, array($this, "onEntryCopy"));
 				CMSPlugin::setEvent('onEntryRemove', CustomFieldPluginAdvanced::PLUGIN_ID, array($this, "onEntryRemove"));
-	
+
 				CMSPlugin::addCustomFieldFunction(CustomFieldPluginAdvanced::PLUGIN_ID, "Entry.Detail", array($this, "onCallCustomField"));
 				CMSPlugin::addCustomFieldFunction(CustomFieldPluginAdvanced::PLUGIN_ID, "Blog.Entry", array($this, "onCallCustomField_inBlog"));
 
@@ -69,15 +69,15 @@ class CustomFieldPluginAdvanced{
 			CMSPlugin::setEvent('onActive', CustomFieldPluginAdvanced::PLUGIN_ID, array($this, "createTable"));
 		}
 	}
-		
+
 	/**
 	 * onEntryOutput
 	 */
 	function display($arg){
-		
+
 		$entryId = $arg["entryId"];
 		$htmlObj = $arg["SOY2HTMLObject"];
-		
+
 		//高速化
 		if($this->acceleration == 1){
 			if(!$this->displayLogic) $this->displayLogic = SOY2Logic::createInstance("site_include.plugin.CustomFieldAdvanced.logic.DisplayLogic");
@@ -87,13 +87,13 @@ class CustomFieldPluginAdvanced{
 		}else{
 			$fields = $this->getCustomFields($entryId);
 			$customFields = $this->customFields;
-		}	
-		
+		}
+
 		foreach($fields as $field){
-			
+
 			//設定を取得
 			$master = (isset($customFields[$field->getId()])) ? $customFields[$field->getId()] : null;
-			
+
 			$class = "CMSLabel";
 			$attr = array(
 				"html"	   => $field->getValue(),
@@ -103,18 +103,23 @@ class CustomFieldPluginAdvanced{
 			//カスタムフィールドの設定が取れるときの動作（たとえば同じサイト内の場合）
 			if($master){
 				
+				//$attr["html"]に改めて値を入れ直す時に使用するフラグ
+				$resetFlag = true;
+
 				//タイプがリンクの場合はここで上書き
 				if($master->getType() == "link"){
 					$class = "HTMLLink";
 					$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
 					unset($attr["html"]);
+					$resetFlag = false;
 				//画像の場合
 				}else if($master->getType() == "image"){
 					$class = "HTMLImage";
 					$attr["src"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
 					unset($attr["html"]);
+					$resetFlag = false;
 				}
-				
+
 				//値が設定されていないなら初期値を使う
 				if(is_null($field->getValue())){
 					$field->setValue($master->getDefaultValue());
@@ -132,36 +137,28 @@ class CustomFieldPluginAdvanced{
 				}
 
 				//上で空の時の値が入るかも知れず、下でunsetされる可能性があるのでここで設定し直す。
-				$attr["html"] = $field->getValue();
+				if($resetFlag){
+					$attr["html"] = $field->getValue();
+				}
 
 				//属性に出力
 				if(strlen($master->getOutput()) > 0){
-					
+
 					//リンクタイプ以外でhrefを使う場合
-					if($master->getOutput() == "href" && $master->getType() != "type"){
+					if($master->getOutput() == "href" && $master->getType() != "link"){
 						$class = "HTMLLink";
 						$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
-					
+
 					//下方互換
 					}else if($master->getType() == "image" && $master->getOutput() == "src"){
 						//上で処理をしているため何もしない
-					
+
 					//その他
 					}else{
 						$class = "HTMLModel";
 						$attr[$master->getOutput()] = $field->getValue();
 					}
-					
-					//追加属性を出力
-					
-					if(strlen($master->getExtraOutputs()) > 0){
-						$extraOutputs = explode("\n", str_replace(array("\r\n", "\r"), "\n", $master->getExtraOutputs()));
-						$extraValues = $field->getExtraValues();
-						foreach($extraOutputs as $key => $extraOutput){
-							$extraOutput = trim($extraOutput);
-							$attr[$extraOutput] = is_array($extraValues) && isset($extraValues[$extraOutput]) ? $extraValues[$extraOutput] : "";
-						}
-					}
+
 					/*
 					if(strlen($master->getExtraOutputs()) > 0 && is_array($field->getExtraValues())){
 						foreach($field->getExtraValues() as $key => $value){
@@ -171,8 +168,20 @@ class CustomFieldPluginAdvanced{
 					*/
 					unset($attr["html"]);//HTMLModelなのでunsetしなくても出力されないはず
 				}
+				
+				//追加属性を出力
+				if(strlen($master->getExtraOutputs()) > 0){
+					$extraOutputs = explode("\n", str_replace(array("\r\n", "\r"), "\n", $master->getExtraOutputs()));
+					$extraValues = $field->getExtraValues();
+					foreach($extraOutputs as $key => $extraOutput){
+						$extraOutput = trim($extraOutput);
+						$attr[$extraOutput] = is_array($extraValues) && isset($extraValues[$extraOutput]) ? $extraValues[$extraOutput] : "";
+					}
+					
+					unset($attr["html"]);//HTMLModelなのでunsetしなくても出力されないはず
+				}
 			}
-			
+
 			$htmlObj->addModel($field->getId() . "_visible", array(
 				"soy2prefix" => "cms",
 				"visible" => (strlen($field->getValue()) > 0)
@@ -187,7 +196,7 @@ class CustomFieldPluginAdvanced{
 				"soy2prefix" => "cms",
 				"visible" => (strlen($field->getValue()) === 0)
 			));
-			
+
 			//SOY2HTMLのデフォルトの _visibleがあるので、$field->getId()."_visible"より後にこれをやらないと表示されなくなる
 			$htmlObj->createAdd($field->getId(), $class, $attr);
 		}
@@ -203,25 +212,25 @@ class CustomFieldPluginAdvanced{
 		$form->execute();
 		return $form->getObject();
 	}
-	
+
 	/**
 	 * 記事作成時、記事更新時
 	 */
 	function onEntryUpdate($arg){
 		 $dao = $this->dao;
-		
+
 		$entry = $arg["entry"];
 
 		$arg = SOY2PageController::getArguments();
 		$entryId = @$arg[0];
 		$postFields = @$_POST["custom_field"];
 		$extraFields = @$_POST["custom_field_extra"];
-		
+
 		foreach($this->customFields as $key => $field){
-			
+
 			$value = (isset($postFields[$key])) ? $postFields[$key] : "";
 			$extra = (isset($extraFields[$key]))? $extraFields[$key]: array();
-			
+
 			//更新の場合
 			try{
 				$obj = $dao->get($entry->getId(), $field->getId());
@@ -230,9 +239,9 @@ class CustomFieldPluginAdvanced{
 				$dao->update($obj);
 				continue;
 			}catch(Exception $e){
-				
+
 			}
-			
+
 			//新規作成の場合
 			try{
 				$obj = new EntryAttribute();
@@ -248,16 +257,16 @@ class CustomFieldPluginAdvanced{
 
 		return true;
 	}
-	
+
 	/**
 	 * 記事複製時
 	 */
 	function onEntryCopy($args){
 		list($old, $new) = $args;
 		$list = $this->getCustomFields($old);
-		
+
 		$dao = $this->dao;
-		
+
 		foreach($list as $custom){
 			try{
 				$obj = new EntryAttribute();
@@ -267,13 +276,13 @@ class CustomFieldPluginAdvanced{
 				$obj->setExtraValuesArray($custom->getExtraValues());
 				$dao->insert($obj);
 			}catch(Exception $e){
-				
+
 			}
 		}
 
 		return true;
 	}
-	
+
 	/**
 	 * 記事削除時
 	 * @param array $args エントリーID
@@ -284,14 +293,14 @@ class CustomFieldPluginAdvanced{
 			try{
 				$dao->deleteByEntryId($entryId);
 			}catch(Exception $e){
-				
+
 			}
 		}
-		
+
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * プラグイン管理画面 カスタムフィールドの削除
 	 */
@@ -376,7 +385,7 @@ class CustomFieldPluginAdvanced{
 		$this->customFields[$_field->getId()] = $_field;
 		CMSPlugin::savePluginConfig(CustomFieldPluginAdvanced::PLUGIN_ID, $this);
 	}
-	
+
 	/**
 	 * 記事投稿画面
 	 * @return string HTMLコード
@@ -387,7 +396,7 @@ class CustomFieldPluginAdvanced{
 		$entryId = (isset($arg[0])) ? (int)$arg[0] : null;
 		return $this->buildFormOnEntryPage($entryId);
 	}
-	
+
 	/**
 	 * ブログ記事 投稿画面
 	 * @return string HTMLコード
@@ -397,12 +406,12 @@ class CustomFieldPluginAdvanced{
 		$entryId = (isset($arg[1])) ? (int)$arg[1] : null;
 		return $this->buildFormOnEntryPage($entryId);
 	}
-	
+
 	function buildFormOnEntryPage($entryId){
 		$html = $this->getScripts();
 		$html .= '<div class="section custom_field">';
 		$db_arr = $this->getCustomFields($entryId);
-		
+
 		$db_values = array();
 		foreach($db_arr as $field){
 			$db_values[$field->getId()] = $field->getValue();
@@ -412,7 +421,7 @@ class CustomFieldPluginAdvanced{
 		foreach($db_arr as $field){
 			$db_extra_values[$field->getId()] = $field->getExtraValues();
 		}
-		
+
 		foreach($this->customFields as $fieldId => $fieldObj){
 			$html .= $fieldObj->getForm($this, @$db_values[$fieldId], @$db_extra_values[$fieldId]);
 		}
@@ -421,7 +430,7 @@ class CustomFieldPluginAdvanced{
 
 		return $html;
 	}
-	
+
 	/**
 	 * 記事投稿画面でのJavaScriptファイル
 	 * @return string
@@ -434,7 +443,7 @@ class CustomFieldPluginAdvanced{
 		$script = str_replace("#FILE_UPLOAD_LINK#", SOY2PageController::createLink("Page.Editor.FileUpload"), $script);
 		$script = str_replace("#PUBLIC_URL#", UserInfoUtil::getSiteURLBySiteId(""), $script);
 		$script = str_replace("#SITE_URL#", UserInfoUtil::getSiteURL(), $script);
-		
+
 		return $script;
 	}
 
@@ -444,9 +453,9 @@ class CustomFieldPluginAdvanced{
 	 * @return Array <CustomField>
 	 */
 	function getCustomFields($entryId, $labelIdWithBlock = null, $blogCategoryLabelList = array()){
-		
+
 		$dao = $this->dao;
-		
+
 		if(is_null($labelIdWithBlock)){
 			$customFields = $this->customFields;
 			try{
@@ -456,7 +465,7 @@ class CustomFieldPluginAdvanced{
 			}
 		}else{
 			$fieldIds = $this->prevFieldIds;
-			
+
 			if($labelIdWithBlock != $this->prevLabelId){
 				$fieldIds = array();
 				$customFields = $this->customFields;
@@ -465,12 +474,12 @@ class CustomFieldPluginAdvanced{
 
 					//ラベルと紐づけを行っているフィールドの場合、指定されているラベルのIDと一致していなかった場合は配列から除く
 					if($this->checkLabelConfigOnBlock($labelId, $labelIdWithBlock)){
-						
+
 						//ブログのカテゴリ設定分を確認する。存在している場合はcontinue
 						if(count($blogCategoryLabelList) > 0 && in_array($labelId, $blogCategoryLabelList)) continue;
-						
+
 						unset($customFields[$customField->getId()]);
-					
+
 					//検索対象として、fieldIdsに入れておく
 					}else{
 						$fieldIds[] = $customFields[$customField->getId()]->getId();
@@ -481,44 +490,44 @@ class CustomFieldPluginAdvanced{
 			}else{
 				$customFields = $this->advancedCustomFields;
 			}
-			
+
 			$entryAttributes = $dao->getByEntryIdCustom($entryId, $fieldIds);
 			$this->prevLabelId = $labelIdWithBlock;
 		}
-		
+
 		/*
 		 * 注意！
 		 * $this->customFieldsは連想配列（カスタムフィールドのID => カスタムフィールドのオブジェクト）
 		 * $db_arryはただの配列（連番 => カスタムフィールドのオブジェクト（IDと値だけが入っている、高度な設定などは空））
 		 */
-		
-		
+
+
 		//記事にないカスタムフィールドの設定内容を入れておく
 		//（HTMLListやカスタムフィールドを追加したときの既存の記事のため）
 		$list = array();
 		foreach($customFields as $fieldId => $fieldValue){
 			$added = new CustomField();
 			$added->setId($fieldId);
-			
+
 			//カスタムフィールドのデータがある場合
-			if(isset($entryAttributes[$fieldId]) 
+			if(isset($entryAttributes[$fieldId])
 			&& $entryAttributes[$fieldId] instanceof EntryAttribute){
 				//do nothing
 				$attr = $entryAttributes[$fieldId];
 				$added->setValue($attr->getValue());
 				$added->setExtraValues($attr->getExtraValuesArray());
 				$list[] = $added;
-			
+
 			//データがない場合。初回など。
 			}else{
 				$added->setValue($fieldValue->getDefaultValue());
 				$list[] = $added;
 			}
 		}
-		
+
 		return $list;
 	}
-	
+
 	/**
 	 * ブロックに紐づいたラベルIDと高度な設定で設定したラベルIDが同じでなければtrue
 	 */
@@ -542,7 +551,7 @@ class CustomFieldPluginAdvanced{
 			$this->deleteField($field->getId());
 		}
 	}
-	
+
 	/**
 	 * エクスポート
 	 */
@@ -563,7 +572,7 @@ class CustomFieldPluginAdvanced{
 
 		CMSPlugin::savePluginConfig(CustomFieldPluginAdvanced::PLUGIN_ID,$this);
 	}
-	
+
 	function getAcceleration(){
 		return $this->acceleration;
 	}
@@ -573,20 +582,20 @@ class CustomFieldPluginAdvanced{
 	 */
 	function createTable(){
 		$dao = new SOY2DAO();
-		
+
 		try{
 			$exist = $dao->executeQuery("SELECT * FROM EntryAttribute", array());
 			return;//テーブル作成済み
 		}catch(Exception $e){
 
 		}
-		
+
 		$file = file_get_contents(dirname(__FILE__) . "/sql/init_".SOYCMS_DB_TYPE.".sql");
 		$sqls = preg_split('/create/', $file, -1, PREG_SPLIT_NO_EMPTY) ;
-		
+
 		foreach($sqls as $sql){
 			$sql = trim("create" . $sql);
-			try{			
+			try{
 				$dao->executeUpdateQuery($sql, array());
 			}catch(Exception $e){
 				//
@@ -598,13 +607,13 @@ class CustomFieldPluginAdvanced{
 
 	public static function register(){
 		if(!class_exists("CustomField")){
-			include_once(dirname(__FILE__)."/entity.php");
+			include(dirname(__FILE__)."/entity.php");
 		}
-		
+
 		if(!class_exists("CustomFieldAdvancedPluginFormPage")){
-			include_once(dirname(__FILE__)."/form.php");
+			include(dirname(__FILE__)."/form.php");
 		}
-		
+
 		$obj = CMSPlugin::loadPluginConfig(CustomFieldPluginAdvanced::PLUGIN_ID);
 		if(is_null($obj)){
 			$obj = new CustomFieldPluginAdvanced();

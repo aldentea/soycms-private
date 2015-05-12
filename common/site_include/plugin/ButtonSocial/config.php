@@ -17,7 +17,9 @@
 				app_id：<input type="text" name="app_id" value="<?php echo htmlspecialchars($this->app_id,ENT_QUOTES); ?>" style="text-align:right;ime-mode:inactive;" />
 				admins：<input type="text" name="admins" value="<?php echo htmlspecialchars($this->admins,ENT_QUOTES); ?>" style="text-align:right;ime-mode:inactive;" /><br />
 				descripions：<input type="text" name="description" value="<?php echo htmlspecialchars($this->description,ENT_QUOTES); ?>" style="width:80%;" /><br />
-				サムネイルのパス：<input type="text" name="image" value="<?php echo htmlspecialchars($this->image,ENT_QUOTES); ?>" style="width:50%;" />
+				サムネイルのパス：<input type="text" name="image" value="<?php echo htmlspecialchars($this->image,ENT_QUOTES); ?>" style="width:50%;" /><br />
+				※サムネイル(og:image)を設定しなければ、og:imageタグは出力されません。<br />
+				※値を空にしてテンプレートにog:imageを直接記述することもできます。
 		</td>
 	</tr>
 	<tr>

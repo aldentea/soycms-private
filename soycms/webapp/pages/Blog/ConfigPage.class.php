@@ -152,8 +152,6 @@ class ConfigPage extends CMSWebPageBase{
 		));
 		
 		
-			
-		
 		
 		//ページ生成設定
 		$form->createAdd("top_page_uri_prefix","HTMLLabel",array(
@@ -222,6 +220,23 @@ class ConfigPage extends CMSWebPageBase{
 		$form->createAdd("rss_display_count","HTMLInput",array(
 			"value" => $page->getRssDisplayCount(),
 			"name"=>"rssDisplayCount"
+		));
+		
+		//表示順
+		$form->createAdd("top_entry_sort", "HTMLSelect", array(
+			"name" => "topEntrySort",
+			"options" => array("desc" => "降順", "asc" => "昇順"),
+			"selected" => $page->getTopEntrySort()
+		));
+		$form->createAdd("month_entry_sort", "HTMLSelect", array(
+			"name" => "monthEntrySort",
+			"options" => array("desc" => "降順", "asc" => "昇順"),
+			"selected" => $page->getMonthEntrySort()
+		));
+		$form->createAdd("category_entry_sort", "HTMLSelect", array(
+			"name" => "categoryEntrySort",
+			"options" => array("desc" => "降順", "asc" => "昇順"),
+			"selected" => $page->getCategoryEntrySort()
 		));
 		
 		//生成フラグ

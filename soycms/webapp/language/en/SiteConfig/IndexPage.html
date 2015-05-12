@@ -28,18 +28,29 @@
 						<td>
 							<input type="text" name="name" soy:id="name" class="siteconfig_text" value="hoge">
 						</td>					
-					<tr>
+					</tr>
 					<tr>			
 						<td class="caption">Description</td>
 						<td>
 							<textarea type="text" soy:id="description" soy:id="description">aaaaaaa</textarea>
 						</td>					
+					</tr>
 					<tr>			
 						<td class="caption">character Set</td>
 						<td>
 							<select name="charset" soy:id="charset"></select>
 						</td>
 					</tr>
+
+					<tr>
+						<td class="caption">Label</td>
+						<td>
+							<input type="hidden" name="useLabelCategory" value="0" />
+							<input soy:id="useLabelCategory" />
+						</td>
+					</tr>
+
+					<tr>
 						<td class="caption">File Upload Path</td>
 						<td>
 							<input type="text"  class="siteconfig_text" soy:id="uploadpath" />

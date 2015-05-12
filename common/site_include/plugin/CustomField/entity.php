@@ -32,7 +32,7 @@ class CustomField{
 
 	//どの属性値に出力するかの設定
 	private $output;
-	
+
 	//フィールドの説明文
 	private $description;
 
@@ -137,8 +137,7 @@ class CustomField{
 
 		$h_formName = htmlspecialchars($this->getFormName(),ENT_QUOTES,"UTF-8");
 		$h_formID = htmlspecialchars($this->getFormId(),ENT_QUOTES,"UTF-8");
-		
-		
+
 		$title = '<label for="'.$h_formID.'">'
 		         .( ($pluginObj->displayTitle) ? 'カスタムフィールド：' : '' )
 		         .htmlspecialchars($this->getLabel(),ENT_QUOTES,"UTF-8")
@@ -253,7 +252,7 @@ class CustomField{
 							' />';
 					}
 				}
-				
+
 				break;
 			case "link":
 				$h_value = htmlspecialchars($fieldValue,ENT_QUOTES,"UTF-8");

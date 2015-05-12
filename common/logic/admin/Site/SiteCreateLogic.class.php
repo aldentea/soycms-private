@@ -151,15 +151,23 @@ class SiteCreateLogic extends SOY2LogicBase{
 
 	/**
 	 * サイト設定の初期化
-	 *
+	 * @param String $siteName
+	 * @param int $encoding
 	 */
 	public function initSiteConfig($siteName,$encoding){
 
+		$siteConfig = new SiteConfig();
+		//ラベルの階層化を有効にする
+		$siteConfig->setUseLabelCategory(true);
+		$siteConfig->getSiteConfig();
+
 		$pdo = $this->getSitePDO();
-		$sql = "insert into SiteConfig(name,charset) values (:name,:encoding)";
+		$sql = "insert into SiteConfig(name,charset,siteConfig) values (:name,:encoding,:siteConfig)";
 		$stmt = $pdo->prepare($sql);
 		$stmt->bindParam(":name",$siteName);
 		$stmt->bindParam(":encoding",$encoding);
+		$stmt->bindParam(":siteConfig",$siteConfig->getSiteConfig());
+
 		$stmt->execute();
 
 	}

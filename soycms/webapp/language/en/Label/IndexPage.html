@@ -17,9 +17,10 @@
 				
 				<div style="margin-bottom:10px;">
 					<form soy:id="create_label" id="create_label">
-						<input id="create_label_caption" type="text" name="caption" size="60">
+						<input id="create_label_caption" type="text" name="caption" size="60" placeholder="input label name to create" soy:id="create_label_caption">
 						<input type="submit" value="Add new label" onclick="if(!this.form.caption.value)return false;">
 						<a soy:id="Label.BulkCreate">Bulk Create</a>
+						<img soy:message="HELP_LABEL_NAME_HINT"/>
 					</form soy:id="create_label">
 				</div>
 				<div soy:id="no_label_message"></div soy:id="no_label_message">

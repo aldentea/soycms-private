@@ -8,12 +8,12 @@ class UpdateAction extends SOY2Action{
     	$logic = SOY2Logic::createInstance("logic.site.SiteConfig.SiteConfigLogic");
     	try{
     		$logic->update($siteConfig);
-    		
+
     		$site = UserInfoUtil::getSite();
     		$site->setSiteName($siteConfig->getName());
     		UserInfoUtil::updateSite($site);
-    		
-    		
+
+
     	}catch(Exception $e){
     		return SOY2Action::FAILED;
     	}
@@ -29,7 +29,8 @@ class UpdateActionForm extends SOY2ActionForm{
 	var $defaultUploadDirectory;
 	var $createUploadDirectoryByDate;
 	var $isShowOnlyAdministrator;
-	
+	var $useLabelCategory;
+
 	function setName($name) {
 		$this->name = $name;
 	}
@@ -58,6 +59,13 @@ class UpdateActionForm extends SOY2ActionForm{
 	}
 	function setIsShowOnlyAdministrator($isShowOnlyAdministrator) {
 		$this->isShowOnlyAdministrator = $isShowOnlyAdministrator;
+	}
+
+	function getUseLabelCategory() {
+		return $this->useLabelCategory;
+	}
+	function setUseLabelCategory($useLabelCategory) {
+		$this->useLabelCategory = $useLabelCategory;
 	}
 }
 

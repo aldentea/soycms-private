@@ -33,18 +33,30 @@
 						<td>
 							<input type="text" name="name" soy:id="name" class="siteconfig_text" value="ほげ">
 						</td>					
-					<tr>
+					</tr>
 					<tr>			
 						<td class="caption">サイトの説明</td>
 						<td>
 							<textarea type="text" soy:id="description" soy:id="description">ああああああ</textarea>
 						</td>					
+					</tr>
 					<tr>			
 						<td class="caption">文字コード</td>
 						<td>
 							<select name="charset" soy:id="charset"></select>
 						</td>
 					</tr>
+
+					<tr>
+						<td class="caption">ラベル</td>
+						<td>
+							<input type="hidden" name="useLabelCategory" value="0" />
+							<input soy:id="useLabelCategory" />
+							<img soy:message="HELP_USE_LABEL_CATEGORY"/>
+						</td>
+					</tr>
+
+					<tr>			
 						<td class="caption">ファイルアップロード先<br />パス設定</td>
 						<td>
 							<input type="text"  class="siteconfig_text" soy:id="uploadpath" />
@@ -54,6 +66,7 @@
 							</div>
 						</td>
 					</tr>
+
 					<tr>
 						<td class="caption">閲覧制限</td>
 						<td>

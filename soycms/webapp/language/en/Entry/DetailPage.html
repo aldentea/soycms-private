@@ -65,8 +65,9 @@
 					</div>
 				</div>
 				
+				<!-- soy:id="label_categories" -->
 				<div class="section entry_label">
-					<p class="sub">Labels<img soy:message="HELP_ENTRY_LABEL"/></p>
+					<p class="sub"><!-- soy:id="category_name" /--><img soy:message="HELP_ENTRY_LABEL"/></p>
 					
 					<div id="labels">
 						<div id="labels_wrapper">
@@ -83,28 +84,20 @@
 						</div>
 					</div>				
 				</div>
+				<!-- /soy:id="label_categories" -->
 				
-				<script type="text/javascript">
-				if(is_ie){
-					$("entry_content_wrapper").style.position = "relative";
-					$("entry_content_wrapper").style.height = "0px";
-					$("entry_content_wrapper").style.width = "0px";
-					$("entry_more_wrapper").style.position = "relative";
-					$("entry_more_wrapper").style.height = "0px";
-					$("entry_more_wrapper").style.width = "0px";
-				}		
-				</script>
 				<!-- soy:custom="Entry.Detail" -->
 				<!-- /soy:custom="Entry.Detail" -->
 				<div class="section">
-					<div style="float:left;">
-					
-						<p class="sub">Created Date<img soy:message="HELP_ENTRY_CREATE_DATE"/></p>
-						
+					<div class="span-10">
+						<p class="sub">Date<img soy:message="HELP_ENTRY_CREATE_DATE"/></p>
 						<span soy:id="createdate_show" id="create_show"></span>
 						<button id="create_show_button" type="button" onclick="$('create_show').hide();$('create_input').show();$('create_show_button').hide();">Change</button>
-						
 						<input type="text" soy:id="createdate" id="create_input" style="display:none;" size="25">
+					</div>
+					<div class="span-11 last">
+						<p class="sub">Last Modified</p>
+						<span soy:id="updatedate_show"></span>
 					</div>
 					<div style="clear:both;"><!--  --></div>
 				</div>

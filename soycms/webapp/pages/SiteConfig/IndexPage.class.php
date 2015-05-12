@@ -1,13 +1,12 @@
 <?php
 
 class IndexPage extends CMSWebPageBase{
-	
+
 	function doPost() {
     	if(soy2_check_token()){
-			
+
 			//当サイトのファイルDBを更新
-			{	
-				
+			{
 				SOY2::import("util.CMSFileManager");
 
 				CMSFileManager::deleteAll();
@@ -20,7 +19,7 @@ class IndexPage extends CMSWebPageBase{
 					CMSFileManager::insertAll($site->getPath());
 				}
 			}
-				
+
 			$action = SOY2ActionFactory::createInstance("SiteConfig.UpdateAction");
 			$result = $action->run();
 			if($result->success()){
@@ -33,48 +32,57 @@ class IndexPage extends CMSWebPageBase{
     	}else{
 			$this->addErrorMessage("SITECONFIG_UPDATE_FAILED");
     	}
-		
+
 	}
-	
+
 	function IndexPage(){
 		WebPage::WebPage();
-		
+
 		$this->createAdd("index_form","HTMLForm",array(
 			"action"=>SOY2PageController::createLink("SiteConfig")
 		));
-		
+
 		$action = SOY2ActionFactory::createInstance("SiteConfig.DetailAction");
 		$result = $action->run();
 		$entity = $result->getAttribute("entity");
-		
+
 		$this->createAdd("name","HTMLInput",array("value"=>$entity->getName()));
 		$this->createAdd("description","HTMLTextArea",array("text"=>$entity->getDescription(),"name"=>"description"));
 		$this->createAdd("charset","HTMLSelect",array(
 			"selected"=>$entity->getCharset(),
 			"options"=>SiteConfig::getCharsetLists()
 		));
+
+		$this->createAdd("useLabelCategory","HTMLCheckBox",array(
+			"name" => "useLabelCategory",
+			"value" => 1,
+			"type" => "checkbox",
+			"selected" => $entity->useLabelCategory(),
+			"label" => $this->getMessage(SOYCMS_CONFIG_USE_LABEL_CATEGORY)
+		));
+
 		$this->createAdd("uploadpath","HTMLInput",array(
 			"name"=>"defaultUploadDirectory",
-			"value"=>$entity->getDefaultUploadDirectory()
+			"value"=>$entity->getDefaultUploadDirectory(),
 		));
-		
+
 		$this->createAdd("create_by_date","HTMLCheckBox",array(
 			"name" => "createUploadDirectoryByDate",
 			"value" => 1,
 			"type" => "checkbox",
 			"selected" => $entity->isCreateDefaultUploadDirectory(),
-			"label" => "日付毎にディレクトリを作成する"
+			"label" => $this->getMessage(SOYCMS_CONFIG_CREATE_UPLOAD_DIRECTORY_BY_DATE),
 		));
-		
+
 		$this->createAdd("isShowOnlyAdministrator","HTMLCheckBox",array(
 			"name" => "isShowOnlyAdministrator",
 			"value" => 1,
 			"type" => "checkbox",
 			"selected" => $entity->isShowOnlyAdministrator(),
-			"label" => "管理側にログインしている時のみ表示"
+			"label" => $this->getMessage(SOYCMS_CONFIG_SHOW_ONLY_ADMINISTRATOR),
 		));
 	}
-	
+
 	/**
 	 * サイト一覧
 	 */

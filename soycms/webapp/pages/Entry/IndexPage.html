@@ -70,71 +70,79 @@
 			<hr class="span-22" style="margin-left:40px;" />
 			
 			<div class="prepend-1 span-22 last">
-				<h6 id="toggle_label_list_opened" class="span-10 last" onclick="return toggle_label_list(this);" style="text-decoration:underline;cursor:pointer;">ラベルで絞り込み [-]</h4>
-				<h6 id="toggle_label_list_closed" class="span-10 last" onclick="return toggle_label_list(this);" style="display:none;margin-bottom:11px;text-decoration:underline;cursor:pointer;">ラベルで絞り込み [+]</h4>
+				<h5 id="toggle_label_list_opened" class="toggle_list toggle_list_opened span-22 last" onclick="return toggle_label_list(this, 'label_list');">ラベルで絞り込み [-]</h5>
+				<h5 id="toggle_label_list_closed" class="toggle_list toggle_list_closed span-22 last" onclick="return toggle_label_list(this, 'label_list');">ラベルで絞り込み [+]</h5>
 			</div>
 					
-			<div id="label_list" class="prepend-1 span-22 last">
-				<!-- soy:id="label_list" -->
-				<div class="label_table span-6">
-					
-					<div class="icon span-6 last">
-						<a soy:id="detail_link_01">
-							<img soy:id="label_icon" soy:src="./image/labelicon/default.gif" height="64" width="64" />
-							<h6 soy:id="label_name">ラベルA</h6>
-						</a>
-						<br/>
-						<a soy:id="create_link" href="#">新規作成</a>
+			<div id="label_list" class="prepend-2 span-22 last">
+				<!-- soy:id="label_categories" -->
+				<h6 soy:id="toggle_opened" id="toggle_label_list_opened" class="toggle_list toggle_list_opened span-22 last" onclick="return toggle_label_list(this, 'label_list');"><!-- soy:id="label_category_name" /--> [-]</h6>
+				<h6 soy:id="toggle_closed" id="toggle_label_list_closed" class="toggle_list toggle_list_closed span-22 last" onclick="return toggle_label_list(this, 'label_list');"><!-- soy:id="label_category_name" /--> [+]</h6>
+				<div soy:id="toggle_target" class="prepend-1 span-22 last">
+					<!-- soy:id="label_list" -->
+					<div class="label_table span-5">
+						<div class="icon span-5 last">
+							<a soy:id="detail_link_01">
+								<img soy:id="label_icon" soy:src="./image/labelicon/default.gif" height="64" width="64" />
+								<h6 soy:id="label_name">ラベルA</h6>
+							</a>
+							<br/>
+							<a soy:id="create_link" href="#">新規作成</a>
+						</div>
+							
+						<div class="info span-6 last">
+							<p soy:id="label_description">ラベルのメモが入ります。</p>
+						</div>
 					</div>
-						
-					<div class="info span-6 last">
-						<p soy:id="label_description">ラベルのメモが入ります。</p>
-					</div>
-					
-				</div>
-				<!-- /soy:id="label_list" -->
+					<!-- /soy:id="label_list" -->
+				</div soy:id="toggle_target">
+				<!-- /soy:id="label_categories" -->
 			</div>
 			
 			<script type="text/javascript">
 			<!--
-				//クッキーからlabellistの状態取得
-				var regexp = new RegExp('; label_list=(.*?);');
-				var match  = ('; ' + document.cookie + ';').match(regexp);
-				var is_opened = (match) ? match[1] : 1;
-				if(is_opened != 1){
-					$("#toggle_label_list_opened").hide();
-					$("#toggle_label_list_closed").show();
-					$("#label_list").hide();
-				}
-				
-				function toggle_label_list(ele){
-					if(ele.getAttribute("id") == "toggle_label_list_opened"){
-						$("#toggle_label_list_opened").hide();
-						$("#toggle_label_list_closed").show();
-						$("#label_list").hide();
-						
+				function toggle_label_list(ele, target_id){
+					if($(ele).attr("id") == "toggle_"+target_id+"_opened"){
+						$("#toggle_"+target_id+"_opened").hide();
+						$("#toggle_"+target_id+"_closed").css("display", "inline");
+						$("#toggle_"+target_id+"_closed").css("margin-right", "1em");
+						$("#"+target_id).hide();
 						is_opened = 0;
 					}else{
-						$("#toggle_label_list_opened").show();
-						$("#toggle_label_list_closed").hide();
-						$("#label_list").show();
-						
+						$("#toggle_"+target_id+"_opened").show();
+						$("#toggle_"+target_id+"_closed").hide();
+						$("#"+target_id).show();
 						is_opened = 1;
 					}
 					
-					document.cookie = 'label_list=' + is_opened + "; expires=" + new Date(2030, 1).toUTCString();
+					document.cookie = 'label_list_'+target_id+'=' + is_opened + "; expires=" + new Date(2030, 1).toUTCString();
 					
 					return false;
 				}
+				//クッキーからlabellistの状態取得
+				$(function(){
+					var regexp = new RegExp(' label_list_[^=]+?=[^;]+?;','g');
+					var match  = (' ' + document.cookie + ';').match(regexp);
+					regexp = new RegExp('label_list_([^=]+?)=([^;]+?);');
+					match.forEach(function(e){
+						var match2  = e.match(regexp);
+						var target_id = match2[1];
+						var is_opened = (match2) ? match2[2] : 1;
+						if(is_opened != 1){
+							toggle_label_list($("#toggle_"+target_id+"_opened"), target_id);
+						}
+					});
+				});
 			//-->
 			</script>
 			
 			<hr class="span-22" style="margin-left:40px;">
 			
 			<div class="prepend-1 span-22 last">
-				<div class="span-22 last">
-					<h6>公開状態で絞込み</h6>
-				</div>
+				<h5 id="toggle_status_list_opened" class="toggle_list toggle_list_opened span-22 last" onclick="return toggle_label_list(this, 'status_list');">公開状態で絞込み [-]</h5>
+				<h5 id="toggle_status_list_closed" class="toggle_list toggle_list_closed span-22 last" onclick="return toggle_label_list(this, 'status_list');">公開状態で絞込み [+]</h5>
+			</div>
+			<div id="status_list" class="prepend-2 span-22 last">
 				<div class="label_table span-6">
 					<div class="icon span-6"" style="text-align:left;height:64px;">
 						<a href="#" soy:link="Entry.List.Closed">

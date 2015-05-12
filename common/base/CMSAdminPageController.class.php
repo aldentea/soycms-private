@@ -6,11 +6,18 @@ class CMSAdminPageController extends SOY2PageController{
 		 * ページがなかったらr=[REQUEST_URI]としてルートに転送
 		 * 非ログイン時にログインしていないと見られないURIへアクセスしようとしているのを想定している
 		 */
+
+		//デフォルトパスの場合はすでにルートにアクセスしているので転送しない（無限リダイレクト回避）
+		if($this->getRequestPath() == "Index"){
+			parent::onNotFound();
+		}
+
 		if(strpos($_SERVER["REQUEST_URI"],"Logout")===false){
 			$redirectParam = "?r=".rawurlencode(self::createRelativeLink($_SERVER["REQUEST_URI"]));
 		}else{
 			$redirectParam = "";
 		}
+
 		self::redirect("./".$redirectParam);
 		exit;
 	}

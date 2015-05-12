@@ -11,10 +11,14 @@ class SiteConfig {
     private $charset;
     private $description;
 
+	/**
+	 * 設定の入った配列がserializeされた文字列を返す
+	 */
     function getSiteConfig(){
     	return $this->siteConfig;
     }
     function setSiteConfig($config){
+    	//$this->siteConfigには常にserializeされた文字列が入る
     	if(is_string($config)){
     		$this->siteConfig = $config;
     	}else{
@@ -40,83 +44,106 @@ class SiteConfig {
     	$this->description = $description;
     }
 
+    /**
+     * 設定の配列を返す
+     */
+    public function getSiteConfigArray(){
+    	if(strlen($this->siteConfig) && strpos($this->siteConfig, "a:") === 0 && ( $config = unserialize($this->siteConfig) ) !== false){
+    		return $config;
+    	}else{
+    		return array();
+    	}
+    }
+    /**
+     * 設定値を返す
+     */
+    public function getConfigValue($key){
+    	$config = $this->getSiteConfigArray();
+    	if(is_array($config) && isset($config[$key])){
+    		return $config[$key];
+    	}else{
+    		//値が見つからないとき
+    		return false;
+    	}
+    }
+    /**
+     * 設定値を保持する
+     */
+    public function setConfigValue($key, $value){
+    	$config = $this->getSiteConfigArray();
+    	$config[$key] = $value;
+    	$this->setSiteConfig($config);
+    }
+
    	/**
    	 * 最終更新時刻を設定
    	 */
     function notifyUpdate(){
-    	$config = (is_string($this->siteConfig)) ? unserialize($this->siteConfig) : array();
-    	$config["udate"] = time();
-
-    	$this->setSiteConfig($config);
+    	$this->setConfigValue("udate", time());
     }
 
     /**
      * 最終更新時刻を取得
      */
     function getLastUpdateDate(){
-    	$config = @unserialize($this->getSiteConfig());
-    	if(is_array($config)){
-    		return (isset($config["udate"])) ? $config["udate"] : null;
+    	$udate = $this->getConfigValue("udate");
+    	if($udate !== false){
+    		return $udate;
+    	}else{
+    		return strtotime(date("Y-m-d 00:00:00"));
     	}
-
-    	return strtotime(date("Y-m-d 00:00:00"));
     }
 
     /**
      * 日付毎にディレクトリを作成するかどうか
      */
     function isCreateDefaultUploadDirectory(){
-    	$config = @unserialize($this->getSiteConfig());
-    	if(is_array($config)){
-    		return (isset($config["createUploadDirectoryByDate"])) ? (boolean)$config["createUploadDirectoryByDate"] : false;
-    	}
-
-    	return false;
+    	return (boolean)$this->getConfigValue("createUploadDirectoryByDate");
     }
 
     /**
      * 日付毎にディレクトリを作成するかどうかのフラグを保存
      */
     function setCreateUploadDirectoryByDate($value){
-    	$config = (is_string($this->siteConfig)) ? unserialize($this->siteConfig) : array();
-    	$config["createUploadDirectoryByDate"] = (int)$value;
-
-    	$this->setSiteConfig($config);
+    	$this->setConfigValue("createUploadDirectoryByDate", (int)$value);
     }
 
     /**
      * 管理側にログインしている時のみ表示するかどうか
      */
     function isShowOnlyAdministrator(){
-    	$config = @unserialize($this->getSiteConfig());
-    	if(is_array($config)){
-    		return (isset($config["isShowOnlyAdministrator"])) ? (boolean)$config["isShowOnlyAdministrator"] : false;
-    	}
-
-    	return false;
+    	return (boolean)$this->getConfigValue("isShowOnlyAdministrator");
     }
 
     /**
      * 日付毎にディレクトリを作成するかどうかのフラグを保存
      */
     function setIsShowOnlyAdministrator($value){
-    	$config = (is_string($this->siteConfig)) ? unserialize($this->siteConfig) : array();
-    	$config["isShowOnlyAdministrator"] = (int)$value;
-
-    	$this->setSiteConfig($config);
+    	$this->setConfigValue("isShowOnlyAdministrator", (int)$value);
     }
 
     function getDefaultUploadDirectory(){
-    	$array = is_array($this->getSiteConfig()) ? $this->getSiteConfig() : unserialize($this->getSiteConfig());
-    	$dir =  isset($array["upload_directory"]) ? $array["upload_directory"] : "/files";
+    	$dir = $this->getConfigValue("upload_directory");
+    	if($dir === false){
+    		return "/files";
+    	}
 
+    	// ディレクトリの遡行は許されない
     	$dir = str_replace("..","",$dir);
+
+    	// /始まりを強制
     	if($dir[0] != '/'){
     		$dir = '/'.$dir;
     	}
 
+    	// 末尾の/は全て削除
     	while(substr($dir,-1) == '/'){
-	    	$dir = substr($dir,0,-1);
+    		$dir = substr($dir,0,-1);
+    	}
+
+    	// /の連続は削除
+    	while(strpos($dir, "//") !== false){
+    		$dir = strtr($dir, array("//" => "/"));
     	}
 
     	return $dir;
@@ -163,9 +190,10 @@ class SiteConfig {
     }
 
     function setDefaultUploadDirectory($dir){
-    	$array = is_array($this->getSiteConfig()) ? $this->getSiteConfig() : unserialize($this->getSiteConfig());
-    	$array["upload_directory"] = $dir;
-    	$this->setSiteConfig($array);
+    	$this->setConfigValue("upload_directory", $dir);
+
+    	//正規化
+    	$this->setConfigValue("upload_directory", $this->getDefaultUploadDirectory());
     }
 
     /**
@@ -230,6 +258,19 @@ class SiteConfig {
     		SiteConfig::CHARSET_SHIFT_JIS => "Shift_JIS",
     		SiteConfig::CHARSET_EUC_JP    => "EUC-JP"
     	);
+    }
+
+    /**
+     * 日付毎にディレクトリを作成するかどうか
+     */
+    public function useLabelCategory(){
+    	return (boolean)$this->getConfigValue("useLabelCategory");
+    }
+    /**
+     * 日付毎にディレクトリを作成するかどうかのフラグを保存
+     */
+    public function setUseLabelCategory($value){
+    	$this->setConfigValue("useLabelCategory", (int)$value);
     }
 
 }

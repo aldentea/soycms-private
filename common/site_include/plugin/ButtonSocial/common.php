@@ -7,9 +7,22 @@
  */
  SOY2::import("util.UserInfoUtil");
 class ButtonSocialCommon{
-	function getOgMeta($obj,$description=null,$image=null){
+	
+	private $pluginObj;
+	private $fieldObj;
+	
+	function getOgMeta($obj, $description = null, $image = null, $entryId = null){
 		$siteConfig = $obj->siteConfig;
 
+		if(!$this->fieldObj){
+			$this->fieldObj = (isset($entryId)) ? $this->pluginObj->getOgImageObject($entryId) : new EntryAttribute();
+		}
+		
+		if(isset($this->fieldObj) && strlen($this->fieldObj->getValue()) > 0){
+			$http = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "https" : "http";
+			$image = $http . "://" . $_SERVER ["HTTP_HOST"]. "/" . $this->fieldObj->getValue();
+		}
+		
 		$html = array();
 
 		$html[] = "<meta property=\"og:title\" content=\"".$this->getTitle($obj)."\" />";
@@ -316,6 +329,10 @@ class ButtonSocialCommon{
 
 		return $entry;
 
+	}
+	
+	function setPluginObj($pluginObj){
+		$this->pluginObj = $pluginObj;
 	}
 }
 ?>

@@ -474,6 +474,23 @@ class SiteLabeledBlockComponent_ViewPage extends HTMLList{
 			"visible"=>(strlen($entity->getMore()) != 0)
 		));
 
+		//1.7.5~
+		$this->createAdd("update_date","DateLabel",array(
+			"text"=>$entity->getUdate(),
+			"soy2prefix"=>"cms",
+		));
+
+		$this->createAdd("update_time","DateLabel",array(
+			"text"=>$entity->getUdate(),
+			"soy2prefix"=>"cms",
+			"defaultFormat"=>"H:i"
+		));
+
+		$this->createAdd("entry_url","HTMLLabel",array(
+			"text"=>$entryUrl,
+			"soy2prefix"=>"cms",
+		));
+
 		CMSPlugin::callEventFunc('onEntryOutput',array("entryId"=>$entity->getId(),"SOY2HTMLObject"=>$this,"entry"=>$entity));
 	}
 

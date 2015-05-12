@@ -11,6 +11,9 @@ class BlogPage extends Page{
 	const TEMPLATE_ENTRY = "entry";
 	const TEMPLATE_POPUP = "popup";
 	
+	const ENTRY_SORT_DESC = "desc";
+	const ENTRY_SORT_ASC = "asc";
+	
 	//トップページのURL
 	private $topPageUri = "";
 	
@@ -34,6 +37,15 @@ class BlogPage extends Page{
 	
 	//カテゴリ別ページの表示件数
 	private $categoryDisplayCount = 10;
+	
+	//トップページの表示順
+	private $topEntrySort = "desc";
+	
+	//月別ページの表示順
+	private $monthEntrySort = "desc";
+	
+	//カテゴリ別ページの表示順
+	private $categoryEntrySort = "desc";
 	
 	//RSSの表示件数
 	private $rssDisplayCount = 10;
@@ -192,6 +204,10 @@ class BlogPage extends Page{
 		$obj->categoryDisplayCount = $this->categoryDisplayCount;
 		$obj->rssDisplayCount = $this->rssDisplayCount;
 		
+		$obj->topEntrySort = $this->topEntrySort;
+		$obj->monthEntrySort = $this->monthEntrySort;
+		$obj->categoryEntrySort = $this->categoryEntrySort;
+		
 		$obj->generateTopFlag = $this->generateTopFlag;
 		$obj->generateMonthFlag = $this->generateMonthFlag;
 		$obj->generateCategoryFlag = $this->generateCategoryFlag;
@@ -302,6 +318,25 @@ class BlogPage extends Page{
      }
      function setRssDisplayCount($rssDisplayCount) {
      	$this->rssDisplayCount = (int)$rssDisplayCount;
+     }
+     
+     function getTopEntrySort(){
+     	return $this->topEntrySort;
+     }
+     function setTopEntrySort($topEntrySort){
+     	$this->topEntrySort = $topEntrySort;
+     }
+     function getMonthEntrySort(){
+     	return $this->monthEntrySort;
+     }
+     function setMonthEntrySort($monthEntrySort){
+     	$this->monthEntrySort = $monthEntrySort;
+     }
+     function getCategoryEntrySort(){
+     	return $this->categoryEntrySort;
+     }
+     function setCategoryEntrySort($categoryEntrySort){
+     	$this->categoryEntrySort = $categoryEntrySort;
      }
 
      function getGenerateTopFlag() {

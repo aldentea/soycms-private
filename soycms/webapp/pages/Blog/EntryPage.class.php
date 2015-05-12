@@ -208,6 +208,10 @@ class EntryPage extends CMSEntryEditorPageBase{
     		"text" => date('Y-m-d H:i:s',$entry->getCdate())
     	));
 
+    	$this->createAdd("updatedate_show","HTMLLabel",array(
+    		"text" => strlen($entry->getUdate()) ? date('Y-m-d H:i:s',$entry->getUdate()) : "-",
+    	));
+
 
     	$this->createAdd("description","HTMLInput",array(
     		"value"=>$entry->getDescription()

@@ -18,23 +18,23 @@ $isExtLink = true;
 
 //ログインしている場合
 if($isLoggined === true){
-	
+
 	//ディフォルトユーザの場合はクッキーの情報を見る
 	if(UserInfoUtil::isDefaultUser()){
 		//$isExtModeの値はそのまま
-		
+
 	//ディフォルトユーザ以外の場合
 	}else{
 		//siteroleに一つでも公開権限のない記事管理者権限があった場合は必ずextmode。それ以外はクッキーの情報を見る
 		$userId = UserInfoUtil::getUserId();
 		$siteRoleDao = SOY2DAOFactory::create("admin.SiteRoleDAO");
-		
+
 		try{
 			$roles = $siteRoleDao->getByUserId($userId);
 		}catch(Exception $e){
 			$roles = array();
 		}
-		
+
 		if(count($roles) > 0){
 			foreach($roles as $role){
 				//記事管理者の権限が一つでも存在していた場合は常にextmode
@@ -50,7 +50,7 @@ if($isLoggined === true){
 			$isExtLink = false;
 		}
 	}
-	
+
 }else{
 	$isExtMode = 1;
 	$isExtLink = false;
@@ -59,11 +59,24 @@ if($isLoggined === true){
 //$isExtMode=0;
 
 if($isExtMode){
+
+	if(strlen(EXT_MODE_DERECTORY_NAME) && is_dir(dirname(__FILE__) . "/" . EXT_MODE_DERECTORY_NAME)){
+		//OK
+	}else{
+		//ディレクトリが無効
+		header("HTTP/1.1 404 Not Found");
+		header("Content-Type: text/html; charset=utf-8");
+		echo "<h1>404 Not Found</h1><hr>指定されたディレクトリが存在しません。";
+		exit;
+	}
+
 	if($isLoggined === true){
 		SOY2HTMLConfig::PageDir(dirname(__FILE__) . "/" . EXT_MODE_DERECTORY_NAME . "/");
 	}else{
 		SOY2HTMLConfig::PageDir(dirname(__FILE__) . "/" . EXT_MODE_DERECTORY_NAME . "/Login/");
 	}
+
+	//HTMLファイルから.class.phpを自動で作成する
 	define("SOY2HTML_AUTO_GENERATE", true);
 
 	/**
@@ -81,7 +94,7 @@ if($isExtMode){
 //		"type" => "text/css",
 //		"href" => SOY2PageController::createRelativeLink("./css/ext.css")."?".SOYCMS_BUILD_TIME
 //	));
-	
+
 	if(!isset($_GET["updated"])){
 		DisplayPlugin::hide("updated");
 	}
@@ -91,11 +104,11 @@ if($isExtMode){
 }
 
 /**
- * extmodeのリンクを表示させるか？
+ * extmodeのリンクを表示さするか
  * <a href="?ext_mode" soy:display="ext_mode_link">画面切り替え</a>
  */
 if($isExtLink === true){
-	//表示させる
+	//表示する
 }else{
 	DisplayPlugin::hide("ext_mode_link");
 }
