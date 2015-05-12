@@ -10,7 +10,8 @@ class CustomField{
 		"select" => "セレクトボックス",
 		"image" => "画像",
 		"file" => "ファイル",
-		"richtext" => "リッチテキスト"
+		"richtext" => "リッチテキスト",
+		"link" => "リンク"
 	);
 
 	private $id;
@@ -242,6 +243,17 @@ class CustomField{
 					}
 				}
 				
+				break;
+			case "link":
+				$h_value = htmlspecialchars($fieldValue,ENT_QUOTES,"UTF-8");
+				$body = '<input type="text" class="custom_field_input" style="width:70%"'
+				       .' id="'.$h_formID.'"'
+				       .' name="'.$h_formName.'"'
+				       .' value="'.$h_value.'"'
+				       .' />';
+				if(strlen($h_value)){
+					$body .= "&nbsp;<a href=\"" . $h_value . "\" target=\"_blank\">確認</a>";
+				}
 				break;
 			case "input":
 			default:

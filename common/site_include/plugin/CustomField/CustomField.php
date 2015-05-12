@@ -11,37 +11,36 @@ class CustomFieldPlugin{
 
 
 	function init(){
-		CMSPlugin::addPluginMenu(CustomFieldPlugin::PLUGIN_ID,array(
+		CMSPlugin::addPluginMenu(CustomFieldPlugin::PLUGIN_ID, array(
 			"name"=>"カスタムフィールド",
 			"description"=>"エントリーにカスタムフィールドを追加します。",
 			"author"=>"日本情報化農業研究所",
 			"url"=>"http://www.n-i-agroinformatics.com/",
 			"mail"=>"soycms@soycms.net",
-			"version"=>"1.6"
+			"version"=>"1.7"
 		));
 
-		CMSPlugin::addPluginConfigPage(CustomFieldPlugin::PLUGIN_ID,array(
-			$this,"config_page"
+		CMSPlugin::addPluginConfigPage(CustomFieldPlugin::PLUGIN_ID, array(
+			$this, "config_page"
 		));
 
 		if(CMSPlugin::activeCheck(CustomFieldPlugin::PLUGIN_ID)){
 
-			CMSPlugin::setEvent('onEntryUpdate',CustomFieldPlugin::PLUGIN_ID,array($this,"onEntryUpdate"));
-			CMSPlugin::setEvent('onEntryCreate',CustomFieldPlugin::PLUGIN_ID,array($this,"onEntryUpdate"));
-			CMSPlugin::setEvent('onEntryCopy',CustomFieldPlugin::PLUGIN_ID,array($this,"onEntryCopy"));
+			CMSPlugin::setEvent('onEntryUpdate', CustomFieldPlugin::PLUGIN_ID, array($this, "onEntryUpdate"));
+			CMSPlugin::setEvent('onEntryCreate', CustomFieldPlugin::PLUGIN_ID, array($this, "onEntryUpdate"));
+			CMSPlugin::setEvent('onEntryCopy', CustomFieldPlugin::PLUGIN_ID, array($this, "onEntryCopy"));
 
-			CMSPlugin::addCustomFieldFunction(CustomFieldPlugin::PLUGIN_ID,"Entry.Detail",array($this,"onCallCustomField"));
-			CMSPlugin::addCustomFieldFunction(CustomFieldPlugin::PLUGIN_ID,"Blog.Entry",array($this,"onCallCustomField_inBlog"));
+			CMSPlugin::addCustomFieldFunction(CustomFieldPlugin::PLUGIN_ID, "Entry.Detail", array($this, "onCallCustomField"));
+			CMSPlugin::addCustomFieldFunction(CustomFieldPlugin::PLUGIN_ID, "Blog.Entry", array($this, "onCallCustomField_inBlog"));
 
-			CMSPlugin::setEvent('onEntryOutput',CustomFieldPlugin::PLUGIN_ID,array($this,"display"));
+			CMSPlugin::setEvent('onEntryOutput', CustomFieldPlugin::PLUGIN_ID, array($this, "display"));
 		}else{
-			CMSPlugin::setEvent('onActive',CustomFieldPlugin::PLUGIN_ID,array($this,"createTable"));
+			CMSPlugin::setEvent('onActive', CustomFieldPlugin::PLUGIN_ID, array($this, "createTable"));
 		}
-
 	}
 
 	function display($arg){
-
+		
 		$entryId = $arg["entryId"];
 		$htmlObj = $arg["SOY2HTMLObject"];
 
@@ -57,9 +56,16 @@ class CustomFieldPlugin{
 				"html"       => $field->getValue(),
 				"soy2prefix" => "cms",
 			);
-
+			
 			//カスタムフィールドの設定が取れるときの動作（たとえば同じサイト内の場合）
 			if($master){
+				
+				//タイプがリンクの場合はここで上書き
+				if($master->getType() == "link"){
+					$class = "HTMLLink";
+					$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
+					unset($attr["html"]);
+				}
 
 				//値が設定されていないなら初期値を使う
 				if(is_null($field->getValue())){
@@ -81,9 +87,16 @@ class CustomFieldPlugin{
 				$attr["html"] = $field->getValue();
 
 				//属性に出力
-				if(strlen($master->getOutput())>0){
-					$class = "HTMLModel";
-					$attr[$master->getOutput()] = $field->getValue();
+				if(strlen($master->getOutput()) > 0){
+					
+					//リンクタイプ以外でhrefを使う場合
+					if($master->getOutput() == "href" && $master->getType() != "type"){
+						$class = "HTMLLink";
+						$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
+					}else{
+						$class = "HTMLModel";
+						$attr[$master->getOutput()] = $field->getValue();
+					}
 					
 					//追加属性を出力
 					
@@ -106,27 +119,26 @@ class CustomFieldPlugin{
 				}
 			}
 
-			$htmlObj->createAdd($field->getId()."_visible","HTMLModel",array(
+			$htmlObj->addModel($field->getId() . "_visible", array(
 				"soy2prefix" => "cms",
-				"visible" => (strlen($field->getValue())>0)
+				"visible" => (strlen($field->getValue()) > 0)
 			));
 
-			$htmlObj->createAdd($field->getId()."_is_not_empty","HTMLModel",array(
+			$htmlObj->addModel($field->getId() . "_is_not_empty", array(
 				"soy2prefix" => "cms",
-				"visible" => (strlen($field->getValue())>0)
+				"visible" => (strlen($field->getValue()) > 0)
 			));
 
-			$htmlObj->createAdd($field->getId()."_is_empty","HTMLModel",array(
+			$htmlObj->addModel($field->getId() . "_is_empty", array(
 				"soy2prefix" => "cms",
-				"visible" => (strlen($field->getValue())==0)
+				"visible" => (strlen($field->getValue()) === 0)
 			));
-
+			
 			//SOY2HTMLのデフォルトの _visibleがあるので、$field->getId()."_visible"より後にこれをやらないと表示されなくなる
-			$htmlObj->createAdd($field->getId(),$class,$attr);
+			$htmlObj->createAdd($field->getId(), $class, $attr);
 		}
 
 	}
-
 
 	function config_page($message){
 		//$this->importFields();
@@ -140,9 +152,9 @@ class CustomFieldPlugin{
 		$entry = $arg["entry"];
 
 		$arg = SOY2PageController::getArguments();
-		$entryId = @$arg[0];
-		$postFields = @$_POST["custom_field"];
-		$extraFields = @$_POST["custom_field_extra"];
+		$entryId = (isset($arg[0])) ? (int)$arg[0] : null;
+		$postFields = (isset($_POST["custom_field"])) ? $_POST["custom_field"] : null;
+		$extraFields = (isset($_POST["custom_field_extra"])) ? $_POST["custom_field_extra"] : null;
 
 		//各エントリーに保存する時はIDとValueのみ保存するように変更
 		$saveCustomFields = array();
@@ -193,7 +205,7 @@ class CustomFieldPlugin{
 	}
 
 	function onEntryCopy($args){
-		list($old,$new) = $args;
+		list($old, $new) = $args;
 
 		try{
 			$fields = $this->getCustomFields($old);
@@ -224,11 +236,11 @@ class CustomFieldPlugin{
 	 *
 	 * ラベルと種別のみ更新
 	 */
-	function update($id,$value,$type){
+	function update($id, $value, $type){
 		if(isset($this->customFields[$id])){
 			$this->customFields[$id]->setLabel($value);
 			$this->customFields[$id]->setType($type);
-			CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID,$this);
+			CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID, $this);
 		}
 	}
 
@@ -237,20 +249,20 @@ class CustomFieldPlugin{
 	 */
 	function updateAdvance($id,$obj){
 		if(isset($this->customFields[$id])){
-			SOY2::cast($this->customFields[$id],$obj);
-			CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID,$this);
+			SOY2::cast($this->customFields[$id], $obj);
+			CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID, $this);
 		}
 	}
 
 	/**
 	 * 移動
 	 */
-	function moveField($id,$diff){
+	function moveField($id, $diff){
 		if(isset($this->customFields[$id])){
 
 			$keys = array_keys($this->customFields);
-			$currentKey = array_search($id,$keys);
-			$swap = ($diff > 0) ? $currentKey+1 :$currentKey-1;
+			$currentKey = array_search($id, $keys);
+			$swap = ($diff > 0) ? $currentKey + 1 :$currentKey - 1;
 
 			if($swap >= 0 && $swap < count($keys)){
 				$tmp = $keys[$currentKey];
@@ -266,8 +278,7 @@ class CustomFieldPlugin{
 				$this->customFields = $tmpArray;
 			}
 
-
-			CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID,$this);
+			CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID, $this);
 		}
 	}
 
@@ -278,25 +289,25 @@ class CustomFieldPlugin{
 		}
 
 		$id_blacklist = array(
-			"title","content","more","id","create_date",
+			"title", "content", "more", "id", "create_date",
 		);
 
-		if(in_array($_field->getId(),$id_blacklist)){
+		if(in_array($_field->getId(), $id_blacklist)){
 			return false;
 		}
 
-		if(preg_match('/_visible$/i',$_field->getId())){
+		if(preg_match('/_visible$/i', $_field->getId())){
 			return false;
 		}
 
 		$this->customFields[$_field->getId()] = $_field;
-		CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID,$this);
+		CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID, $this);
 	}
 
 	function onCallCustomField(){
 
 		$arg = SOY2PageController::getArguments();
-		$entryId = @$arg[0];
+		$entryId = (isset($arg[0])) ? (int)$arg[0] : null;
 		
 		$html = $this->getScripts();
 		$html .= '<div class="section custom_field">';
@@ -323,7 +334,7 @@ class CustomFieldPlugin{
 
 	function onCallCustomField_inBlog(){
 		$arg = SOY2PageController::getArguments();
-		$entryId = @$arg[1];
+		$entryId = (isset($arg[1])) ? (int)$arg[1] : null;
 
 		$html = $this->getScripts();
 		$html .= '<div class="section custom_field">';
@@ -374,7 +385,7 @@ class CustomFieldPlugin{
 			$result = null;
 		}else{
 			try{
-				$result = $dao->executeQuery("select custom_field from Entry where id = :id",array(":id"=>$entryId));
+				$result = $dao->executeQuery("select custom_field from Entry where id = :id", array(":id" => $entryId));
 			}catch(Exception $e){
 				$result = null;
 			}
@@ -430,7 +441,7 @@ class CustomFieldPlugin{
 	 * custom_field.tsvをインポートする
 	 */
 	function importFields(){
-		$tsv_file = dirname(__FILE__) . "/"."custom_field.tsv";
+		$tsv_file = dirname(__FILE__) . "/" . "custom_field.tsv";
 		if(!file_exists($tsv_file)) return false;
 
 		//まず削除
@@ -478,8 +489,8 @@ class CustomFieldPlugin{
 	 */
 	function updateDisplayConfig($config){
 		//表示設定
-		$this->displayTitle = ( $config["display_title"] >0 ) ? 1 : 0 ;
-		$this->displayID = ( $config["display_id"] >0 ) ? 1 : 0 ;
+		$this->displayTitle = ( $config["display_title"] > 0 ) ? 1 : 0 ;
+		$this->displayID = ( $config["display_id"] > 0 ) ? 1 : 0 ;
 
 		CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID,$this);
 	}

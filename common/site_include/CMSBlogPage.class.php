@@ -652,6 +652,7 @@ class CMSBlogPage extends CMSPage{
     			break;
     	}
 
+		$template = $this->onLoadPageTemplate($template);
 		return $this->parseComment($template);
 	}
 

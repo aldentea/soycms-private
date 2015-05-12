@@ -67,6 +67,7 @@ class CMSPlugin {
 		//その他
 		"onActive"=>array(),			//プラグインが有効になる直前
 		"onDisable"=>array(),			//プラグインが無効になる直前
+		"onLoadPageTemplate"=>array(),	//ページのテンプレートが呼び出される直前	array()
 		"beforeOutput"=>array(),		//出力される直前
 		"afterOutput"=>array(),			//出力された直後
 		"onOutput"=>array(),			//出力されるHTMLに対して最後に呼ばれるイベント（最終的に出力されるHTML）	array(html,page,webPage),

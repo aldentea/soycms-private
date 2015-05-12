@@ -8,7 +8,6 @@
 		<!-- soy:id="page_list" -->
 		<li>	<span soy:id="name"></span>
 				(<span soy:id="url"></span>)
-			</td>
 		</li>
 		<!-- /soy:id="page_list" -->
 	</ul>
@@ -33,7 +32,7 @@
 	</p>
 </div>
 
-<form id="detail_form" method="post" action="?admin_block_manager&amp;mode=2" onsubmit="return common_submit_to_layer(this,{onclose:function(){window.location.reload();}});">
+<form id="detail_form" method="post" action="?admin_block_manager&amp;mode=2" onsubmit="return common_submit_to_layer($(this),{onclose:function(){window.location.reload();}});">
 	<input id="detail_form_submit" type="submit" style="display:none;" />
 </form>
 

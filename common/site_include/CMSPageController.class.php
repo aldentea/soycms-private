@@ -31,14 +31,14 @@ class CMSPageController extends SOY2PageController{
 
 		//URLShortener
 		//CMS:PLUGIN callEventFunction
-		CMSPlugin::callEventFunc('onSiteAccess',array("controller"=>$this));
+		CMSPlugin::callEventFunc('onSiteAccess', array("controller" => $this));
 
 		//文字コード変換
 		$_GET = $this->convertEncoding($_GET);
 		$_POST = $this->convertEncoding($_POST);
 
 		//ヘッダー送信（先に送信しておかないと後で上書きできない）
-		header("Content-Type: text/html; charset=".$this->siteConfig->getCharsetText());
+		header("Content-Type: text/html; charset=" . $this->siteConfig->getCharsetText());
 		//多言語対応のために保留
 		//header("Content-Language: ja");
 
@@ -56,7 +56,7 @@ class CMSPageController extends SOY2PageController{
 					SOY2::import("util.UserInfoUtil");
 					SOY2::import("domain.admin.Site");
 
-					if(!UserInfoUtil::isLoggined() OR !UserInfoUtil::getSite()
+					if(!UserInfoUtil::isLoggined() || !UserInfoUtil::getSite()
 						OR soy2_realpath(_SITE_ROOT_) != soy2_realpath(UserInfoUtil::getSite()->getPath())
 					){
 						throw new Exception("not logined");
@@ -73,7 +73,7 @@ class CMSPageController extends SOY2PageController{
 
 					case Page::PAGE_TYPE_BLOG:
 						$webPage = &SOY2HTMLFactory::createInstance("CMSBlogPage", array(
-							"arguments" => array($page->getId(),$args,$siteConfig),
+							"arguments" => array($page->getId(), $args, $siteConfig),
 							"siteRoot" => SOY2PageController::createLink("")
 						));
 						//TODO 存在しないページへのアクセスで例外を投げる
@@ -81,14 +81,14 @@ class CMSPageController extends SOY2PageController{
 
 					case Page::PAGE_TYPE_MOBILE:
 						$webPage = &SOY2HTMLFactory::createInstance("CMSMobilePage", array(
-							"arguments" => array($page->getId(),$args,$siteConfig),
+							"arguments" => array($page->getId(), $args, $siteConfig),
 							"siteRoot" => SOY2PageController::createLink("")
 						));
 						break;
 
 					case Page::PAGE_TYPE_APPLICATION:
 						$webPage = &SOY2HTMLFactory::createInstance("CMSApplicationPage", array(
-							"arguments" => array($page->getId(),$args,$siteConfig),
+							"arguments" => array($page->getId(), $args, $siteConfig),
 							"siteRoot" => SOY2PageController::createLink("")
 						));
 						break;
@@ -99,17 +99,15 @@ class CMSPageController extends SOY2PageController{
 						/*
 						 * URIが空のページに対して、/index.html以外（hoge.htmlなど）でアクセスした場合
 						 */
-						if(empty($uri) && count($args)>0 && strstr($args[0],"index.htm") === false){
+						if(empty($uri) && count($args) > 0 && strstr($args[0], "index.htm") === false){
 							throw new Exception("存在しないページ");
 						}
 
 						$webPage = &SOY2HTMLFactory::createInstance("CMSPage", array(
-							"arguments" => array($page->getId(),$args,$siteConfig),
+							"arguments" => array($page->getId(), $args, $siteConfig),
 							"siteRoot" => SOY2PageController::createLink("")
 						));
 						break;
-
-
 				}
 
 				$this->webPage = $webPage;
@@ -122,16 +120,16 @@ class CMSPageController extends SOY2PageController{
 					$filter = $plugin[1]['filter'];
 					switch($filter){
 						case 'all':
-							call_user_func($func,array('page'=>&$page, 'webPage'=>&$webPage));
+							call_user_func($func, array('page' => &$page, 'webPage' => &$webPage));
 							break;
 						case 'blog':
 							if($page->getPageType() == Page::PAGE_TYPE_BLOG){
-								call_user_func($func,array('page'=>&$page, 'webPage'=>&$webPage));
+								call_user_func($func, array('page' => &$page, 'webPage' => &$webPage));
 							}
 							break;
 						case 'page':
 							if($page->getPageType() == Page::PAGE_TYPE_NORMAL){
-								call_user_func($func,array('page'=>&$page, 'webPage'=>&$webPage));
+								call_user_func($func, array('page' => &$page, 'webPage' => &$webPage));
 							}
 							break;
 					}
@@ -147,9 +145,9 @@ class CMSPageController extends SOY2PageController{
 				$html = $this->convertCharset($html, $webPage);
 
 				//改行コードを統一しておく
-				$html = strtr($html,array("\r\n"=>"\n","\r"=>"\n"));
+				$html = strtr($html, array("\r\n" => "\n", "\r" => "\n"));
 
-				header("Content-Length: ".strlen($html));
+				header("Content-Length: " . strlen($html));
 				echo $html;
 
 			}catch(Exception $e){
@@ -180,7 +178,7 @@ class CMSPageController extends SOY2PageController{
 		$onLoad = CMSPlugin::getEvent('onOutput');
 		foreach($onLoad as $plugin){
 			$func = $plugin[0];
-			$res = call_user_func($func,array('html'=>$html,'page'=>&$page, 'webPage'=>&$webPage));
+			$res = call_user_func($func, array('html' => $html, 'page' => &$page, 'webPage' => &$webPage));
 			if(!is_null($res) && is_string($res)) $html = $res;
 		}
 		return $html;
@@ -221,10 +219,9 @@ class CMSPageController extends SOY2PageController{
 		$html = $this->convertCharset($html, $webPage);
 
 		header("HTTP/1.1 404 Not Found");
-		header("Content-Type: text/html; charset=".$this->siteConfig->getCharsetText());
-		header("Content-Length: ".strlen($html));
+		header("Content-Type: text/html; charset=" . $this->siteConfig->getCharsetText());
+		header("Content-Length: " . strlen($html));
 		echo $html;
-
 	}
 
 	function &getPathBuilder(){
@@ -241,9 +238,9 @@ class CMSPageController extends SOY2PageController{
 	 * POSTデータの文字コード変換
 	 */
 	function convertEncoding($obj = null){
-		if(!$obj)$obj = $_POST;
+		if(!$obj) $obj = $_POST;
 
-		if(!is_array($obj))return;
+		if(!is_array($obj)) return;
 
 		foreach($obj as $key => $value){
 			if(is_array($value)){
@@ -263,7 +260,7 @@ class CMSPageController extends SOY2PageController{
 	function getCurrentContentsLifetime(){
 		$minTime = CMSUtil::DATE_MAX;
 		if(defined("SOYCMS_CACHE_LIFETIME")){
-			$minTime = min($minTime,time()+(int)SOYCMS_CACHE_LIFETIME);
+			$minTime = min($minTime, time() + (int)SOYCMS_CACHE_LIFETIME);
 		}
 		try{
 			$entryDao = SOY2DAOFactory::create("cms.EntryDAO");
@@ -290,7 +287,6 @@ class CMSPageController extends SOY2PageController{
 	function getPageType(){
 		return $this->pageType;
 	}
-
 }
 
 class CMS_PathInfoBuilder extends SOY2_PathInfoPathBuilder{
@@ -302,10 +298,9 @@ class CMS_PathInfoBuilder extends SOY2_PathInfoPathBuilder{
 		$pathInfo = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : "";
 
 		//先頭の「/」と末尾の「/」は取り除く
-		$pathInfo = preg_replace('/^\/|\/$/',"",$pathInfo);
+		$pathInfo = preg_replace('/^\/|\/$/', "", $pathInfo);
 
 		list($this->path, $this->arguments) = self::parsePath($pathInfo);
-
 	}
 
 	/**
@@ -337,7 +332,7 @@ class CMS_PathInfoBuilder extends SOY2_PathInfoPathBuilder{
 			}
 
 			// path/index.htmも試す
-			$testUri = $baseuri."/index.htm";
+			$testUri = $baseuri . "/index.htm";
 			if($dao->checkUri($testUri)){
 				$uri = $testUri;
 				break;
@@ -361,7 +356,7 @@ class CMS_PathInfoBuilder extends SOY2_PathInfoPathBuilder{
 		if( $_SERVER["SERVER_PORT"] == "80" && !isset($_SERVER["HTTPS"]) || $_SERVER["SERVER_PORT"] == "443" && isset($_SERVER["HTTPS"]) ){
 			$port = "";
 		}elseif(strlen($_SERVER["SERVER_PORT"]) > 0){
-			$port = ":".$_SERVER["SERVER_PORT"];
+			$port = ":" . $_SERVER["SERVER_PORT"];
 		}else{
 			$port = "";
 		}
@@ -372,16 +367,16 @@ class CMS_PathInfoBuilder extends SOY2_PathInfoPathBuilder{
 		/**
 		 * 絶対URLが渡されたらそのまま返す
 		 */
-		if(preg_match("/^https?:/",$path)){
+		if(preg_match("/^https?:/", $path)){
 			return $path;
 		}
 
 		/**
 		 * 絶対パスが渡されたときもそのまま返す
 		 */
-		if(preg_match("/^\//",$path)){
+		if(preg_match("/^\//", $path)){
 			if($isAbsoluteUrl){
-				return $scheme."://".$host.$port.$path;
+				return $scheme . "://" . $host . $port . $path;
 			}else{
 				return $path;
 			}
@@ -391,23 +386,20 @@ class CMS_PathInfoBuilder extends SOY2_PathInfoPathBuilder{
 		 * 相対パス（絶対URL、絶対パス以外）のとき
 		 */
 		//フロントコントローラーのURLでの絶対パス（ファイル名index.phpは削除する）
-		$scriptPath = (isset($_SERVER['SCRIPT_NAME']) && strlen($_SERVER['SCRIPT_NAME'])!=0) ? $_SERVER['SCRIPT_NAME'] : "/";
-		if($scriptPath[strlen($scriptPath)-1] == "/"){
+		$scriptPath = (isset($_SERVER['SCRIPT_NAME']) && strlen($_SERVER['SCRIPT_NAME']) != 0) ? $_SERVER['SCRIPT_NAME'] : "/";
+		if($scriptPath[strlen($scriptPath) - 1] == "/"){
 			//サーバーによってはindex.phpが付かないところもあるようだ（Ablenet）
 		}else{
-			$scriptPath = preg_replace("/".basename($scriptPath)."\$/","",$scriptPath);
+			$scriptPath = preg_replace("/" . basename($scriptPath) . "\$/", "", $scriptPath);
 		}
 
 		$url = self::convertRelativePathToAbsolutePath($path, $scriptPath);
 
 		if($isAbsoluteUrl){
-			return $scheme."://".$host.$port.$url;
+			return $scheme . "://" . $host . $port . $url;
 		}else{
 			return $url;
 		}
 	}
-
-
-
 }
 ?>

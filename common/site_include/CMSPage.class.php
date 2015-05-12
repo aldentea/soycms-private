@@ -89,8 +89,8 @@ class CMSPage extends WebPage{
 	}
 
 	function getTemplate(){
-		//コメントの置き換えを追加
-		return $this->parseComment($this->page->getTemplate());
+		$html = $this->onLoadPageTemplate($this->page->getTemplate());
+		return $this->parseComment($html);
 	}
 
 	function getCacheFilePath($extension = ".html.php"){
@@ -236,6 +236,19 @@ class CMSPage extends WebPage{
 
 		$plugin = null;
 	}
+	
+	/**
+	 * テンプレートを読み込む前に、置換のためのプラグインを実行します
+	 */
+	function onLoadPageTemplate($html){
+		$onLoad = CMSPlugin::getEvent('onLoadPageTemplate');
+		foreach($onLoad as $plugin){
+			$func = $plugin[0];
+			$res = call_user_func($func, array('html' => $html));
+			if(!is_null($res) && is_string($res)) $html = $res;
+		}
+		return $html;
+	}
 
 	/**
 	 * コメントを消去します。
@@ -281,7 +294,6 @@ class CMSPage extends WebPage{
 				break;
 			}
 		}
-
 
 		return $html;
 

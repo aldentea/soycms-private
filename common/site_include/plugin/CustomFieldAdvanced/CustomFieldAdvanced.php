@@ -24,7 +24,7 @@ class CustomFieldPluginAdvanced{
 			"author" => "日本情報化農業研究所",
 			"url" => "http://www.n-i-agroinformatics.com/",
 			"mail" => "soycms@soycms.net",
-			"version"=>"1.0"
+			"version"=>"1.1"
 		));
 
 		CMSPlugin::addPluginConfigPage(CustomFieldPluginAdvanced::PLUGIN_ID, array(
@@ -56,7 +56,7 @@ class CustomFieldPluginAdvanced{
 	 * onEntryOutput
 	 */
 	function display($arg){
-
+		
 		$entryId = $arg["entryId"];
 		$htmlObj = $arg["SOY2HTMLObject"];
 
@@ -66,7 +66,7 @@ class CustomFieldPluginAdvanced{
 
 			//設定を取得
 			$master = (isset($this->customFields[$field->getId()])) ? $this->customFields[$field->getId()] : null;
-
+			
 			$class = "CMSLabel";
 			$attr = array(
 				"html"       => $field->getValue(),
@@ -75,6 +75,13 @@ class CustomFieldPluginAdvanced{
 
 			//カスタムフィールドの設定が取れるときの動作（たとえば同じサイト内の場合）
 			if($master){
+				
+				//タイプがリンクの場合はここで上書き
+				if($master->getType() == "link"){
+					$class = "HTMLLink";
+					$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
+					unset($attr["html"]);
+				}
 
 				//値が設定されていないなら初期値を使う
 				if(is_null($field->getValue())){
@@ -96,9 +103,16 @@ class CustomFieldPluginAdvanced{
 				$attr["html"] = $field->getValue();
 
 				//属性に出力
-				if(strlen($master->getOutput())>0){
-					$class = "HTMLModel";
-					$attr[$master->getOutput()] = $field->getValue();
+				if(strlen($master->getOutput()) > 0){
+					
+					//リンクタイプ以外でhrefを使う場合
+					if($master->getOutput() == "href" && $master->getType() != "type"){
+						$class = "HTMLLink";
+						$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
+					}else{
+						$class = "HTMLModel";
+						$attr[$master->getOutput()] = $field->getValue();
+					}
 					
 					//追加属性を出力
 					
@@ -121,23 +135,23 @@ class CustomFieldPluginAdvanced{
 				}
 			}
 
-			$htmlObj->createAdd($field->getId()."_visible","HTMLModel",array(
+			$htmlObj->addModel($field->getId() . "_visible", array(
 				"soy2prefix" => "cms",
-				"visible" => (strlen($field->getValue())>0)
+				"visible" => (strlen($field->getValue()) > 0)
 			));
 
-			$htmlObj->createAdd($field->getId()."_is_not_empty","HTMLModel",array(
+			$htmlObj->addModel($field->getId() . "_is_not_empty", array(
 				"soy2prefix" => "cms",
-				"visible" => (strlen($field->getValue())>0)
+				"visible" => (strlen($field->getValue()) > 0)
 			));
 
-			$htmlObj->createAdd($field->getId()."_is_empty","HTMLModel",array(
+			$htmlObj->addModel($field->getId()."_is_empty", array(
 				"soy2prefix" => "cms",
-				"visible" => (strlen($field->getValue())==0)
+				"visible" => (strlen($field->getValue()) === 0)
 			));
-
+			
 			//SOY2HTMLのデフォルトの _visibleがあるので、$field->getId()."_visible"より後にこれをやらないと表示されなくなる
-			$htmlObj->createAdd($field->getId(),$class,$attr);
+			$htmlObj->createAdd($field->getId(), $class, $attr);
 		}
 
 	}
@@ -491,11 +505,16 @@ class CustomFieldPluginAdvanced{
 
 		}
 		
-		try{
-			$sql = file_get_contents(dirname(__FILE__) . "/sql/init_".SOYCMS_DB_TYPE.".sql");
-			$dao->executeUpdateQuery($sql, array());
-		}catch(Exception $e){
+		$file = file_get_contents(dirname(__FILE__) . "/sql/init_".SOYCMS_DB_TYPE.".sql");
+		$sqls = preg_split('/create/', $file, -1, PREG_SPLIT_NO_EMPTY) ;
 		
+		foreach($sqls as $sql){
+			$sql = trim("create" . $sql);
+			try{			
+				$dao->executeUpdateQuery($sql, array());
+			}catch(Exception $e){
+				//
+			}
 		}
 
 		return;
