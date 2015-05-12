@@ -24,7 +24,9 @@ class SOYShopConnectorPlugin{
 			$this,"config_page"
 		));
 
-		if(CMSPlugin::activeCheck($this->getId())){
+		//プラグインのアクティブかつ、SOY Shopがインストールされているか？
+		$soyshopRoot = dirname(SOY2::RootDir()) . "/soyshop/"; 
+		if(CMSPlugin::activeCheck($this->getId()) && file_exists($soyshopRoot)){
 
 			//activeな時だけロード
 			CMSPlugin::setEvent('onPageLoad'

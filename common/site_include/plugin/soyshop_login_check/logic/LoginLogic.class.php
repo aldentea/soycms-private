@@ -10,6 +10,9 @@ class LoginLogic extends SOY2LogicBase {
 	
 	function getLoginPageUrl(){
 		
+		//SOY Shopがインストールされていない場合は空文字を返す
+		if(!SOYShopLoginCheckCommon::checkSOYShopInstall()) return "";
+		
 		$old = SOYShopLoginCheckCommon::switchShopDsn($this->siteId);
 		
 		SOY2::import("domain.config.SOYShop_DataSets");

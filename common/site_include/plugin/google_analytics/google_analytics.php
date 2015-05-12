@@ -45,13 +45,16 @@ class GoogleAnalytics{
 			"modifier"=>"Jun Okada",
 			"url"=>"http://www.n-i-agroinformatics.com/",
 			"mail"=>"soycms@soycms.net",
-			"version"=>"1.7"
+			"version"=>"1.9"
 		));
 
-		CMSPlugin::addPluginConfigPage(self::PLUGIN_ID,array(
-			$this,"config"));
-
-		CMSPlugin::setEvent('onOutput',self::PLUGIN_ID,array($this,"onOutput"),array("filter"=>"all"));
+		if(CMSPlugin::activeCheck(self::PLUGIN_ID)){
+			
+			CMSPlugin::addPluginConfigPage(self::PLUGIN_ID,array(
+				$this,"config"));
+	
+			CMSPlugin::setEvent('onOutput',self::PLUGIN_ID,array($this,"onOutput"),array("filter"=>"all"));
+		}
 	}
 
 	/**

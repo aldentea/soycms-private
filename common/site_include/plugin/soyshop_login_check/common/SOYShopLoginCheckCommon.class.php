@@ -3,6 +3,16 @@
 class SOYShopLoginCheckCommon{
 	
 	/**
+	 * SOY Shopがインストールされているか？
+	 * @return boolen
+	 */
+	public static function checkSOYShopInstall(){
+		$soyshopRoot = dirname(SOY2::RootDir()) . "/soyshop/"; 
+		
+		return (file_exists($soyshopRoot));
+	}
+	
+	/**
 	 * SOY CMSの管理側のDSNと切り替え
 	 */
 	public static function switchDsn(){

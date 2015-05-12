@@ -27,14 +27,18 @@ class CalendarPlugin{
 			"author"=>"日本情報化農業研究所",
 			"url"=>"http://www.n-i-agroinformatics.com/",
 			"mail"=>"soycms@soycms.net",
-			"version"=>"1.4"
-		));	
-		CMSPlugin::addPluginConfigPage($this->getId(),array(
-			$this,"config_page"
+			"version"=>"1.5"
 		));
-		CMSPlugin::addBlock($this->getId(),"page",array(
-			$this,"block"
-		));
+		
+		if(CMSPlugin::activeCheck($this->getId())){
+		
+			CMSPlugin::addPluginConfigPage($this->getId(),array(
+				$this,"config_page"
+			));
+			CMSPlugin::addBlock($this->getId(),"page",array(
+				$this,"block"
+			));
+		}
 	}
 	
 	function config_page($message){

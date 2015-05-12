@@ -11,6 +11,9 @@ class LoginCheckLogic extends SOY2LogicBase{
 	function isLoggedIn(){
 		
 		static $isLoggedIn;
+		
+		//SOY Shopがインストールされていない場合は必ずfalse
+		if(!SOYShopLoginCheckCommon::checkSOYShopInstall()) return false;
 
 		if(is_null($isLoggedIn)){
 			$old = SOYShopLoginCheckCommon::switchShopDsn($this->siteId);
