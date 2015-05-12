@@ -4,13 +4,16 @@ SOY2::import("domain.cms.SiteConfig");
 class CreatePage extends CMSUpdatePageBase{
 
 	function doPost(){
-		if($this->createSite()){
-			$this->addMessage("CREATE_SUCCESS");
-			$this->jump("Site");
-		}else{
-			$this->addErrorMessage("CREATE_FAILED");
-			$errores = CMSMessageManager::getErrorMessages();
-			$this->jump("Site.Create");
+		
+		if(soy2_check_token()){
+			if($this->createSite()){
+				$this->addMessage("CREATE_SUCCESS");
+				$this->jump("Site");
+			}else{
+				$this->addErrorMessage("CREATE_FAILED");
+				$errores = CMSMessageManager::getErrorMessages();
+				$this->jump("Site.Create");
+			}
 		}
 	}
 
@@ -32,14 +35,14 @@ class CreatePage extends CMSUpdatePageBase{
     	$this->addForm("create_site_form");
     	
     	//文字コードの追加
-		$this->createAdd("encoding","HTMLSelect",array(
+		$this->addSelect("encoding", array(
 			"options" => $this->getEncordingList(),
 			"name" => "encoding"
 		));
 		
 		
 		//サイトのコピー機能（既存サイトのデータを渡す） 初期値は「コピーしない」
-		$this->createAdd("copy_from","HTMLSelect",array(
+		$this->addSelect("copy_from", array(
 			"options" => $this->getSiteList(),
 			"name" => "copyFrom",
 			"selected" =>"none"
@@ -51,7 +54,7 @@ class CreatePage extends CMSUpdatePageBase{
 			DisplayPlugin::hide("only_first_site");
 		}
 		
-		$this->createAdd("separate","HTMLCheckBox",array(
+		$this->addCheckBox("separate", array(
 			"value"=>"0",
 			"name"=>"separate",
 			"label"=>$this->getMessage("ADMIN_MAKE_WEBSITE_IN_ADMIN_DB")
@@ -59,15 +62,14 @@ class CreatePage extends CMSUpdatePageBase{
 		
 		$messages = CMSMessageManager::getMessages();
 		$errores = CMSMessageManager::getErrorMessages();
-    	$this->createAdd("message","HTMLLabel",array(
+    	$this->addLabel("message", array(
 			"text" => implode($messages),
-			"visible" => (count($messages)>0)
+			"visible" => (count($messages) > 0)
 		));
-		$this->createAdd("error","HTMLLabel",array(
+		$this->addLabel("error", array(
 			"text" => implode($errores),
-			"visible" => (count($errores)>0)
+			"visible" => (count($errores) > 0)
 		));
-		
     }
     
     /**
@@ -93,11 +95,10 @@ class CreatePage extends CMSUpdatePageBase{
     		SOY2::import("util.CMSFileManager");
 	    	CMSFileManager::insertAll($site->getPath());
     	}else{
+    		//
     	}
-    	
     	    	
     	return $result->success();
-    	
     }
     
     /**
@@ -116,7 +117,7 @@ class CreatePage extends CMSUpdatePageBase{
 		$siteList = array();
 		$siteList["none"] = "コピーせず新規作成";
 		foreach( $sites as $site){
-			$siteList[$site->getId()]=$site->getSiteName();
+			$siteList[$site->getId()] = $site->getSiteName();
 		}
 		return $siteList;
 	}

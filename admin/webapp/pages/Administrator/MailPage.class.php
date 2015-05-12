@@ -69,18 +69,18 @@ class MailPage extends WebPage{
 
 	function buildForm(){
 
-		$this->createAdd("form","HTMLForm");
+		$this->addForm("form");
 
 		$serverConfig = $this->logic->get();
 
-		$this->createAdd("send_server_type_sendmail","HTMLCheckBox",array(
+		$this->addCheckBox("send_server_type_sendmail", array(
 			"elementId" => "send_server_type_sendmail",
 			"name" => "sendServerType",
 			"value" => SOY2Mail_ServerConfig::SERVER_TYPE_SENDMAIL,
 			"selected" => ($serverConfig->getSendServerType() == SOY2Mail_ServerConfig::SERVER_TYPE_SENDMAIL),
 			"onclick" => 'toggleSMTP()'
 		));
-		$this->createAdd("send_server_type_smtp","HTMLCheckBox",array(
+		$this->addCheckBox("send_server_type_smtp", array(
 			"elementId" => "send_server_type_smtp",
 			"name" => "sendServerType",
 			"value" => SOY2Mail_ServerConfig::SERVER_TYPE_SMTP,
@@ -89,7 +89,7 @@ class MailPage extends WebPage{
 		));
 
 
-		$this->createAdd("is_use_pop_before_smtp","HTMLCheckBox",array(
+		$this->addCheckBox("is_use_pop_before_smtp", array(
 			"elementId" => "is_use_pop_before_smtp",
 			"name" => "isUsePopBeforeSMTP",
 			"value" => 1,
@@ -98,7 +98,7 @@ class MailPage extends WebPage{
 			"onclick" => 'togglePOPIMAPSetting();'
 		));
 
-		$this->createAdd("is_use_smtp_auth","HTMLCheckBox",array(
+		$this->addCheckBox("is_use_smtp_auth", array(
 			"elementId" => "is_use_smtp_auth",
 			"name" => "isUseSMTPAuth",
 			"value" => 1,
@@ -107,95 +107,94 @@ class MailPage extends WebPage{
 			"onclick" => 'toggleSMTPAUTHSetting();'
 		));
 
-		$this->createAdd("send_server_address","HTMLInput",array(
+		$this->addInput("send_server_address", array(
 			"id" => "send_server_address",
 			"name" => "sendServerAddress",
 			"value" => $serverConfig->getSendServerAddress(),
 			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP),
 		));
-		$this->createAdd("send_server_port","HTMLInput",array(
+		$this->addInput("send_server_port", array(
 			"id" => "send_server_port",
 			"name" => "sendServerPort",
 			"value" => $serverConfig->getSendServerPort(),
 			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP),
 		));
 
-
-		$this->createAdd("send_server_user","HTMLInput",array(
+		$this->addInput("send_server_user", array(
 			"id" => "send_server_user",
 			"name" => "sendServerUser",
 			"value" => $serverConfig->getSendServerUser(),
-			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) OR !$serverConfig->getIsUseSMTPAuth(),
+			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) || !$serverConfig->getIsUseSMTPAuth(),
 		));
-		$this->createAdd("send_server_password","HTMLInput",array(
+		$this->addInput("send_server_password", array(
 			"id" => "send_server_password",
 			"name" => "sendServerPassword",
 			"value" => $serverConfig->getSendServerPassword(),
-			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) OR !$serverConfig->getIsUseSMTPAuth(),
+			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) || !$serverConfig->getIsUseSMTPAuth(),
 		));
 
-		$this->createAdd("is_use_ssl_send_server","HTMLCheckBox",array(
+		$this->addCheckBox("is_use_ssl_send_server", array(
 			"elementId" => "is_use_ssl_send_server",
 			"name" => "isUseSSLSendServer",
 			"value" => 1,
 			"selected" => $this->isSSLEnabled() && $serverConfig->getIsUseSSLSendServer(),
-			"disabled" => !$this->isSSLEnabled() OR ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP),
+			"disabled" => !$this->isSSLEnabled() || ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP),
 			"onclick" => 'changeSendPort();'
 		));
 
 		/* 受信設定 */
-		$this->createAdd("receive_server_type_pop","HTMLCheckBox",array(
+		$this->addCheckBox("receive_server_type_pop", array(
 			"elementId" => "receive_server_type_pop",
 			"name" => "receiveServerType",
 			"value" => SOY2Mail_ServerConfig::RECEIVE_SERVER_TYPE_POP,
 			"selected" => ($serverConfig->getReceiveServerType() == SOY2Mail_ServerConfig::RECEIVE_SERVER_TYPE_POP),
-			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) OR !$serverConfig->getIsUsePopBeforeSMTP(),
+			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) || !$serverConfig->getIsUsePopBeforeSMTP(),
 			"onclick" => 'changeReceivePort();'
 		));
 
-		$this->createAdd("receive_server_type_imap","HTMLCheckBox",array(
+		$this->addCheckBox("receive_server_type_imap", array(
 			"elementId" => "receive_server_type_imap",
 			"name" => "receiveServerType",
 			"value" => SOY2Mail_ServerConfig::RECEIVE_SERVER_TYPE_IMAP,
 			"selected" => ($serverConfig->getReceiveServerType() == SOY2Mail_ServerConfig::RECEIVE_SERVER_TYPE_IMAP),
-			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) OR !$serverConfig->getIsUsePopBeforeSMTP() OR !$this->isIMAPEnabled(),
+			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) || !$serverConfig->getIsUsePopBeforeSMTP() OR !$this->isIMAPEnabled(),
 			"onclick" => 'changeReceivePort();'
 		));
 
-		$this->createAdd("receive_server_address","HTMLInput",array(
+		$this->addInput("receive_server_address", array(
 			"id" => "receive_server_address",
 			"name" => "receiveServerAddress",
 			"value" => $serverConfig->getReceiveServerAddress(),
-			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) OR !$serverConfig->getIsUsePopBeforeSMTP(),
+			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) || !$serverConfig->getIsUsePopBeforeSMTP(),
 		));
 
-		$this->createAdd("receive_server_user","HTMLInput",array(
+		$this->addInput("receive_server_user", array(
 			"id" => "receive_server_user",
 			"name" => "receiveServerUser",
 			"value" => $serverConfig->getReceiveServerUser(),
-			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) OR !$serverConfig->getIsUsePopBeforeSMTP(),
+			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) || !$serverConfig->getIsUsePopBeforeSMTP(),
 		));
 
-		$this->createAdd("receive_server_password","HTMLInput",array(
+		$this->addInput("receive_server_password", array(
 			"id" => "receive_server_password",
 			"name" => "receiveServerPassword",
 			"value" => $serverConfig->getReceiveServerPassword(),
-			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) OR !$serverConfig->getIsUsePopBeforeSMTP(),
+			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) || !$serverConfig->getIsUsePopBeforeSMTP(),
 		));
 
-		$this->createAdd("receive_server_port","HTMLInput",array(
+		$this->addInput("receive_server_port", array(
 			"id" => "receive_server_port",
 			"name" => "receiveServerPort",
 			"value" => $serverConfig->getReceiveServerPort(),
-			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) OR !$serverConfig->getIsUsePopBeforeSMTP(),
+			"disabled" => ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP) || !$serverConfig->getIsUsePopBeforeSMTP(),
 		));
 
-		$this->createAdd("is_use_ssl_receive_server","HTMLCheckBox",array(
+		$this->addCheckBox("is_use_ssl_receive_server", array(
 			"elementId" => "is_use_ssl_receive_server",
 			"name" => "isUseSSLReceiveServer",
 			"value" => 1,
 			"selected" => $this->isSSLEnabled() && $serverConfig->getIsUseSSLReceiveServer(),
-			"disabled" => !$this->isSSLEnabled() OR ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP),
+			"disabled" => !$this->isSSLEnabled() || ($serverConfig->getSendServerType() != SOY2Mail_ServerConfig::SERVER_TYPE_SMTP),
 			"onclick" => 'changeReceivePort();'
 		));
 
@@ -204,7 +203,7 @@ class MailPage extends WebPage{
 			"id"    => "is_ssl_enabled",
 			"value" => (int) $this->isSSLEnabled()
 		));
-		$this->createAdd("ssl_disabled", "HTMLModel", array(
+		$this->addModel("ssl_disabled", array(
 			"visible" => !$this->isSSLEnabled()
 		));
 		/* IMAP */
@@ -212,57 +211,54 @@ class MailPage extends WebPage{
 			"id"    => "is_imap_enabled",
 			"value" => (int) $this->isIMAPEnabled()
 		));
-		$this->createAdd("imap_disabled", "HTMLModel", array(
+		$this->addModel("imap_disabled", array(
 			"visible" => !$this->isIMAPEnabled()
 		));
 
 		/* 送信者設定 */
-		$this->createAdd("from_address","HTMLInput",array(
+		$this->addInput("from_address", array(
 			"name" => "fromMailAddress",
 			"value" => $serverConfig->getFromMailAddress()
 		));
-		$this->createAdd("from_name","HTMLInput",array(
+		$this->addInput("from_name", array(
 			"name" => "fromMailAddressName",
 			"value" => $serverConfig->getFromMailAddressName()
 		));
-		$this->createAdd("return_address","HTMLInput",array(
+		$this->addInput("return_address", array(
 			"name" => "returnMailAddress",
 			"value" => $serverConfig->getReturnMailAddress()
 		));
 		
-		$this->createAdd("return_name","HTMLInput",array(
+		$this->addInput("return_name", array(
 			"name" => "returnMailAddressName",
 			"value" => $serverConfig->getReturnMailAddressName()
 		));
 
 		/* 文字コード設定 */
-		$this->createAdd("encoding_select","HTMLSelect",array(
+		$this->addSelect("encoding_select", array(
 			"name" => "encoding",
 			"options" => array("UTF-8","ISO-2022-JP"),
 			"selected" => $serverConfig->getEncoding()
 		));
-
 	}
 
 	function buildTestSendForm(){
-		$this->createAdd("test_form","HTMLForm");
+		$this->addForm("test_form");
 
-		$this->createAdd("test_mail_address","HTMLLabel",array(
+		$this->addLabel("test_mail_address", array(
 			"name" => "test_mail_address",
 			"value" => "",
 		));
-
 	}
 
 	function testSend($to){
 
-		$title = "SOY CMS テストメール ".date("Y-m-d H:i:s");
+		$title = "SOY CMS テストメール " . date("Y-m-d H:i:s");
 		$content = "これはSOY CMSから送信したテストメールです。";
 
 		$logic = SOY2LogicContainer::get("logic.mail.MailLogic");
 
 		$logic->sendTestMail($to);
-
 	}
 
 	/**

@@ -39,7 +39,6 @@ class IndexPage extends CMSWebPageBase{
 		$this->createAdd("list", "SiteList", array(
 			"list" => $sites
 		));
-
 	}
 
 	/**
@@ -49,7 +48,6 @@ class IndexPage extends CMSWebPageBase{
 		$SiteLogic = SOY2Logic::createInstance("logic.admin.Site.SiteLogic");
 		return $SiteLogic->getSiteOnly();
 	}
-
 }
 
 class SiteList extends HTMLList{
@@ -59,16 +57,15 @@ class SiteList extends HTMLList{
 		$array = parse_url($url);
 
 		$host = $array["host"];
-		if(isset($array["port"]))$host .=   ":" . $array["port"];
+		if(isset($array["port"])) $host .=   ":" . $array["port"];
 
-		if(strlen($host)>30){
-			$host = mb_strimwidth($host,0,30,"...");
+		if(strlen($host) > 30){
+			$host = mb_strimwidth($host, 0, 30, "...");
 		}
 
 		$url = $array["scheme"] . "://" . $host . $array["path"];
 
 		return $url;
-
 	}
 
 	protected function populateItem($entity){
@@ -78,28 +75,27 @@ class SiteList extends HTMLList{
 			$siteName = "*" . $siteName;
 		}
 
-		$this->add("site_name",SOY2HTMLFactory::createInstance("HTMLLabel",array(
+		$this->addLabel("site_name", array(
 			"text" => $siteName
-		)));
+		));
 
 		$siteLink = (isset($_SERVER["HTTPS"]) ? "https://" : "http://"). $_SERVER['HTTP_HOST'] . '/' . $entity->getSiteId();
-		$this->createAdd("site_link","HTMLLink",array(
+		$this->addLink("site_link", array(
 			"link" => $entity->getUrl(),
 			"text" => $this->replaceTooLongHost($entity->getUrl())
 		));
 
 		$rootLink = UserInfoUtil::getSiteURLBySiteId("");
-		$this->createAdd("domain_root_site_url","HTMLLink",array(
+		$this->addLink("domain_root_site_url", array(
 			"link" => $rootLink,
 			"text" => $this->replaceTooLongHost($rootLink),
 			"visible" => $entity->getIsDomainRoot()
 		));
 
-		$this->createAdd("site_detail_link","HTMLLink",array(
-			"link" => SOY2PageController::createLink("Site.Detail.".$entity->getId()),
+		$this->addLink("site_detail_link", array(
+			"link" => SOY2PageController::createLink("Site.Detail." . $entity->getId()),
 			"visible" => ($entity->getSiteType()!=Site::TYPE_SOY_SHOP)
 		));
-
 	}
 }
 ?>

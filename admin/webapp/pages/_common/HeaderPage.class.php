@@ -11,15 +11,15 @@ class HeaderPage extends CMSWebPageBase{
     function HeaderPage() {
 		WebPage::WebPage();    
 		
-		HTMLHead::addLink("globalpage.css",array(
+		HTMLHead::addLink("globalpage.css", array(
 			"type" => "text/css",
 			"rel" => "stylesheet",
-			"href" => SOY2PageController::createRelativeLink("./css/global_page/globalpage.css")."?".SOYCMS_BUILD_TIME
+			"href" => SOY2PageController::createRelativeLink("./css/global_page/globalpage.css") . "?" . SOYCMS_BUILD_TIME
 		));
     }
     
     function execute(){
-    	$this->createAdd("header","HTMLHead",array(
+    	$this->createAdd("header", "HTMLHead", array(
 			"title" => $this->title,
 			"isEraseHead" => false		
 		));

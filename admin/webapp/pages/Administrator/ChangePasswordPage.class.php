@@ -5,9 +5,10 @@ class ChangePasswordPage extends CMSUpdatePageBase{
 	private $failed = false;
 
 	function doPost(){
-		if($this->updatePassword()){
-    		$this->addMessage("CHANGE_PASSWORD_SUCCESS");
-			$this->jump("Administrator");
+		
+		if(soy2_check_token() && $this->updatePassword()){
+			$this->addMessage("CHANGE_PASSWORD_SUCCESS");
+			$this->jump("Administrator");	
 		}else{
 			$this->failed = true;
 		}
@@ -17,7 +18,7 @@ class ChangePasswordPage extends CMSUpdatePageBase{
     	WebPage::WebPage();
     	$this->addForm("change_password_form");
 
-    	$this->createAdd("error","HTMLModel",array(
+    	$this->addModel("error", array(
     		"visible" => $this->failed
     	));
 
@@ -33,7 +34,6 @@ class ChangePasswordPage extends CMSUpdatePageBase{
     	$result = $action->run();
     	
     	return $result->success();
-    	
     }
 }
 ?>

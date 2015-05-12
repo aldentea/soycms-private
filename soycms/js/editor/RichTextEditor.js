@@ -2,7 +2,7 @@ tinymce.init({
 	mode : "specific_textareas",
 	editor_selector : "mceEditor",
 	theme : "modern",
-	skin : "lightgray_panel_abs",
+	skin : "lightgray",
 	plugins : "save,pagebreak,table,hr,insertdatetime,searchreplace,contextmenu,code,textcolor,paste,directionality,fullscreen,noneditable,charmap,visualchars,nonbreaking,innerlink,insertimage,soycms_emoji,insertwidget",
 	tools : "inserttable",
 	language : soycms.language,

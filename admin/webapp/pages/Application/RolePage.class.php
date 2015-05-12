@@ -5,45 +5,47 @@ class RolePage extends CMSUpdatePageBase{
 	private $appId;
 
 	function doPost(){
-		$role = $_POST["AppRole"];
-
-		$appRoleDAO = SOY2DAOFactory::create("admin.AppRoleDAO");
-
-		try{
-			$appRoleDAO->begin();
-			foreach($role as $userId => $value){
-
-				try{
-					$appRole = $appRoleDAO->getRole($this->appId, $userId);
-
-					if($value > 0){
+		
+		if(soy2_check_token()){
+			$role = $_POST["AppRole"];
+	
+			$appRoleDAO = SOY2DAOFactory::create("admin.AppRoleDAO");
+	
+			try{
+				$appRoleDAO->begin();
+				foreach($role as $userId => $value){
+	
+					try{
+						$appRole = $appRoleDAO->getRole($this->appId, $userId);
+	
+						if($value > 0){
+							$appRole->setAppRole($value);
+							$appRoleDAO->update($appRole);
+						}else{
+							//権限なしの場合は削除
+							$appRoleDAO->delete($appRole);
+						}
+	
+					}catch(Exception $e){
+						if($value == 0) continue;
+						$appRole = new AppRole();
+						$appRole->setAppId($this->appId);
+						$appRole->setUserId($userId);
 						$appRole->setAppRole($value);
-						$appRoleDAO->update($appRole);
-					}else{
-						//権限なしの場合は削除
-						$appRoleDAO->delete($appRole);
+						$appRoleDAO->insert($appRole);
 					}
-
-				}catch(Exception $e){
-					if($value == 0)continue;
-					$appRole = new AppRole();
-					$appRole->setAppId($this->appId);
-					$appRole->setUserId($userId);
-					$appRole->setAppRole($value);
-					$appRoleDAO->insert($appRole);
 				}
+	
+				$appRoleDAO->commit();
+				$this->addMessage("UPDATE_SUCCESS");
+	
+			}catch(Exception $e){
+				$appRoleDAO->rollback();
+				$this->addMessage("UPDATE_FAILED");
 			}
-
-			$appRoleDAO->commit();
-			$this->addMessage("UPDATE_SUCCESS");
-
-		}catch(Exception $e){
-			$appRoleDAO->rollback();
-			$this->addMessage("UPDATE_FAILED");
+	
+			$this->jump("Application.Role" . "?app_id=" . $this->appId );
 		}
-
-		$this->jump("Application.Role" . "?app_id=" . $this->appId );
-
 	}
 
     function RolePage($arg) {
@@ -82,38 +84,37 @@ class RolePage extends CMSUpdatePageBase{
     	$users = $userDAO->get();
     	$roles = $appRoleDAO->getByAppId($this->appId);
 
-    	$this->createAdd("role_list","RoleList",array(
+    	$this->createAdd("role_list", "RoleList", array(
     		"list" => $users,
     		"roles" => $roles,
     		"application" => $application
     	));
 
-    	$this->addForm("form",array(
+    	$this->addForm("form", array(
     		"action" => SOY2PageController::createLink("Application.Role") . "?app_id=" . $this->appId
     	));
 
-    	$this->createAdd("modify_button","HTMLInput",array(
+    	$this->addInput("modify_button", array(
     		"type" => "submit",
     		"value" => CMSMessageManager::get("ADMIN_CHANGE"),
-    		"visible" => (count($users)>1)
+    		"visible" => (count($users) > 1)
     	));
 
-    	$this->createAdd("app_name","HTMLLabel",array(
+    	$this->addLabel("app_name", array(
     		"text" => $application["title"]
     	));
 
     	$messages = CMSMessageManager::getMessages();
 		$errores = CMSMessageManager::getErrorMessages();
-    	$this->createAdd("message","HTMLLabel",array(
+    	$this->addLabel("message", array(
 			"text" => implode($messages),
-			"visible" => (count($messages)>0)
+			"visible" => (count($messages) > 0)
 		));
-		$this->createAdd("error","HTMLLabel",array(
+		$this->addLabel("error", array(
 			"text" => implode($errores),
-			"visible" => (count($errores)>0)
+			"visible" => (count($errores) > 0)
 		));
     }
-
 }
 
 class RoleList extends HTMLList{
@@ -121,11 +122,11 @@ class RoleList extends HTMLList{
 	private $roles;
 	private $application;
 
-	protected function populateItem($entity,$key){
+	protected function populateItem($entity, $key){
 
 		$userId = $entity->getId();
 
-		$this->createAdd("user_name","HTMLLabel",array(
+		$this->addLabel("user_name", array(
 			"text" => (strlen($entity->getName())) ? $entity->getName() . " (".$entity->getUserId().")" : $entity->getUserId()
 		));
 
@@ -137,7 +138,7 @@ class RoleList extends HTMLList{
 			$roleValeu = 0;
 		}
 
-		$this->createAdd("role","HTMLSelect",array(
+		$this->addSelect("role", array(
 			"options" => AppRole::getRoleLists($this->application["useMultipleRole"]),
 			"indexOrder" => true,
 			"name" => "AppRole[".$userId."]",
@@ -159,7 +160,4 @@ class RoleList extends HTMLList{
 		$this->application = $application;
 	}
 }
-
-
-
 ?>

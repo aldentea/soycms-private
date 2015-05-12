@@ -5,11 +5,14 @@ class CreatePage extends CMSUpdatePageBase{
 	var $failed = false;
 
 	function doPost(){
-		$res = $this->createAdministrator();
 		
-		if($res !== false){
-    		$this->addMessage("CREATE_SUCCESS");
-			SOY2PageController::jump("Administrator.SiteRole.".$res);
+		if(soy2_check_token()){
+			$res = $this->createAdministrator();
+			
+			if($res !== false){
+	    		$this->addMessage("CREATE_SUCCESS");
+				SOY2PageController::jump("Administrator.SiteRole." . $res);
+			}
 		}
 		
 		$this->failed = true;
@@ -22,7 +25,7 @@ class CreatePage extends CMSUpdatePageBase{
     	WebPage::WebPage();
     	$this->addForm("change_password_form");
     	
-    	$this->createAdd("error","HTMLModel",array(
+    	$this->addModel("error", array(
     		"visible" => $this->failed
     	));
     }

@@ -21,7 +21,7 @@ class UpperMenuPage extends CMSWebPageBase{
     	$requestPath = SOY2PageController::getRequestPath();
 
     	foreach($this->activeTabRules as $rule => $tab){
-    		if(preg_match("/".$rule."/",$requestPath)){
+    		if(preg_match("/" . $rule . "/", $requestPath)){
     			$this->activeTab = $tab;
     			break;
     		}
@@ -29,40 +29,40 @@ class UpperMenuPage extends CMSWebPageBase{
     }
 
     function execute(){
-		$this->add("update_link",SOY2HTMLFactory::createInstance("HTMLLink",array(
-			"link" => SOY2PageController::createLink("Administrator.Detail.".UserInfoUtil::getUserId())
-		)));
+		$this->addLink("update_link", array(
+			"link" => SOY2PageController::createLink("Administrator.Detail." . UserInfoUtil::getUserId())
+		));
 
-    	$this->createAdd("adminname","HTMLLabel",array(
+    	$this->addLabel("adminname", array(
 			"text" => UserInfoUtil::getUserName(),
 			"width" => 30,
 			"title" => UserInfoUtil::getUserName(),
 		));
 
-    	$this->createAdd("biglogo","HTMLModel",array(
+    	$this->addModel("biglogo", array(
     		"src"=>SOY2PageController::createRelativeLink("css/img/logo_big.gif")
     	));
 
     	/* タブの状態を設定 */
-    	$this->createAdd("top","HTMLTab",array(
+    	$this->createAdd("top", "HTMLTab", array(
     		"class" => $this->getMenuStatus("top")
     	));
 
-    	$this->createAdd("site","HTMLTab",array(
+    	$this->createAdd("site", "HTMLTab", array(
     		"class" => $this->getMenuStatus("site")
     	));
 
-    	$this->createAdd("administrator","HTMLTab",array(
+    	$this->createAdd("administrator", "HTMLTab", array(
     		"class" => $this->getMenuStatus("administrator")
     	));
 
-    	$this->createAdd("application","HTMLTab",array(
+    	$this->createAdd("application", "HTMLTab", array(
     		"class" => $this->getMenuStatus("application")
     	));
 
     	/* アプリケーションタブの表示 */
     	$logic = SOY2Logic::createInstance("logic.admin.Application.ApplicationLogic");
-    	$this->createAdd("is_application_installed","HTMLModel",array(
+    	$this->addModel("is_application_installed", array(
     		"visible" => $logic->checkIsInstalledApplication()
     	));
     }
@@ -91,6 +91,5 @@ class HTMLTab extends SOY2HTML{
 	function getObject(){
 		return "";
 	}
-
 }
 ?>

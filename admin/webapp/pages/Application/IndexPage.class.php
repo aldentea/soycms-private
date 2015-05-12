@@ -12,12 +12,12 @@ class IndexPage extends CMSWebPageBase{
 		
 		//アプリケーション
 		$applications = $this->getLoginiableApplicationLists();
-		$this->createAdd("application_list","ApplicationList",array(
+		$this->createAdd("application_list", "ApplicationList", array(
 			"list" => $applications
 		));
 		
-		$this->createAdd("no_application","HTMLModel",array(
-			"visible" => (count($applications)<1)
+		$this->addModel("no_application", array(
+			"visible" => (count($applications) < 1)
 		));
 		
 	}
@@ -33,26 +33,25 @@ class IndexPage extends CMSWebPageBase{
 			return $appLogic->getLoginableApplications(UserInfoUtil::getUserId());
 		}
 	}
-	
 }
 
 class ApplicationList extends HTMLList{
-	protected function populateItem($entity,$key){
-		$this->createAdd("name","HTMLLabel",array(
+	protected function populateItem($entity, $key){
+		$this->addLabel("name", array(
 			"text" => $entity["title"]
 		));
 		
-		$this->createAdd("login_link","HTMLLink",array(
+		$this->addLink("login_link", array(
 			"link" => SOY2PageController::createRelativeLink("../app/index.php/" . $key)
 		));
-		$this->createAdd("description","HTMLLabel",array(
+		$this->addLabel("description", array(
 			"text" => $entity["description"]
 		));
-		$this->createAdd("version","HTMLLabel",array(
+		$this->addLabel("version", array(
 			"text" => (isset($entity["version"])) ? "ver. " . $entity["version"] : "",
 			"visible" => (isset($entity["version"])),
 		));
-		$this->createAdd("auth_link","HTMLLink",array(
+		$this->addLink("auth_link", array(
 			"link" => SOY2PageController::createLink("Application.Role") . "?app_id=" . $key
 		));
 	}

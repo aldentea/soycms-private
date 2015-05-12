@@ -11,9 +11,9 @@ class DetailPage extends CMSUpdatePageBase{
     		exit;
     	}
 
-		if($this->updateAdministrator()){
+		if(soy2_check_token() && $this->updateAdministrator()){
     		$this->addMessage("UPDATE_SUCCESS");
-			$this->jump("Administrator.Detail.".$this->adminId);
+			$this->jump("Administrator.Detail." . $this->adminId);
 			exit;
 		}else{
 			$this->failed = true;
@@ -21,10 +21,10 @@ class DetailPage extends CMSUpdatePageBase{
 	}
 
     function DetailPage($arg) {
-    	$adminID = @$arg[0];
-    	if(!UserInfoUtil::isDefaultUser() OR strlen($adminID)<1) $adminID = UserInfoUtil::getUserId();
+    	$adminID = (isset($arg[0])) ? $arg[0] : null;
+    	if(!UserInfoUtil::isDefaultUser() || strlen($adminID) < 1) $adminID = UserInfoUtil::getUserId();
 
-    	$result = $this->run("Administrator.DetailAction",array("adminId"=>$adminID));
+    	$result = $this->run("Administrator.DetailAction", array("adminId" => $adminID));
     	$admin = $result->getAttribute("admin");
     	$this->adminId = $adminID;
 
@@ -32,43 +32,43 @@ class DetailPage extends CMSUpdatePageBase{
 
 		$showInputForm = UserInfoUtil::isDefaultUser() || $this->adminId == UserInfoUtil::getUserId();
 
-    	$this->createAdd("userId","HTMLInput",array(
+    	$this->addInput("userId", array(
 			"name" => "userId",
 			"value"=>$admin->getUserId(),
 			"visible"=> $showInputForm
 		));
-    	$this->createAdd("name","HTMLInput",array(
+    	$this->addInput("name", array(
 			"name" => "name",
 			"value"=>$admin->getName(),
 			"visible"=> $showInputForm
 		));
-    	$this->createAdd("email","HTMLInput",array(
+    	$this->addInput("email", array(
 			"name" => "email",
 			"value"=>$admin->getEmail(),
 			"visible"=> $showInputForm
 		));
 
-		$this->createAdd("userId_text","HTMLLabel",array(
+		$this->addLabel("userId_text", array(
 			"text"=>(strlen($admin->getUserId()) == 0 )? CMSMessageManager::get("ADMIN_NO_SETTING") : $admin->getUserId(),
 			"visible"=> !$showInputForm
 		));
-		$this->createAdd("name_text","HTMLLabel",array(
-			"text"=>(strlen($admin->getName()) == 0 )? CMSMessageManager::get("ADMIN_NO_SETTING") : $admin->getName(),
+		$this->addLabel("name_text", array(
+			"text"=>(strlen($admin->getName()) == 0 ) ? CMSMessageManager::get("ADMIN_NO_SETTING") : $admin->getName(),
 			"visible"=> !$showInputForm
 		));
-    	$this->createAdd("email_text","HTMLLabel",array(
+    	$this->addLabel("email_text", array(
 			"text"=>(strlen($admin->getEmail()) == 0 )? CMSMessageManager::get("ADMIN_NO_SETTING") : $admin->getEmail(),
 			"visible"=> !$showInputForm
 		));
 
-		$this->createAdd("show_userid_input","HTMLModel",array(
+		$this->addModel("show_userid_input", array(
 			"attr:class" => $showInputForm ? "" : "no_example"
 		));
-		$this->createAdd("show_userid_input_example","HTMLModel",array(
+		$this->addModel("show_userid_input_example", array(
 			"visible" => $showInputForm
 		));
 
-		$this->createAdd("button_toggle","HTMLModel",array(
+		$this->addModel("button_toggle", array(
 			"visible"=> $showInputForm
 		));
 
@@ -76,16 +76,15 @@ class DetailPage extends CMSUpdatePageBase{
     	$this->addForm("detailForm");
 
 
-    	$this->createAdd("error","HTMLModel",array(
+    	$this->addModel("error", array(
     		"visible" => $this->failed
     	));
 
     	$messages = CMSMessageManager::getMessages();
-    	$this->createAdd("message","HTMLLabel",array(
-    		"text" => implode("\n",$messages),
+    	$this->addLabel("message", array(
+    		"text" => implode("\n", $messages),
     		"visible" => !empty($messages)
     	));
-
     }
 
     function setAdminId($adminId) {
@@ -93,7 +92,7 @@ class DetailPage extends CMSUpdatePageBase{
     }
 
     function updateAdministrator(){
-		$result = $this->run("Administrator.UpdateAction",array("adminId"=>$this->adminId));
+		$result = $this->run("Administrator.UpdateAction", array("adminId" => $this->adminId));
     	return $result->success();
     }
 }

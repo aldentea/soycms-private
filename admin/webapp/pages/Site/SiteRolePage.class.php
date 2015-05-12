@@ -5,20 +5,23 @@ class SiteRolePage extends CMSUpdatePageBase{
 	private $siteId;
 
 	function doPost(){
-		$action = SOY2ActionFactory::createInstance("SiteRole.UpdateAction");
-    	$result = $action->run();
-    	
-    	if($result->success()){
-			$this->addMessage("UPDATE_SUCCESS");
-    		$this->jump("Site.SiteRole.".$this->siteId);
-    	}else{
-    		$this->jump("Site.SiteRole.".$this->siteId);
-    	}
+		
+		if(soy2_check_token()){
+			$action = SOY2ActionFactory::createInstance("SiteRole.UpdateAction");
+	    	$result = $action->run();
+	    	
+	    	if($result->success()){
+				$this->addMessage("UPDATE_SUCCESS");
+	    		$this->jump("Site.SiteRole." . $this->siteId);
+	    	}else{
+	    		$this->jump("Site.SiteRole." . $this->siteId);
+	    	}
+		}
 	}
 
     function SiteRolePage($arg) {
     	
-    	$siteId = @$arg[0];
+    	$siteId = (isset($arg[0])) ? $arg[0] : null;
     	if(is_null($siteId)){
     		SOY2PageController::jump("Site");
     	}
@@ -30,8 +33,8 @@ class SiteRolePage extends CMSUpdatePageBase{
     	
     	WebPage::WebPage();
     	
-    	$action = SOY2ActionFactory::createInstance("SiteRole.ListAction",array(
-    		"siteId" => $arg[0]
+    	$action = SOY2ActionFactory::createInstance("SiteRole.ListAction", array(
+    		"siteId" => $siteId
     	));
     	$result = $action->run();
     	
@@ -42,35 +45,31 @@ class SiteRolePage extends CMSUpdatePageBase{
     	$siteRole = $result->getAttribute("siteRole");
     	$userName = $result->getAttribute("adminName");
     	
-    	$list = SOY2HTMLFactory::createInstance("SiteRoleList",array(
+    	$this->createAdd("siterole_block", "SiteRoleList", array(
+    		"list" => $siteRole,
     		"user" => $userName,
     		"siteId" => $this->siteId
     	));
-    	$list->setList($siteRole);
-    	
-    	$this->add("siterole_block",$list);
     	
     	$this->addForm("siteRoleForm");
     	
     	$siteInfo = $result->getAttribute("siteTitle");
-    	$this->createAdd("site_title","HTMLLabel",array(
-    		"text" => $siteInfo->getSiteId().CMSMessageManager::get("ADMIN_MASSAGE_ADMIN_LIST")
+    	$this->addLabel("site_title", array(
+    		"text" => $siteInfo->getSiteId() . CMSMessageManager::get("ADMIN_MASSAGE_ADMIN_LIST")
     	));
     	
-    	$this->createAdd("modify_button","HTMLInput",array(
+    	$this->addInput("modify_button", array(
     		"type" => "submit",
     		"value" => CMSMessageManager::get("ADMIN_CHANGE"),
-    		"visible" => (count($siteRole)>0)
+    		"visible" => (count($siteRole) > 0)
     	));
 
 		$messages = CMSMessageManager::getMessages();
-    	$this->createAdd("message","HTMLLabel",array(
+    	$this->addLabel("message", array(
 			"text" => implode($messages),
-			"visible" => (count($messages)>0)
+			"visible" => (count($messages) > 0)
 		));
-    	
     }
-    
 }
 
 class SiteRoleList extends HTMLList{
@@ -87,21 +86,17 @@ class SiteRoleList extends HTMLList{
 	}
 	
 	
-	protected function populateItem($entity,$key){
-		$this->createAdd("user_name","HTMLLabel",array(
+	protected function populateItem($entity, $key){
+		$this->addLabel("user_name", array(
 			"text" => $this->user[$key]
 		));
 		
-		$this->createAdd("site_role","HTMLSelect",array(
+		$this->addSelect("site_role", array(
 			"options" => SiteRole::getSiteRoleLists(),
-			"name" => "siteRole[".$key."][".$this->siteId."]",
+			"name" => "siteRole[" . $key . "][" . $this->siteId . "]",
 			"indexOrder" => true,
 			"selected" => (int)$entity
 		));
 	}
-	
 }
-
-
-
 ?>

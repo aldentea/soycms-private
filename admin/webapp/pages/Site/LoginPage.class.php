@@ -6,7 +6,7 @@ class LoginPage extends CMSWebPageBase{
 
     	WebPage::WebPage();
 
-    	$id = $args[0];
+    	$id = (isset($args[0])) ? $args[0] : null;
 
 		$res = false;
 
@@ -25,7 +25,7 @@ class LoginPage extends CMSWebPageBase{
     	//他のサイトにログインしているかどうかチェック
     	$oldSite = UserInfoUtil::getSite();
 
-    	$action = SOY2ActionFactory::createInstance("Site.LoginAction",array(
+    	$action = SOY2ActionFactory::createInstance("Site.LoginAction", array(
     		"siteId" => $id
     	));
 
@@ -45,7 +45,7 @@ class LoginPage extends CMSWebPageBase{
     		}
 
     		if($oldSite && $oldSite->getId() != $id){
-    			$this->addMessage("NOTIFY_DOUBLE_LOGIN",array(
+    			$this->addMessage("NOTIFY_DOUBLE_LOGIN", array(
     				"SITE_NAME" => $oldSite->getSiteName()
     			));
     			CMSMessageManager::save();
@@ -53,7 +53,7 @@ class LoginPage extends CMSWebPageBase{
 
 			//転送先の指定があればそこへリダイレクト
 			$redirect = isset($_GET["r"]) ? $_GET["r"] : "" ;
-			if(strlen($redirect) >0 && CMSAdminPageController::isAllowedPath($redirect, "../soycms/")){
+			if(strlen($redirect) > 0 && CMSAdminPageController::isAllowedPath($redirect, "../soycms/")){
 				SOY2PageController::redirect($redirect);
 			}else{
 				SOY2PageController::redirect("../soycms/");

@@ -8,25 +8,27 @@ class ChangePasswordPage extends CMSUpdatePageBase{
 	}
 	
 	function doPost(){
-		$result = SOY2ActionFactory::createInstance("Administrator.ChangePasswordAction")->run();
 		
-		$form = $result->getAttribute("form");
-		
-		if($result->success()){
-			$this->jump("Account",array("passwordChanged"=>true));
-		}else{
+		if(soy2_check_token()){
+			$result = SOY2ActionFactory::createInstance("Administrator.ChangePasswordAction")->run();
 			
-			if($form->hasError()){
-				$str = CMSMessageManager::get("ADMIN_NEW_PASSWORD_FORMAT_WRONG");
-			}else if($form->newPassword != $form->newPasswordConfirm){
-				$str = CMSMessageManager::get("ADMIN_NEW_PASSWORDS_NOT_SAME");
+			$form = $result->getAttribute("form");
+			
+			if($result->success()){
+				$this->jump("Account", array("passwordChanged"=>true));
 			}else{
-				$str = CMSMessageManager::get("ADMIN_OLD_PASSWORD_WRONG");
+				
+				if($form->hasError()){
+					$str = CMSMessageManager::get("ADMIN_NEW_PASSWORD_FORMAT_WRONG");
+				}else if($form->newPassword != $form->newPasswordConfirm){
+					$str = CMSMessageManager::get("ADMIN_NEW_PASSWORDS_NOT_SAME");
+				}else{
+					$str = CMSMessageManager::get("ADMIN_OLD_PASSWORD_WRONG");
+				}
+				
+				$this->jump("Account.ChangePassword", array("error_str" => $str));
 			}
-			
-			$this->jump("Account.ChangePassword",array("error_str"=>$str));
 		}
-		
 	}
 	
     function ChangePasswordPage() {
@@ -38,30 +40,28 @@ class ChangePasswordPage extends CMSUpdatePageBase{
     
     function buildForm(){
     	
-    	$this->createAdd("password","HTMLInput",array(
+    	$this->addInput("password", array(
     		"name" => "newPassword",
     		"value" => "",
-    		"type" => "password"    	
+    		"type" => "password"
     	));
     	
-    	$this->createAdd("password_confirm","HTMLInput",array(
+    	$this->addInput("password_confirm", array(
     		"name" => "newPasswordConfirm",
     		"value" => "",
-    		"type" => "password"    	
+    		"type" => "password"
     	));
     	
-    	$this->createAdd("old_password","HTMLInput",array(
+    	$this->addInput("old_password", array(
     		"name"=>"oldPassword",
     		"value"=>"",
     		"type"=>"password"
     	));
     	
-    	$this->createAdd("error_msg","HTMLLabel",array(
+    	$this->addLabel("error_msg", array(
 	    	"text"=>$this->error_str,
-	    	"visible"=>strlen($this->error_str)>0
+	    	"visible"=>(strlen($this->error_str) > 0)
 	    ));
-    	
-    	
     }
 }
 ?>

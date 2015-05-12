@@ -10,18 +10,17 @@ class MenuPage extends CMSWebPageBase{
 	
 	function execute(){
 				
-		$this->add("administratorlink",SOY2HTMLFactory::createInstance("HTMLLink",array(
+		$this->addLink("administratorlink", array(
 			"link" => SOY2PageController::createLink("Administrator.List")
-		)));
+		));
 		
-		$this->add("sitelink",SOY2HTMLFactory::createInstance("HTMLLink",array(
+		$this->addLink("sitelink", array(
 			"link" => SOY2PageController::createLink("Site.List")
-		)));
+		));
 		
-		$this->add("siterolelink",SOY2HTMLFactory::createInstance("HTMLLink",array(
+		$this->addLink("siterolelink", array(
 			"link" => SOY2PageController::createLink("SiteRole.List")
-		)));
+		));
 	}
-	    
 }
 ?>

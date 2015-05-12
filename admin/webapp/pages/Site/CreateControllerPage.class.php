@@ -4,13 +4,13 @@ class CreateControllerPage extends CMSWebPageBase{
 
     function CreateControllerPage($args) {
   
-      	if(!UserInfoUtil::isDefaultUser() || count($args)<1){
+      	if(!UserInfoUtil::isDefaultUser() || count($args) < 1){
     		//デフォルトユーザのみ作成可能
     		$this->jump("Site");
     		exit;
     	}
 
-		$id = $args[0];
+		$id = (isset($args[0])) ? $args[0] : null;
     	
     	if(soy2_check_token()){
 			try{
@@ -23,7 +23,7 @@ class CreateControllerPage extends CMSWebPageBase{
 			$this->addMessage("CREATE_FAILED");
     	}
 		
-		$this->jump("Site.Detail.".$id);
+		$this->jump("Site.Detail." . $id);
 		
 		exit;
 	}

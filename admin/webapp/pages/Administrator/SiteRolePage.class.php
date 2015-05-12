@@ -7,31 +7,33 @@ class SiteRolePage extends CMSUpdatePageBase{
 	function doPost(){
 
 		if(!UserInfoUtil::isDefaultUser()){
-    		SOY2PageController::jump("Administrator.SiteRole.".$this->userId);
+    		SOY2PageController::jump("Administrator.SiteRole." . $this->userId);
     	}
-
-		$action = SOY2ActionFactory::createInstance("SiteRole.UpdateAction");
-    	$result = $action->run();
-
-    	if($result->success()){
-    		$this->addMessage("UPDATE_SUCCESS");
-    		$this->jump("Administrator.SiteRole.".$this->userId);
-    	}else{
-    		SOY2PageController::jump("Administrator.SiteRole.".$this->userId);
+    	
+    	if(soy2_check_token()){
+    		$action = SOY2ActionFactory::createInstance("SiteRole.UpdateAction");
+	    	$result = $action->run();
+	
+	    	if($result->success()){
+	    		$this->addMessage("UPDATE_SUCCESS");
+	    		$this->jump("Administrator.SiteRole." . $this->userId);
+	    	}else{
+	    		SOY2PageController::jump("Administrator.SiteRole." . $this->userId);
+	    	}
     	}
 	}
 
     function SiteRolePage($arg) {
 
-    	$userId = @$arg[0];
-    	if(!UserInfoUtil::isDefaultUser() OR strlen($userId)<1) $userId = UserInfoUtil::getUserId();
+    	$userId = (isset($arg[0])) ? $arg[0] : null;
+    	if(!UserInfoUtil::isDefaultUser() || strlen($userId) < 1) $userId = UserInfoUtil::getUserId();
     	$this->userId = $userId;
 
     	WebPage::WebPage();
 
     	$this->outputMessage();
 
-    	$action = SOY2ActionFactory::createInstance("SiteRole.ListAction",array(
+    	$action = SOY2ActionFactory::createInstance("SiteRole.ListAction", array(
     		"userId" => $this->userId,
     		"limitSite" => true
     	));
@@ -49,22 +51,22 @@ class SiteRolePage extends CMSUpdatePageBase{
     	));
 
     	$this->addForm("siteRoleForm");
-    	$this->createAdd("modify_button","HTMLInput",array(
+    	$this->addInput("modify_button", array(
     		"type" => "submit",
     		"value" => CMSMessageManager::get("ADMIN_CHANGE"),
-    		"visible" => (count($siteRole)>0 && UserInfoUtil::isDefaultUser())
+    		"visible" => (count($siteRole) > 0 && UserInfoUtil::isDefaultUser())
     	));
 
     	$admin = $result->getAttribute("adminName");
-    	$this->createAdd("user_name","HTMLLabel",array(
-    		"text"=>$admin->getUserId().CMSMessageManager::get("ADMIN_MESSAGE_SITE_ROLE_LIST")
+    	$this->addLabel("user_name", array(
+    		"text"=>$admin->getUserId() . CMSMessageManager::get("ADMIN_MESSAGE_SITE_ROLE_LIST")
     	));
     }
 
     function outputMessage(){
     	$messages = CMSMessageManager::getMessages();
-    	$this->createAdd("message","HTMLLabel",array(
-    		"text" => implode("\n",$messages),
+    	$this->addLabel("message", array(
+    		"text" => implode("\n", $messages),
     		"visible" => !empty($messages)
     	));
     }
@@ -87,7 +89,6 @@ class SiteRolePage extends CMSUpdatePageBase{
 		}
 		return $ids;
 	}
-
 }
 
 class SiteRoleList extends HTMLList{
@@ -109,27 +110,27 @@ class SiteRoleList extends HTMLList{
 	}
 
 
-	protected function populateItem($entity,$key){
+	protected function populateItem($entity, $key){
 
-		$this->createAdd("site_name","HTMLLabel",array(
+		$this->addLabel("site_name", array(
 			"text"    => $this->site[$key],
 		));
 
 
-		$this->createAdd("site_role","HTMLSelect",array(
+		$this->addSelect("site_role", array(
 			"options" => SiteRole::getSiteRoleLists(),
-			"name" => "siteRole[".$this->userId."][".$key."]",
+			"name" => "siteRole[" . $this->userId . "][" . $key . "]",
 			"indexOrder" => true,
 			"selected" => (int)$entity,
 			"visible"=>UserInfoUtil::isDefaultUser(),
-			"disabled" => ($this->getSiteType($key)==2)
+			"disabled" => ($this->getSiteType($key) == 2)
 		));
 
 		$list = SiteRole::getSiteRoleLists();
 		$text = $list[(int)$entity];
-		$this->createAdd("site_role_text","HTMLLabel",array(
-			"text"=>$text,
-			"visible"=>!UserInfoUtil::isDefaultUser()
+		$this->addLabel("site_role_text", array(
+			"text" => $text,
+			"visible" => !UserInfoUtil::isDefaultUser()
 		));
 	}
 
@@ -145,5 +146,4 @@ class SiteRoleList extends HTMLList{
 	}
 
 }
-
 ?>
