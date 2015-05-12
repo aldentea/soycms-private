@@ -60,9 +60,14 @@ function applyTemplate(){
 			var result = eval('('+oResponse.responseText+')');
 			
 			$("#style").val(result['templates']['style']);
-						
-			$('#entry_content').val(result['templates']['content']);
-			$('#entry_more').val(result['templates']['more']);
+			
+			if(result['templates']['content'].length > 0){
+				$('#entry_content').val(result['templates']['content']);
+			}
+			
+			if(result['templates']['more'].length){
+				$('#entry_more').val(result['templates']['more']);
+			}
 	};
 	
 	$.ajax({

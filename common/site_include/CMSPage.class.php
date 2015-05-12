@@ -43,7 +43,28 @@ class CMSPage extends WebPage{
 			if(!is_object($object)){
 				continue;
 			}
-			$this->add($block->getSoyId(),$object->getViewPage($this));
+			$soy2HtmlObject = $object->getViewPage($this);
+			/*
+			 * ブロック
+			 * block:id="xxx"
+			 */
+			$this->add($block->getSoyId(),$soy2HtmlObject);
+			/*
+			 * 記事がなければ表示しない領域
+			 * if_has_entry_in:id="xxx"
+			 */
+			$this->createAdd($block->getSoyId().":has_entry","HTMLModel",array(
+				"visible"    => count($soy2HtmlObject->list),
+				"soy2prefix" => "if",
+			));
+			/*
+			 * 記事があるときに表示しない領域
+			 * if_no_entry_in:id="xxx"
+			 */
+			$this->createAdd($block->getSoyId().":no_entry","HTMLModel",array(
+				"visible"    => !count($soy2HtmlObject->list),
+				"soy2prefix" => "if",
+			));
 		}
 
 		CMSPlugin::callEventFunc('onPageOutput',$this);
@@ -236,7 +257,7 @@ class CMSPage extends WebPage{
 
 		$plugin = null;
 	}
-	
+
 	/**
 	 * テンプレートを読み込む前に、置換のためのプラグインを実行します
 	 */

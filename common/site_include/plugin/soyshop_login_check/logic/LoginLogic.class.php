@@ -25,6 +25,28 @@ class LoginLogic extends SOY2LogicBase {
 		return $loginPageUrl;
 	}
 	
+	function getLogoutPageUrl(){
+		
+		if(!SOYShopLoginCheckCommon::checkSOYShopInstall()) return "";
+		
+		$old = SOYShopLoginCheckCommon::switchShopDsn($this->siteId);
+		
+		SOY2::import("domain.config.SOYShop_DataSets");
+		SOY2::import("domain.config.SOYShop_ShopConfig");
+		include_once(SOY2::RootDir() . "base/func/common.php");
+		
+		$config = SOYShop_ShopConfig::load();
+		$logoutPageUrl = soyshop_get_mypage_url() . "/logout";
+		
+		if($config->getDisplayPageAfterLogout() == 1){
+			$logoutPageUrl .= "?r=" . rawurldecode($_SERVER["REQUEST_URI"]);
+		}
+		
+		SOYShopLoginCheckCommon::resetShopDsn($old);
+		
+		return $logoutPageUrl;
+	}
+	
 	function setSiteId($siteId){
 		$this->siteId = $siteId;
 	}

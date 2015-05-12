@@ -40,11 +40,19 @@ function applyTemplate(){
 		var result = eval('('+oResponse.responseText+')');
 			
 		$("#style").val(result['templates']['style']);
-
-		tinymce.get("entry_content").setContent(result["templates"]["content"]);
-		tinymce.get("entry_more").setContent(result["templates"]["more"]);
-		tinymce.get('entry_content').dom.loadCSS(result['style_path']);
-		tinymce.get('entry_more').dom.loadCSS(result['style_path']);
+		
+		if(result["templates"]["content"].length > 0){
+			tinymce.get("entry_content").setContent(result["templates"]["content"]);
+		}
+		
+		if(result["templates"]["more"].length > 0){
+			tinymce.get("entry_more").setContent(result["templates"]["more"]);
+		}
+		
+		if(result['style_path'].length > 0){
+			tinymce.get('entry_content').dom.loadCSS(result['style_path']);
+			tinymce.get('entry_more').dom.loadCSS(result['style_path']);
+		}
 	};
 	
 	$.ajax({

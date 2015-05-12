@@ -143,22 +143,31 @@ class SOYCMS_Info_Plugin{
 	function loadRSS($url){
 		
 		$now = time();
+		$xml = null;
 		
 		if(isset($this->rssCache[$url]) && (($this->rssCache[$url]["last_update_date"] + self::INTERVAL) > $now)){
 			
 			//キャッシュから
 			return array(simplexml_load_string($this->rssCache[$url]["contents"]),$this->rssCache[$url]["last_update_date"]);
 		}
-		
-		$contents = file_get_contents($url);
-		$xml = simplexml_load_string($contents);
-		
-		$this->rssCache[$url] = array(
-			"last_update_date" => $now,
-			"contents" => $contents
-		);
-		
-		CMSPlugin::savePluginConfig($this->getId(),$this);
+		$ctx = stream_context_create(array( 
+			'http' => array( 
+				'timeout' => 5
+			) 
+		));
+		 
+		$contents = file_get_contents($url, false, $ctx);
+		if(isset($contents)){
+			$xml = simplexml_load_string($contents);
+			
+			$this->rssCache[$url] = array(
+				"last_update_date" => $now,
+				"contents" => $contents
+			);
+			
+			CMSPlugin::savePluginConfig($this->getId(),$this);
+		}
+			
 		
 		return array($xml,$now);
 		
