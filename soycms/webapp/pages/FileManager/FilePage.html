@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>ファイル管理</title>
+<link rel="stylesheet" type="text/css" media="screen" soy:link="./css/jquery-ui/themes/base/jquery-ui.css">
+
+<script type="text/javascript" soy:src="./js/elfinder/jquery/jquery.js"></script>
+<script type="text/javascript" soy:src="./js/elfinder/jquery/jquery-ui.min.js"></script>
+<!-- elFinder CSS (REQUIRED) -->
+<link rel="stylesheet" type="text/css" media="screen" soy:link="./js/elfinder/css/elfinder.min.css">
+<link rel="stylesheet" type="text/css" media="screen" soy:link="./js/elfinder/css/theme.css">
+<!-- elFinder JS (REQUIRED) -->
+<script type="text/javascript" soy:src="./js/elfinder/js/elfinder.min.js"></script>
+<!-- elFinder translation (OPTIONAL) -->
+<script type="text/javascript" soy:src="./js/elfinder/js/i18n/elfinder.jp.js"></script>
+<!-- elFinder initialization (REQUIRED) -->
+<script type="text/javascript" charset="utf-8">
+	$().ready(function(){
+		var elf = $('#elfinder').elfinder({
+			url : '<!-- soy:id="connector_path" /-->',  // connector URL (REQUIRED)
+			commands : [
+				'open', 'reload', 'home', 'up', 'back', 'forward', 'getfile', 'quicklook', 
+				'download', 'rm', 'rename', 'mkdir', 'mkfile', 'upload', 'search', 'info', 'view', 'help',
+				'resize', 'sort'
+			],
+			commandsOptions : {
+					getfile : {
+							// send only URL or URL+path if false
+							onlyURL  : false,
+							
+							// allow to return multiple files info
+							multiple : true,
+							
+							// allow to return folders info
+							folders  : false,
+							
+							// action after callback (close/destroy)
+							oncomplete : ''
+					},
+			},
+			getFileCallback : function(obj) {
+				$.each(obj, function(){
+					var file = CMS_FileManager.filesInDir[this.hash];
+					var url = this.url;
+					window.parent.filemanager_ondblclick(url, file.id);
+				});
+			},
+			handlers : {
+				open : function(event){
+					getFileId(event.data.options.path, event.data.files);
+				},
+				upload : function(event){
+					upload(event.data.added);
+				},
+				rename : function(event){
+					rename(event.data.removed, event.data.added);
+				},
+				reload : function(event){
+					reload();
+				},
+				rm : function(event){
+					rm(event.data.removed);
+				},
+				mkdir : function(event){
+					mkdir(event.data.added);
+				},
+				mkfile : function(event){
+					mkfile(event.data.added);
+				}
+			},
+				// lang: 'ru',             // language (OPTIONAL)
+		}).elfinder('instance');
+	});
+</script>
+</head>
+<body>
+
+<div id="elfinder"></div>
+
+<script type="text/javascript" soy:id="cmsscript"></script>
+
+</body>
+</html>
