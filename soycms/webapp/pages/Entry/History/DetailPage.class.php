@@ -25,6 +25,14 @@ class DetailPage extends CMSWebPageBase {
 			"text"=> date("Y-m-d H:i:s", $history->getCdate())
 		));
 
+		$this->addModel("show_author",array(
+			"visible" => UserInfoUtil::isDefaultUser(),//一応初期管理者に限定しておく
+		));
+
+		$this->addLabel("author",array(
+			"text" => $history->getAuthor(). " (".$history->getUserId().")",
+		));
+
 		$this->createAdd("title","HTMLLabel",array(
 			"text" => $history->getTitle()
 		));

@@ -26,7 +26,7 @@
 <h4>リンクを挿入<span soy:id="current_site"></span></h4>
 <div id="controlle_panel">
 	<select soy:id="insert_link" id="insert_link" style="width:280px" class="sub"></select>
-	<div id="foreign_input" style="display:none">
+	<div id="foreign_input" style="display:block;">
 		<h5>外部リンクのURLを入力してください</h5>
 		<input type="text" size="56" style="width:280px" name="foreignLink" id="foreignLink" class="sub">
 		<br>
@@ -56,7 +56,8 @@
 		var selected = $("#insert_link").val();
 			
 		if(selected == "foreign_address"){
-			$("#foreign_input").css("display", "");
+			//初めは何もしない
+//			$("#foreign_input").css("display", "");
 		}else{
 			$("#foreign_input").css("display", "none");
 		}

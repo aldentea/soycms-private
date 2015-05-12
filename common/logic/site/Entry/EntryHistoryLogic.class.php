@@ -86,6 +86,26 @@ class EntryHistoryLogic extends SOY2LogicBase{
 	}
 
 	/**
+	 * 記事削除時
+	 * @param int Entry.id
+	 * @return int EntryHistory.id
+	 */
+	public function onRemove($entryId){
+		$bean = $this->getLastHistory($entryId);
+
+		$bean->setActionType(EntryHistory::ACTION_DELETE);
+		$bean->setActionTarget(0);
+		$bean->setChangeTitle(0);
+		$bean->setChangeContent(0);
+		$bean->setChangeMore(0);
+		$bean->setChangeAdditional(0);
+		$bean->setChangeIsPublished(0);
+
+		$id = $this->dao->insert($bean);
+		return $id;
+	}
+
+	/**
 	 * 記事複製時
 	 * @param Entry 複製によって作成された記事
 	 * @param int 複製元の記事のID
@@ -165,7 +185,7 @@ class EntryHistoryLogic extends SOY2LogicBase{
 			return $this->_onPublish(array($id),$publish);
 		}
 	}
-	
+
 	/**
 	 * 公開状態がpublicに変更されるときの動作
 	 * @param array <Entry.id>
@@ -178,7 +198,7 @@ class EntryHistoryLogic extends SOY2LogicBase{
 		    	$entry = $entryDao->getById($id);
 				$this->onUpdate($entry);
 			}catch(Exception $e){
-				//			
+				//
 			}
 		}
 	}
@@ -283,7 +303,7 @@ class EntryHistoryLogic extends SOY2LogicBase{
 			return null;
 		}
 	}
-	
+
 	/**
 	 * 変更点を取り出す
 	 */

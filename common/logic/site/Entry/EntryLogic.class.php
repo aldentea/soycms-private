@@ -96,6 +96,7 @@ class EntryLogic extends SOY2LogicBase{
 		$entryLabelDao = $this->getEntryLabelDAO();
 		$entryTrackbackDAO = SOY2DAOFactory::create("cms.EntryTrackbackDAO");
 		$entryCommentDAO = SOY2DAOFactory::create("cms.EntryCommentDAO");
+		$entryHistoryLogic = SOY2LogicContainer::get("logic.site.Entry.EntryHistoryLogic");
 
 		try{
 			$dao->begin();
@@ -103,6 +104,7 @@ class EntryLogic extends SOY2LogicBase{
 			foreach($ids as $id){
 				$dao->delete($id);
 				$entryLabelDao->deleteByEntryId($id);
+				$entryHistoryLogic->onRemove($id);
 
 				//@TODO トラックバックとコメントは削除しない方がいい？
 				$entryTrackbackDAO->deleteByEntryId($id);

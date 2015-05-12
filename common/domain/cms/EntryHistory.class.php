@@ -13,6 +13,8 @@ class EntryHistory {
 	const ACTION_REVERT = 3;
 	//複製
 	const ACTION_COPY   = 4;
+	//削除
+	const ACTION_REMOVE = 5;
 
 	/**
 	 * @id
@@ -228,6 +230,8 @@ class EntryHistory {
 				return CMSMessageManager::get("SOYCMS_COPY") . " (".$this->actionTarget.")";
 			case self::ACTION_REVERT:
 				return CMSMessageManager::get("SOYCMS_RECOVER") . " (".$this->actionTarget.")";
+			case self::ACTION_REMOVE:
+				return CMSMessageManager::get("SOYCMS_DELETE");
 			default:
 				return CMSMessageManager::get("SOYCMS_UNKNOWN");
 
