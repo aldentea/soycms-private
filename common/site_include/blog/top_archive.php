@@ -473,20 +473,15 @@ function soy_cms_blog_output_pages($page, $limit,$total){
 
 /*
 このブロックはトップページ、アーカイブページでご利用になれます。
-
 それぞれのページでの表示されている記事件数以上の記事があった場合、
-
 このブロックの生成するリンクによって続きのページへと移動することができます。
-
 続きがない場合は表示されません。
-
 このブロックは必ずAタグに使用してください。
 
 <a b_block:id="next_link">次へ</a b_block:id="next_link">
 
 1.2.7-
 <a b_block:id="next_page">次へ</a b_block:id="next_page">
-
 1.3.4-
 次のページがあるとき
 <!-- b_block:id="has_next" -->続く<!-- /b_block:id="has_next" -->
@@ -524,23 +519,21 @@ function soy_cms_blog_output_next_link($page,$offset,$limit,$total){
 
 /*
 このブロックはトップページ、アーカイブページでご利用になれます。
-
 それぞれのページでの表示されている記事件数以上の記事があった場合、
-
 より新しい記事がある場合には、このブロックの生成するリンクによって移動することが可能です。
-
 現在表示している記事より新しい記事がない場合はこのブロックは表示されません。
-
 このブロックは必ずAタグに使用してください。
 
 <a b_block:id="prev_link">前へ</a b_block:id="prev_link">
 
 1.2.7～
 <a b_block:id="prev_page">次へ</a b_block:id="prev_page">
-
 1.3.4-
 前のページがないとき
 <!-- b_block:id="no_prev" -->最初<!-- /b_block:id="no_prev" -->
+1.6.1-
+前のページがあるとき
+<!-- b_block:id="has_prev" -->昔<!-- /b_block:id="has_prev" -->
  */
 function soy_cms_blog_output_prev_link($page,$offset,$limit){
 
@@ -562,6 +555,11 @@ function soy_cms_blog_output_prev_link($page,$offset,$limit){
 		"soy2prefix" => "b_block",
 		"visible" => $hasPrev,
 		"link" => $url
+	));
+
+	$page->createAdd("has_prev","HTMLModel",array(
+		"soy2prefix" => "b_block",
+		"visible" => $hasPrev
 	));
 
 	$page->createAdd("no_prev","HTMLModel",array(

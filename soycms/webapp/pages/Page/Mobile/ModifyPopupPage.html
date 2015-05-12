@@ -26,11 +26,10 @@
 			form.attr("method","POST");
 			form.css("display","none");
 			
-			
 			$.each(ids,function(ele){
 				var input = $("<input/>");
 				input.attr("type","hidden");
-				input.val(ele);
+				input.val(ids[ele]);
 				input.attr("name","entries[]");
 				form.append(input);
 			});
