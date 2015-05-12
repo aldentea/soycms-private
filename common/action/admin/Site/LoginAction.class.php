@@ -13,17 +13,14 @@ class LoginAction extends SOY2Action{
 		/*
 		 * サイトの権限持ってるかどうかチェック
 		 */
-		$userId = $this->getUserSession()->getAttribute('userid');
-
-		$adminDao = SOY2DAOFactory::create("admin.AdministratorDAO");
-		$admin = $adminDao->getById($userId);
+		$userId = UserInfoUtil::getUserId();
 
 		//基本的には全てfalse
 		$isSiteAdministrator = false;
 		$isEntryAdministrator = false;
 		$isEntryPublisher = false;
 
-		if($admin->getIsDefaultUser()){
+		if(UserInfoUtil::isDefaultUser()){
 			//初期管理者は全権限を持つ
 			$isSiteAdministrator = true;
 			$isEntryAdministrator = true;
@@ -62,7 +59,7 @@ class LoginAction extends SOY2Action{
 		$this->getUserSession()->setAttribute("isEntryAdministor",$isEntryAdministrator);
 		$this->getUserSession()->setAttribute("isEntryPublisher",$isEntryPublisher);
 		$this->getUserSession()->setAttribute("onlyOneSiteAdministor",false);//ここに来てる時点で複数の管理サイトの権限を持っている
-		
+
 		SOY2ActionSession::regenerateSessionId();
 
 		return SOY2Action::SUCCESS;

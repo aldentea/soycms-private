@@ -2,15 +2,15 @@ tinymce.init({
 	mode : "specific_textareas",
 	editor_selector : "mceEditor",
 	theme : "modern",
-	skin : "lightgray",
-	plugins : "save,pagebreak,table,hr,insertdatetime,searchreplace,contextmenu,code,textcolor,paste,directionality,fullscreen,noneditable,charmap,visualchars,nonbreaking,innerlink,insertimage,soycms_emoji",
+	skin : "lightgray_panel_abs",
+	plugins : "save,pagebreak,table,hr,insertdatetime,searchreplace,contextmenu,code,textcolor,paste,directionality,fullscreen,noneditable,charmap,visualchars,nonbreaking,innerlink,insertimage,soycms_emoji,insertwidget",
 	tools : "inserttable",
 	language : soycms.language,
 	height : "300px",
 		
 	menubar : false,
-	toolbar1 : "save | cut copy paste pastetext pasteword | searchreplace | bold italic underline strikethrough | subscript superscript | forecolor backcolor | alignleft aligncenter alignright | formatselect fontselect fontsizeselect",
-	toolbar2 : "bullist numlist | outdent indent blockquote | undo redo | cleanup removeformat code styleprops attribs | fullscreen preview | insertdate inserttime | innerlink insertimage | soycms_emoji charmap | table",
+	toolbar1 : "save | cut copy paste pastetext | searchreplace | bold italic underline strikethrough | subscript superscript | forecolor backcolor | alignleft aligncenter alignright | formatselect fontselect fontsizeselect",
+	toolbar2 : "bullist numlist | outdent indent blockquote | undo redo | cleanup removeformat code styleprops attribs | fullscreen preview | insertdate inserttime | innerlink insertimage insertwidget | soycms_emoji charmap | table",
 
 	init_instance_callback : function(editor) {
 		onInitTinymceEditor(editor.id);

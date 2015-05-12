@@ -12,6 +12,12 @@ TARGET_DIRECTORY_NOT_WRITABLE	=		ディレクトリの書き込み権限があ�
 SITECONFIG_UPDATE_SUCCESS		=		サイト設定の更新に成功しました。
 SITECONFIG_UPDATE_FAILED		=		サイト設定の更新に失敗しました。
 
+//メール設定
+MAILCONFIG_UPDATE_SUCCESS		=		メール設定の更新に成功しました。
+MAILCONFIG_UPDATE_FAILED		=		メール設定の更新に失敗しました。
+TESTMAIL_SEND_SUCCESS			=		テストメールの送信に成功しました。
+TESTMAIL_SEND_FAILED			=		テストメールの送信に失敗しました。
+
 //プラグイン設定
 PLUGIN_ACTIVATION_SUCCESS			=		プラグインを有効にしました。
 PLUGIN_INACTIVATION_SUCCESS			=		プラグインを無効にしました。

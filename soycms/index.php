@@ -1,7 +1,8 @@
 <?php
 include_once("../common/common.inc.php");
 include_once('webapp/config.inc.php');
-include_once('webapp/config.ext.php');
+//extモードのファイルを読み込む
+if(file_exists(dirname(__FILE__) . "/webapp/config.ext.php")) include_once('webapp/config.ext.php');
 
 try{
 	SOY2PageController::run();

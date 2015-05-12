@@ -57,10 +57,9 @@ var TemplateEditor = {
 		var charCode = e.charCode;
 		var fromChar = String.fromCharCode(charCode);
 		
-		if(keyCode == 13){
+		if(keyCode == 13){//Enter
 			top.setTimeout(function(){TemplateEditor.syntaxHighlight();},100);	
-		
-		}else if(charCode==118 && e.ctrlKey)  { // handle paste
+		}else if(charCode==118 && e.ctrlKey)  { // Ctrl+v handle paste
 		 	top.setTimeout(function(){TemplateEditor.syntaxHighlight();},100);
 		}
 				
@@ -68,7 +67,7 @@ var TemplateEditor = {
 	},
 	
 	syntaxHighlight : function(flag){
-		
+		/* スペースが削られるので何もしない
 		if(flag != "scroll"){
 			window.getSelection().getRangeAt(0).insertNode(document.createTextNode(cc));
 		}
@@ -93,6 +92,7 @@ var TemplateEditor = {
 		editor.innerHTML = "<pre>" + html.replace(z,x) + "</pre>";
 		
 		this.findString();
+		*/
 	},
 	
 	getEditor : function(){

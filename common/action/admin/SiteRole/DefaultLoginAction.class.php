@@ -11,7 +11,7 @@ class DefaultLoginAction extends SOY2Action{
     	//転送先
     	$this->redirect = $req->getParameter('r');
 
-    	$userId = $this->getUserSession()->getAttribute('userid');
+    	$userId = UserInfoUtil::getUserId();
 
 		//基本的には全てfalse
 		$isSiteAdministrator = false;
@@ -20,47 +20,27 @@ class DefaultLoginAction extends SOY2Action{
 
 
 		if(! UserInfoUtil::isDefaultUser()){//初期管理者は自動ログインしない
-			$siteRoleDao = SOY2DAOFactory::create("admin.SiteRoleDAO");
-			try{
-				$siteRoles = $siteRoleDao->getByUserId($userId);
-			}catch(Exception $e){
-				$siteRoles = array();
-			}
-
-			$appRoleDao = SOY2DAOFactory::create("admin.AppRoleDAO");
-			try{
-				$appRoles = $appRoleDao->getByUserId($userId);
-			}catch(Exception $e){
-				$appRoles = array();
-			}
+			$siteRoles = $this->getSiteRoles($userId);
+			$appRoles = $this->getAppRoles($userId);
 
 			if(count($siteRoles) == 1 && count($appRoles) == 0){
 				//ログインできるのがサイト１個のみなので、それにログイン
-				$siteRole = $siteRoles[0];
-
-				/*
-				 * 管理画面に移動
-				 */
-				$this->redirectToCMS($siteRole);
-
-				return SOY2Action::SUCCESS;
+				$siteRole = array_shift($siteRoles);
+				if( $this->redirectToCMS($siteRole) ){
+					return SOY2Action::SUCCESS;
+				}
 			}elseif(count($siteRoles) == 0 && count($appRoles) == 1){
-				$res = $this->checkAppRoles($appRoles);
+				//ログインできるのがApp１個のみなので、それにログイン
+				$appRole = array_shift($appRoles);//@index appIdがかかってるので$appRoles[0]ではだめ
 
-				if($res){
-					//ログインできるのがApp１個のみなので、それにログイン
-					$appRole = array_shift($appRoles);//@index appIdがかかってるので$appRoles[0]ではだめ
-
-					/*
-					 * 管理画面に移動
-					 */
+				//App操作者のみ <-- ログインできるサイトが0なのでShopに関してはこの判定は不要では？
+				if($this->checkAppRole($appRole)){
 					if( $this->redirectToApp($appRole->getAppId()) ){
 						return SOY2Action::SUCCESS;
 					}
-
 				}
 			}elseif(count($siteRoles) == 1 && count($appRoles) == 1){
-				//ShopはSiteにも登録されているのでこれが必要
+				//Shop用：ShopはSiteにも登録されているのでこれが必要
 
 				$siteRole = array_shift($siteRoles);
 				$appRole  = array_shift($appRoles);//@index appIdがかかってるので$appRoles[0]ではだめ
@@ -132,21 +112,18 @@ class DefaultLoginAction extends SOY2Action{
     }
 
     /**
-     * App権限でApp操作者の場合はAppのログインを表示しない
-     * shopの場合はApp管理画面にログインされると都合が悪いが、
-     * 他のAppの場合では管理画面にログインできる必要があるかもしれないので、
-     * この仕様は要検討課題
+     * App権限でApp操作者の場合はAppのログインを表示しない（直接ログインしてしまう）
+     * @TODO この仕様は要検討
+     * Shopの場合はApp管理画面にログインされると都合が悪いのでそれに合わせたが
+     * 他のAppの場合では管理画面にログインできる必要があるかもしれない
      */
-    function checkAppRoles($appRoles){
-    	$res = false;
-
-    	foreach($appRoles as $role){
-    		if($role->getAppRole() == AppRole::APP_USER)$res = true;
-    	}
-
-    	return $res;
+    function checkAppRole($appRole){
+   		return ($appRole->getAppRole() == AppRole::APP_USER);
     }
 
+	/**
+	 * サイトを取得する
+	 */
     function getSiteById($siteId){
 		try{
 			$dao = SOY2DAOFactory::create("admin.SiteDAO");
@@ -154,5 +131,31 @@ class DefaultLoginAction extends SOY2Action{
 		}catch(Exception $e){
 			return false;
 		}
-    }
+	}
+
+	/**
+	 * ユーザーのサイト権限を取得する
+	 */
+	function getSiteRoles($userId){
+		$siteRoleDao = SOY2DAOFactory::create("admin.SiteRoleDAO");
+		try{
+			$siteRoles = $siteRoleDao->getByUserId($userId);
+		}catch(Exception $e){
+			$siteRoles = array();
+		}
+		return $siteRoles;
+	}
+
+	/**
+	 * ユーザーのApp権限を取得する
+	 */
+	function getAppRoles($userId){
+		$appRoleDao = SOY2DAOFactory::create("admin.AppRoleDAO");
+		try{
+			$appRoles = $appRoleDao->getByUserId($userId);
+		}catch(Exception $e){
+			$appRoles = array();
+		}
+		return $appRoles;
+	}
 }

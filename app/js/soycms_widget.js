@@ -27,7 +27,7 @@ soycms.UI.WindowManager.prototype = {
 	counter : 0,
 		
 	initialize: function(options) {
-		this.options = Object.extend(this.options, options || {});
+		this.options = $.extend(this.options, options || {});
 	},
 	getContainer : function(){
 		return (this.options.container) ? this.options.container : document.body; 
@@ -46,29 +46,46 @@ soycms.UI.WindowManager.prototype = {
 		window.setZIndex(100 + this.counter * 1);
 	},
 	remove : function(window){
-		if(window.getWindowEl())this.getContainer().removeChild(window.getWindowEl());
-		this.stack = this.stack.without(window);
+		if(window.getWindowEl().size() > 0)window.getWindowEl().remove();
+		//if(window.getWindowEl())this.getContainer().removeChild(window.getWindowEl());
+		var stack = this.stack;
+		stack.some(function(v, i){
+			if(v == window)stack.splice(i, 1);
+		});
+		this.stack = stack;
+		//this.stack = this.stack.without(window);
+		
 	},
 	getWindow : function(id){
 		var id = this.options.prefix + id;
 		return this.stack.find(function(win) { return win.id == id });
 	},
 	getFrontWindow : function(){
-		return this.stack.last();
+		return this.stack[this.stack.length-1];
 	},
 	sendToBack : function(win) {
-    	this.stack = this.stack.without(window);
+			var stack = this.stack;
+			stack.some(function(v, i){
+				if(v == window)stack.splice(i, 1);
+			});
+			this.stack = stack;
+    	//this.stack = this.stack.without(window);
     	this.stack.unshift(win);
     	this.resetZIndexes();
 	},
 	bringToFront : function(win) {
-    	this.stack = this.stack.without(window);
+			var stack = this.stack;
+			stack.some(function(v, i){
+				if(v == window)stack.splice(i, 1);
+			});
+			this.stack = stack;
+    	//this.stack = this.stack.without(window);
     	this.stack.push(win);
     	this.resetZIndexes();
   	},
   	resetZIndexes : function(){
   		var zIndex = 100;
-  		this.stack.each(function(w) {
+  		this.stack.some(function(w, i) {
 	    	w.setZIndex(zIndex);
 	    	zIndex = w.lastZIndex + 1;
 	    });
@@ -194,7 +211,7 @@ soycms.UI.WindowBase.prototype = {
 				this.offsetY = e.pageY - wrapper.offsetTop;
 			}
 			
-			$$("select").each(function(ele){
+			$(".select").each(function(i, ele){
 				ele._visibility = ele.style.visibility;
 				ele.style.visibility = "hidden";
 			});
@@ -209,7 +226,7 @@ soycms.UI.WindowBase.prototype = {
 				document.onmousemove = null;
 			}
 			
-			$$("select").each(function(ele){
+			$(".select").each(function(i, ele){
 				ele.style.visibility = ele._visibility;
 			});
 			
@@ -291,9 +308,9 @@ soycms.UI.WindowBase.prototype = {
 		};
 	
 		small.onclick = function(){
-			$(targetId + "layer_left").toggle();
-			$(targetId + "layer_right").toggle();
-			$(targetId + "_container").toggle();
+			$("#" + targetId + "layer_left").toggle();
+			$("#" + targetId + "layer_right").toggle();
+			$("#" + targetId + "_container").toggle();
 		};
 	
 		//containerの両脇を作成
@@ -355,8 +372,10 @@ soycms.UI.WindowBase.prototype = {
 			
 			document.onmousemove = function(e){
 				if(!e)e=event;
-				var x = Event.pointerX(e);	
-				var y = Event.pointerY(e);
+				//var x = Event.pointerX(e);	
+				//var y = Event.pointerY(e);
+				var x = e.x;
+				var y = e.y;
 				
 				var newWidth = x - wrapper.offsetLeft;
 				var newHeight = y - wrapper.offsetTop;
@@ -378,19 +397,21 @@ soycms.UI.WindowBase.prototype = {
 	
 	},
 	getWindowEl : function(){
-		return $(this.id + "_wrapper");
+		return $("#" + this.id + "_wrapper");
 	},
 	getContainerEl : function(){
-		return $(this.id + "_container");
+		return $("#" + this.id + "_container");
 	},
 	show : function(){
-		new Effect.BlindDown(this.getWindowEl(),{
-			duration : 0.5
-		});
+		this.getWindowEl().show(0.5);
+		//new Effect.BlindDown(this.getWindowEl(),{
+		//duration : 0.5
+		//});
 		return this;
 	},
 	close : function(){
-		if(this.getWindowEl())this.getWindowEl().hide();
+		if(this.getWindowEl().size() > 0)this.getWindowEl().hide();
+		//if(this.getWindowEl())this.getWindowEl().hide();
 		this.getManager().remove(this);
 		return this;
 	},
@@ -399,7 +420,7 @@ soycms.UI.WindowBase.prototype = {
 		return this;
 	},
 	update : function(str){
-		this.getContainerEl().update(str);
+		this.getContainerEl().get(0).update(str);
 		return this;
 	},
 	resize : function(w,h){
@@ -407,7 +428,8 @@ soycms.UI.WindowBase.prototype = {
 		var targetId = this.id;
 		
 		var _common_get = function(id){
-			return $(targetId + id);
+			return $("#" + targetId + id).get(0);
+			//return $(targetId + id);
 		};
 		
 		if(w && w >= 50){
@@ -440,7 +462,8 @@ soycms.UI.WindowBase.prototype = {
 	
 	setZIndex : function(zIndex){
 		this.lastZIndex = zIndex;
-		this.getWindowEl().style.zIndex = zIndex;
+		//this.getWindowEl().style.zIndex = zIndex;
+		this.getWindowEl().css("z-index", zIndex);
 	},
 	bringToFront : function(){
 		this.options.wm.bringToFront(this);
@@ -450,7 +473,7 @@ soycms.UI.WindowBase.prototype = {
 soycms.UI.Window = function(){
 	this.initialize.apply(this, arguments);
 };
-soycms.UI.Window.prototype = Object.extend(new soycms.UI.WindowBase(),{
+soycms.UI.Window.prototype = $.extend(new soycms.UI.WindowBase(), {
 	initialize: function(options) {
 		this.options = {
 			id : null,
@@ -461,7 +484,7 @@ soycms.UI.Window.prototype = Object.extend(new soycms.UI.WindowBase(),{
 			onresize : null
 		};
 	
-		this.options = Object.extend(this.options, options || {});
+		this.options = $.extend(this.options, options || {});
 		this.build();
 		
 		this.getManager().add(this);
@@ -474,7 +497,7 @@ soycms.UI.Window.prototype = Object.extend(new soycms.UI.WindowBase(),{
 soycms.UI.TargetWindow = function(){
 	this.initialize.apply(this, arguments);
 };
-soycms.UI.TargetWindow.prototype = Object.extend(new soycms.UI.WindowBase(),{
+soycms.UI.TargetWindow.prototype = $.extend(new soycms.UI.WindowBase(), {
 	
 	url : "about:blank",
 	
@@ -489,7 +512,7 @@ soycms.UI.TargetWindow.prototype = Object.extend(new soycms.UI.WindowBase(),{
 			onresize : null
 		};
 	
-		this.options = Object.extend(this.options, options || {});
+		this.options = $.extend(this.options, options || {});
 		this.build();
 		
 		this.getManager().add(this);
@@ -525,23 +548,23 @@ soycms.UI.TargetWindow.prototype = Object.extend(new soycms.UI.WindowBase(),{
 	},
 	
 	hideIframe : function(){
-		this.getIframe().style.visibility = "hidden";
+		this.getIframe().css("visibility", "hidden");
 	},
 	
 	showIframe : function(){
-		this.getIframe().style.visibility = "visible";
+		this.getIframe().css("visibility", "visible");
 	},
 	
 	createIframe : function(){
-		this.getContainerEl().innerHTML = 
+		this.getContainerEl().html( 
 			'<iframe src="'+ this.url +'" name="'+ this.getIframeId() +
 				 '" frameborder="0" id="'+ this.getIframeId() + 
-				 '" class="click_to_layer_frame"></iframe>';
+				 '" class="click_to_layer_frame"></iframe>');
 		
-		this.getIframe().style.width = "100%";
-		this.getIframe().style.height = "100%";
+		this.getIframe().css("width", "100%");
+		this.getIframe().css("height", "100%");
 		
-		this.getContainerEl().style.overflow = "visible";
+		this.getContainerEl().css("overflow", "visible");
 	},
 	
 	getIframeId : function(){
@@ -549,6 +572,6 @@ soycms.UI.TargetWindow.prototype = Object.extend(new soycms.UI.WindowBase(),{
 	},
 	
 	getIframe : function(){
-		return $(this.getIframeId());
+		return $("#" + this.getIframeId());
 	}
 });

@@ -31,15 +31,6 @@ pre{
 th {
 	background-color:#D4EBA5;
 }
-tr.even td {
-	background-color:#F5FBD0;
-}
-tr.last_row td,tr.last_row th{
-	border-bottom:1px solid #AAAAAA !important;
-}
-th.last_col, td.last_col{
-	border-right:1px solid #AAAAAA !important;
-}
 
 /*汎用的なクラス*/
 .center{text-align:center;}
@@ -132,7 +123,7 @@ a.menu_active{
 }
 
 
-.menu_hover{
+.menu:hover{
 	background-color:yellow;
 }
 
@@ -300,15 +291,24 @@ table.button_table{
 }
 
 /* table for list */
-table.list tbody tr.hover td{
+table.list tbody tr:hover td{
 	background-color:#FEFF9F;
 }
-table.list tbody tr.hover td a{
+table.list tbody tr:hover td a{
 	color: black;
 }
 table.list tfoot tr.search td{
 	padding: 1px 0px;
 	text-align: center;
+}
+table.list tbody tr:nth-child(odd) td {
+	background-color:#F5FBD0;
+}
+table.list tbody tr:last-child td,tr:last-child th{
+	border-bottom:1px solid #AAAAAA !important;
+}
+table.list tbody th:last-child, td:last-child{
+	border-right:1px solid #AAAAAA !important;
 }
 
 /* functions */

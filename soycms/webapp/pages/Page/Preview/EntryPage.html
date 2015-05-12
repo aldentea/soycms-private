@@ -119,11 +119,11 @@
 							<td style="vertical-align:top;">
 								<input type="text" soy:id="end_date" id="end_date" size="25" maxlength="19" style="width:100%">
 								<div style="font-size:10px;">
-									<a href="#" onclick="$('#end_date').value(buildDateString(movedate(new Date,0,0,1,0,0,0),true,true));return false;">明日</a><br/>
-									<a href="#" onclick="$('#end_date').value(buildDateString(movedate(new Date,0,0,7,0,0,0),true,true));return false;">来週</a><br/>
-									<a href="#" onclick="$('#end_date').value(buildDateString(movedate(new Date,0,1,0,0,0,0),true,true));return false;">来月</a><br/>
-									<a href="#" onclick="$('#end_date').value(buildDateString(movedate(new Date,0,0,0,0,0,0),false,true));return false;">現在の時刻</a><br/>
-									<a href="#" onclick="$('#end_date').value('');return false;">日時のクリア</a>
+									<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,0,1,0,0,0),true,true));return false;">明日</a><br/>
+									<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,0,7,0,0,0),true,true));return false;">来週</a><br/>
+									<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,1,0,0,0,0),true,true));return false;">来月</a><br/>
+									<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,0,0,0,0,0),false,true));return false;">現在の時刻</a><br/>
+									<a href="#" onclick="$('#end_date').val('');return false;">日時のクリア</a>
 								</div>
 							</td>
 						</tr>

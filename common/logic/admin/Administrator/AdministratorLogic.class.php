@@ -20,8 +20,7 @@ class AdministratorLogic extends Administrator implements SOY2LogicInterface{
 	}
 
 	/**
-	 * ログイン処理を行う
-	 *
+	 * ログイン処理を行い（ユーザーIDとパスワードの照合判定のみ）、$thisにAdministratorの値が入る
 	 * @return boolean ログイン成功したかどうか
 	 */
 	function login($userid,$password){
@@ -81,7 +80,7 @@ class AdministratorLogic extends Administrator implements SOY2LogicInterface{
 	 */
 	function count(){
 		$dao = SOY2DAOFactory::create("admin.AdministratorDAO");
-		return $dao->countUser();		
+		return $dao->countUser();
 	}
 
 
@@ -257,7 +256,7 @@ class AdministratorLogic extends Administrator implements SOY2LogicInterface{
 	 */
 	function hasMailaddress() {
 		$userArray = $this->getAdministratorList();
-		
+
 		foreach($userArray as $user) {
 			if(strlen($user->getEmail())) return true;
 		}
@@ -281,14 +280,14 @@ class AdministratorLogic extends Administrator implements SOY2LogicInterface{
 		$user->setToken($this->getRandomStrings(40));
 
 		$dao = $this->getDAO();
-		
+
     try{
       $dao->update($user);
     }catch(Exception $e){
       error_log(var_export($e, true));
 			return null;
     }
-		
+
     return $user->getToken();
 	}
 
@@ -313,7 +312,7 @@ class AdministratorLogic extends Administrator implements SOY2LogicInterface{
 
 		return $str;
 	}
-	
+
 	private function getDAO() {
 		return SOY2DAOFactory::create("admin.AdministratorDAO");
 	}

@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <link rel="stylesheet" href="<?php echo CMSApplication::getShopRoot(); ?>css/soy2/style.css" />
 <link rel="stylesheet" href="<?php echo CMSApplication::getShopRoot(); ?>css/admin/style.css" />
 <link rel="stylesheet" href="<?php echo CMSApplication::getShopRoot(); ?>js/tools/soy2_date_picker.css" />

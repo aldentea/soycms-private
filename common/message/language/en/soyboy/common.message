@@ -11,6 +11,12 @@ TARGET_DIRECTORY_NOT_WRITABLE	=		Directory is not writable.
 SITECONFIG_UPDATE_SUCCESS		=		Site config is updated successfully.
 SITECONFIG_UPDATE_FAILED		=		Updating site config failed.
 
+//メール設定
+MAILCONFIG_UPDATE_SUCCESS		=		Mail config is updated successfully.
+MAILCONFIG_UPDATE_FAILED		=		Updating mail config failed.
+TESTMAIL_SEND_SUCCESS			=		Sent Test-mail successfully.
+TESTMAIL_SEND_FAILED			=		Sending Test-mail failed.
+
 //プラグイン設定
 PLUGIN_ACTIVATION_SUCCESS			=		The plugin is activated.
 PLUGIN_INACTIVATION_SUCCESS			=		The plugin is inactivated.

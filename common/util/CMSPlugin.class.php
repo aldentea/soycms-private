@@ -326,6 +326,25 @@ class CMSPlugin {
 		$instance->_blocks[$type][$id] = $func;
 	}
 	
+	/**
+	 * プラグインブロックを複数追加する
+	 * @param string $pluginId プラグインID
+	 * @param string $blockId テンプレートに記述するcms:plugin
+	 * @param string $type
+	 * @param array $func
+	 */
+	static function addMultipleBlock($pluginId, $blockId, $type, $func){
+		if(!CMSPlugin::activeCheck($pluginId))return;
+		
+		$instance =& CMSPlugin::getInstance();
+		
+		if(!isset($instance->_blocks[$type])){
+			return;
+		}
+
+		$instance->_blocks[$type][$blockId] = $func;
+	}
+	
 	static function getBlocks($type){
 		$instance =& CMSPlugin::getInstance();
 		return @$instance->_blocks[$type];

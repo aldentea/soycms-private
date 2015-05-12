@@ -103,7 +103,7 @@ class ButtonSocialCommon{
 				"class=\"hatena-bookmark-button\" " .
 				"data-hatena-bookmark-layout=\"standard\" " .
 				"title=\"このエントリーをはてなブックマークに追加\">" .
-				"<img src=\"https://b.st-hatena.com/images/entry-button/button-only.gif\" " .
+				"<img src=\"http://b.st-hatena.com/images/entry-button/button-only.gif\" " .
 				"alt=\"このエントリーをはてなブックマークに追加\" " .
 				"width=\"20\" height=\"20\" style=\"border: none;\" /></a>" .
 				"<script type=\"text/javascript\" " .

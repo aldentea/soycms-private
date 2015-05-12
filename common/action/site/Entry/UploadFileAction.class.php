@@ -50,13 +50,23 @@ class UploadFileAction extends SOY2Action{
 				$responseObject->result = false;
 				$responseObject->message = $message;
 				$responseObject->errorCode = 101;
+				$this->setAttribute("result", $responseObject);
+				return;
 			}
-		}else{
-			$responseObject->result = false;
-			$responseObject->message = "ファイルのアップロードでエラーが発生しました。";
-			$responseObject->errorCode = 100;
 		}
-
+		
+		//エラー POSTされてこなかった状態 post_max_sizeなど
+		if(isset($_FILES) && is_array($_FILES) && count($_FILES) == 0){
+			$responseObject->result = false;
+			$responseObject->message = "ファイルがアップロードされていません。";
+			$responseObject->errorCode = 100;
+			$this->setAttribute("result", $responseObject);
+			return;
+		}
+		
+		$responseObject->result = false;
+		$responseObject->message = "ファイルのアップロードでエラーが発生しました。";
+		$responseObject->errorCode = 100;
 
     	//前回アップロードしたファイルを削除
     	$beforepath = UserInfoUtil::getSiteDirectory().$this->getDefaultUpload().$form->beforepath;

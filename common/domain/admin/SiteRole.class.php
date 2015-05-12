@@ -41,6 +41,7 @@ class SiteRole {
 	private $siteId;
 
 	/**
+	 * 権限の値が入る（以前はフラグが入っていた）
 	 * @column is_limit
 	 */
 	private $isLimitUser;
@@ -93,7 +94,7 @@ class SiteRole {
 
 		$this->isLimitUser = $siteRole;
 	}
-	
+
 	/**
 	 * この管理者権限をテキストで返す関数
 	 */
@@ -101,7 +102,7 @@ class SiteRole {
 		$list = self::getSiteRoleLists();
 		return $list[$this->isLimitUser];
 	}
-	
+
 	/**
 	 * 一般管理者かどうか
 	 */
@@ -140,7 +141,7 @@ class SiteRole {
 
 	/**
 	 * エントリーの公開権限があるかどうか
-	 * 
+	 *
 	 */
 	public function isEntryPublisher(){
 		$siteRole = $this->getSiteRole();

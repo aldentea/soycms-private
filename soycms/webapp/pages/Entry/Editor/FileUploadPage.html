@@ -195,6 +195,7 @@
 	
 	function prepare(resObj){
 		if(!resObj.result){
+			console.log(resObj.message);
 			switch(resObj.errorCode){
 				case 1://already file exists
 				if(confirm("リモートフォルダに同名ファイルが存在しました。\n名前を変えてアップロードしますか？")){
@@ -221,6 +222,9 @@
 				case 2://fatial error
 					alert('致命的なエラーが発生しました');
 				break;
+				
+				default:
+					alert(resObj.message);
 			}
 			$("#insert").hide();
 			return;

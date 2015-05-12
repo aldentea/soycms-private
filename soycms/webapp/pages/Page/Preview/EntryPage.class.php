@@ -47,8 +47,8 @@ class EntryPage extends CMSEntryEditorPageBase{
     function EntryPage($arg) {
     	
     	//$id == null ならば新規作成
-    	$this->id = @$arg[0];
-    	$this->jumpTo = @$_GET["jumpTo"];
+    	$this->id = (isset($arg[0]) && is_numeric($arg[0])) ? $arg[0] : null;
+    	$this->jumpTo = (isset($_GET["jumpTo"])) ? $_GET["jumpTo"] : null;
     	
     	WebPage::WebPage();
     	
@@ -228,7 +228,7 @@ class EntryPage extends CMSEntryEditorPageBase{
 	    ));
 	    
 	    $this->createAdd("create_button","HTMLInput",array(
-	    	"visible" => (boolean)$this->id,
+	    	"visible" => ((boolean)$this->id || is_null($this->id)),
 	    	"type"=>"submit",
 	    	"name" => "as_new",
 	    	"value"=>CMSMessageManager::get("SOYCMS_SAVE_AS_A_NEW_ENTRY"),
@@ -292,11 +292,8 @@ class EntryPage extends CMSEntryEditorPageBase{
 		
 		//ボタンの出しわけ:新規作成ボタン
 		$this->createAdd("show_create_button", "HTMLModel", array(
-			"visible" => (!is_numeric($this->id))
+			"visible" => (is_null($this->id))
 		));
-		
-		
-		
     }
 }
 
