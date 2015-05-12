@@ -149,14 +149,14 @@
 						<div class="body">
 							<textarea soy:id="extra_outputs"></textarea>
 						</div>
-					</div>
+					</div soy:id="use_extra">
 					
 					<div class="section" soy:id="with_options">
 						<p class="head">選択項目<a href="javascript:void(0);" onclick="common_show_message_popup(this,'ラジオボタンとセレクトボックスの選択項目を一行ごとに入力してください。最初に選択されている項目は「初期値」で設定できます。');"><img src="../../../soycms/image/icon/help.gif" class="help_icon" /></a></p>
 						<div class="body">
 							<textarea soy:id="option"></textarea>
-						</div soy:id="with_options">
-					</div>
+						</div>
+					</div soy:id="with_options">
 																	
 					<div style="margin:10px 1em 2em;text-align:right;">
 						<input type="button" soy:id="update_advance" style="padding:10px 20px;" value="設定保存" />
@@ -206,6 +206,37 @@
 		</div>
 </fieldset>
 
+<form id="export_form" method="post">
+<fieldset style="width:670px;">
+	<legend>CSVエクスポートβ</legend>
+	<div>
+		<label><input type="checkbox" name="format[label]" value="1" checked="checked">1行目をラベルとする</label><br>
+		<label><input type="checkbox" name="format[quote]" value="1">データをダブルクォーテーションで必ず括る（オフの場合は自動判別）</label><br>
+		<label><input type="radio" name="format[separator]" value="comma" checked="checked">カンマ区切り</label>
+		<label><input type="radio" name="format[separator]" value="tab">タブ区切り</label><br/>
+		<label><input type="radio" name="format[charset]" value="Shift-JIS" checked="checked">Shift-JIS</label>
+		<label><input type="radio" name="format[charset]" value="UTF-8">UTF-8</label>&nbsp;
+		<input type="submit" name="csv" value="CSV出力">
+	</div>
+</fieldset>
+</form>
+
+<form id="import_form" method="post" enctype="multipart/form-data">
+<fieldset style="width:670px;">
+	<legend>CSVインポートβ</legend>
+	<div>
+		<label><input type="checkbox" name="format[label]" value="1" checked="checked">1行目をラベルとする</label><br>
+		<label><input type="checkbox" name="format[quote]" value="1">データをダブルクォーテーションで必ず括る（オフの場合は自動判別）</label><br>
+		<label><input type="radio" name="format[separator]" value="comma" checked="checked">カンマ区切り</label>
+		<label><input type="radio" name="format[separator]" value="tab">タブ区切り</label><br/>
+		<label><input type="radio" name="format[charset]" value="Shift-JIS" checked="checked">Shift-JIS</label>
+		<label><input type="radio" name="format[charset]" value="UTF-8">UTF-8</label>&nbsp;
+		<input type="file" name="import_file" value="">&nbsp;
+		<input type="submit" name="upload" value="CSVアップロード">
+	</div>
+</fieldset>
+</form>
+
 
 <style type="text/css">
 .section{
@@ -213,6 +244,13 @@
 }
 </style>
 <script type="text/javascript">
+$(function(){
+	$("#export_form").attr("target","download_frame");
+	$("#export_form").submit(function(){
+		setTimeout(function(){location.reload();},1000);
+	});
+});
+
 function check_update(old){
 	var res = window.prompt("New Label?",old);
 	if(res != null && res.length > 0){

@@ -43,7 +43,7 @@ class IndexPage extends CMSWebPageBase {
     }
 
     function insertScript($html){
-    	
+
     	//jquery関連の読み込みがあった場合、読み込まないようにする
     	preg_match_all('/<(script).*?src="(.*)\/jquery(.*)"><\/(script)>/i', $html, $match);
     	foreach($match[0] as $tag){
@@ -141,6 +141,8 @@ class IndexPage extends CMSWebPageBase {
 	    	$insertHTML[] = '</form>';
 	    	$insertHTML[] = '</div>';
     	}
+
+    	$insertHTML[] = '</div>';//soy_cms_operation
 
     	$insertHTML = implode("\n",$insertHTML);
 

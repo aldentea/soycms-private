@@ -461,6 +461,12 @@ class MultiLabelBlockComponent_ViewPage extends HTMLList{
 			"link" => $entryUrl ."#more",
 			"visible"=>(strlen($entity->getMore()) != 0)
 		));
+		
+		$this->createAdd("more_link_no_anchor", "HTMLLink", array(
+			"soy2prefix"=>"cms",
+			"link" => $entryUrl,
+			"visible"=>(strlen($entity->getMore()) != 0)
+		));
 
 		//Blog Title link
 		$this->createAdd("blog_title", "CMSLabel", array(

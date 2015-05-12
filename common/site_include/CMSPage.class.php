@@ -54,7 +54,7 @@ class CMSPage extends WebPage{
 			 * if_has_entry_in:id="xxx"
 			 */
 			$this->createAdd($block->getSoyId().":has_entry","HTMLModel",array(
-				"visible"    => count($soy2HtmlObject->list),
+				"visible"    => (isset($soy2HtmlObject->list) && count($soy2HtmlObject->list)),
 				"soy2prefix" => "if",
 			));
 			/*
@@ -62,7 +62,7 @@ class CMSPage extends WebPage{
 			 * if_no_entry_in:id="xxx"
 			 */
 			$this->createAdd($block->getSoyId().":no_entry","HTMLModel",array(
-				"visible"    => !count($soy2HtmlObject->list),
+				"visible"    => (isset($soy2HtmlObject->list) && !count($soy2HtmlObject->list)),
 				"soy2prefix" => "if",
 			));
 		}
@@ -77,7 +77,17 @@ class CMSPage extends WebPage{
 		$pageFormat = preg_replace('/%SITE%/',$this->siteConfig->getName(),$pageFormat);
 		$pageFormat = preg_replace('/%PAGE%/',$this->page->getTitle(),$pageFormat);
 		$this->setTitle($pageFormat);
-
+		
+		$this->createAdd("top_link", "HTMLLink", array(
+			"link" => SOY2PageController::createLink(""),
+			"soy2prefix" => "cms"
+		));
+		
+		$this->createAdd("site_url", "HTMLLabel", array(
+			"text" => SOY2PageController::createLink(""),
+			"soy2prefix" => "cms"
+		));
+		
 		//メッセージの設定
 		$this->createAdd("site_name","HTMLLabel",array(
 			"text" => $this->siteConfig->getName(),
@@ -91,7 +101,7 @@ class CMSPage extends WebPage{
 			"text" => $this->page->getTitle(),
 			"soy2prefix" => "cms"
 		));
-
+		
 		$this->addMessageProperty("site_name",'<?php echo $'.$this->_soy2_pageParam.'["site_name"]; ?>');
 		$this->addMessageProperty("page_title",'<?php echo $'.$this->_soy2_pageParam.'["page_title"]; ?>');
 		$this->addMessageProperty("raw_page_title",'<?php echo $'.$this->_soy2_pageParam.'["raw_page_title"]; ?>');
@@ -348,6 +358,7 @@ class CMSPage extends WebPage{
 class CMSAppContainer extends SOY2HTML{
 
 	private $page;
+	private $config = array();
 
 	function setPage($page){
 		$this->page = $page;
@@ -365,43 +376,32 @@ class CMSAppContainer extends SOY2HTML{
 				define("CMS_COMMON", SOY2::RootDir());
 			}
 
-			//読み込み
-			include_once(CMS_APPLICATION_ROOT_DIR . "webapp/base/CMSApplication.class.php");
+			if(is_readable(CMS_APPLICATION_ROOT_DIR . "webapp/base/CMSApplication.class.php")){
+				//読み込み
+				include_once(CMS_APPLICATION_ROOT_DIR . "webapp/base/CMSApplication.class.php");
 
-			//保険
-			$oldRooDir = SOY2::RootDir();
-			$oldPagDir = SOY2HTMLConfig::PageDir();
-			$oldCacheDir = SOY2HTMLConfig::CacheDir();
-			$oldDaoDir = SOY2DAOConfig::DaoDir();
-			$oldEntityDir = SOY2DAOConfig::EntityDir();
-			$oldDsn = SOY2DAOConfig::Dsn();
-			$oldUser = SOY2DAOConfig::user();
-			$oldPass = SOY2DAOConfig::pass();
+				//保険
+				$this->saveSOY2Config();
 
-			try{
-
-				foreach($applicationIds as $applicationId){
-					$pagePHP = CMS_APPLICATION_ROOT_DIR . "webapp/" . $applicationId . "/page.php";
-					if(strlen($applicationId) && file_exists($pagePHP)){
-						include_once($pagePHP);
-
-						//実行
-						CMSApplication::page($this->page,$this->page->arguments);
+				//実行
+				try{
+					foreach($applicationIds as $applicationId){
+						$pagePHP = CMS_APPLICATION_ROOT_DIR . "webapp/" . $applicationId . "/page.php";
+						if(strlen($applicationId) && file_exists($pagePHP)){
+							include_once($pagePHP);
+							CMSApplication::page($this->page,$this->page->arguments);
+						}
 					}
+				}catch(Exception $e){
+					//復帰
+					$this->restoreSOY2Config();
+					throw $e;
 				}
 
-			}catch(Exception $e){
-				SOY2::RootDir($oldRooDir);
-				SOY2HTMLConfig::PageDir($oldPagDir);
-				SOY2HTMLConfig::CacheDir($oldCacheDir);
-				SOY2DAOConfig::DaoDir($oldDaoDir);
-				SOY2DAOConfig::EntityDir($oldEntityDir);
-				SOY2DAOConfig::Dsn($oldDsn);
-				SOY2DAOConfig::user($oldUser);
-				SOY2DAOConfig::pass($oldPass);
+				//復帰
+				$this->restoreSOY2Config();
+			}
 
-	    		throw $e;
-	    	}
 		}
 
 		return $this->getInnerHTML();
@@ -423,6 +423,30 @@ class CMSAppContainer extends SOY2HTML{
 		}
 
 		return $applicationIds;
+	}
+
+	private function saveSOY2Config(){
+		$this->config = array(
+			"RootDir" => SOY2::RootDir(),
+			"PageDir" => SOY2HTMLConfig::PageDir(),
+			"CacheDir" => SOY2HTMLConfig::CacheDir(),
+			"DaoDir" => SOY2DAOConfig::DaoDir(),
+			"EntityDir" => SOY2DAOConfig::EntityDir(),
+			"Dsn" => SOY2DAOConfig::Dsn(),
+			"User" => SOY2DAOConfig::user(),
+			"Pass" => SOY2DAOConfig::pass(),
+		);
+	}
+
+	private function restoreSOY2Config(){
+		SOY2::RootDir($this->config["RootDir"]);
+		SOY2HTMLConfig::PageDir($this->config["PageDir"]);
+		SOY2HTMLConfig::CacheDir($this->config["CacheDir"]);
+		SOY2DAOConfig::DaoDir($this->config["DaoDir"]);
+		SOY2DAOConfig::EntityDir($this->config["EntityDir"]);
+		SOY2DAOConfig::Dsn($this->config["Dsn"]);
+		SOY2DAOConfig::user($this->config["User"]);
+		SOY2DAOConfig::pass($this->config["Pass"]);
 	}
 
 }

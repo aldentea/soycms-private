@@ -1,5 +1,5 @@
 <?php
-class CustomFieldPluginFormPage extends WebPage{
+class CustomFieldAdvancedPluginFormPage extends WebPage{
 
 	private $pluginObj;
 
@@ -8,11 +8,26 @@ class CustomFieldPluginFormPage extends WebPage{
 	const SHOW_INPUT_LABEL = 2;
 
 
-	function CustomFieldPluginFormPage(){
-
+	function CustomFieldAdvancedPluginFormPage(){
 	}
 
 	function doPost(){
+
+		//カスタムフィールドから設定をインポート
+		if(soy2_check_token() && isset($_POST["import"])){
+			$migrateLogic = SOY2Logic::createInstance("site_include.plugin.CustomFieldAdvanced.logic.MigrateConfigLogic", array("pluginObj" => $this->pluginObj));
+			$migrateLogic->import();
+		}
+
+		//CSVエクスポート
+		if(isset($_POST["csv"])){
+			$this->pluginObj->exportFields();
+		}
+		
+		//CSVインポート
+		if(isset($_POST["upload"])){
+			$this->pluginObj->importFields();
+		}
 
 		if(isset($_POST["display_config"])){
 			$this->pluginObj->updateDisplayConfig($_POST["display_config"]);
@@ -66,6 +81,9 @@ class CustomFieldPluginFormPage extends WebPage{
 		$this->createAdd("add_field","HTMLModel",array(
 			"visible"=> count($this->pluginObj->customFields)<1
 		));
+		
+		//カスタムフィールドから設定をインポート
+		$this->addForm("import_form");
 
 		//ラベルの取得
 		$labels = SOY2DAOFactory::create("cms.LabelDAO")->get();
@@ -96,7 +114,16 @@ class CustomFieldPluginFormPage extends WebPage{
 			"label"    => "IDを表示する",
 			"onclick"  => "update_display_sample()"
 		));
+		
+		$this->addCheckBox("acceleration", array(
+			"type" => "checkbox",
+			"name" => "display_config[acceleration]",
+			"value" => 1,
+			"selected" => ($this->pluginObj->getAcceleration() == 1),
+			"label" => "表示の高速化"
+		));
 
+		$this->addForm("csv_export_form");
 	}
 
 	function getTemplateFilePath(){
@@ -112,7 +139,7 @@ class CustomFieldPluginFormPage extends WebPage{
 }
 
 
-
+if(!class_exists("FieldList")){
 class FieldList extends HTMLList{
 
 	private $labels = array();
@@ -305,6 +332,6 @@ class FieldList extends HTMLList{
 	function setLabels($labels) {
 		$this->labels = $labels;
 	}
+}	
 }
-
 ?>

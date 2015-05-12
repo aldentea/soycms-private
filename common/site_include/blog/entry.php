@@ -59,6 +59,8 @@ function soy_cms_blog_output_entry($page,$entry){
 	
 			var $entryPageUri;
 			var $categoryPageUri;
+			var $blogLabelId;
+			var $categoryLabelList;
 	
 			function setCategoryPageUri($uri){
 				$this->categoryPageUri = $uri;
@@ -66,6 +68,14 @@ function soy_cms_blog_output_entry($page,$entry){
 	
 			function setEntryPageUri($uri){
 				$this->entryPageUri = $uri;
+			}
+			
+			function setBlogLabelId($blogLabelId){
+				$this->blogLabelId = $blogLabelId;
+			}
+			
+			function setCategoryLabelList($categoryLabelList){
+				$this->categoryLabelList = $categoryLabelList;
 			}
 	
 			function setEntry($entry){
@@ -117,6 +127,12 @@ function soy_cms_blog_output_entry($page,$entry){
 				$this->createAdd("more_link","HTMLLink",array(
 					"soy2prefix"=>"cms",
 					"link" => $link ."#more",
+					"visible"=>(strlen($entry->getMore()) != 0)
+				));
+				
+				$this->createAdd("more_link_no_anchor","HTMLLink",array(
+					"soy2prefix"=>"cms",
+					"link" => $link,
 					"visible"=>(strlen($entry->getMore()) != 0)
 				));
 	
@@ -177,6 +193,8 @@ function soy_cms_blog_output_entry($page,$entry){
 		"soy2prefix" => "b_block",
 		"entryPageUri"=> $page->getEntryPageURL(),
 		"categoryPageUri" => $page->getCategoryPageURL(),
+		"blogLabelId" => $page->page->getBlogLabelId(),
+		"categoryLabelList" => $page->page->getCategoryLabelList(),
 		"visible" => ($entry->getId()),
 		"entry" => $entry
 	));

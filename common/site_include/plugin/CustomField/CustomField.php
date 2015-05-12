@@ -3,6 +3,10 @@ class CustomFieldPlugin{
 
 	const PLUGIN_ID = "CustomField";
 
+	function getId(){
+		return self::PLUGIN_ID;
+	}
+
 	var $customFields = array();
 
 	//設定
@@ -65,6 +69,11 @@ class CustomFieldPlugin{
 					$class = "HTMLLink";
 					$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
 					unset($attr["html"]);
+				//画像の場合
+				}else if($master->getType() == "image"){
+					$class = "HTMLImage";
+					$attr["src"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
+					unset($attr["html"]);
 				}
 
 				//値が設定されていないなら初期値を使う
@@ -93,6 +102,12 @@ class CustomFieldPlugin{
 					if($master->getOutput() == "href" && $master->getType() != "type"){
 						$class = "HTMLLink";
 						$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
+					
+					//下方互換
+					}else if($master->getType() == "image" && $master->getOutput() == "src"){
+						//上で処理をしているため何もしない
+					
+					//その他
 					}else{
 						$class = "HTMLModel";
 						$attr[$master->getOutput()] = $field->getValue();
@@ -438,50 +453,29 @@ class CustomFieldPlugin{
 	}
 
 	/**
-	 * custom_field.tsvをインポートする
+	 * csvファイルをインポートする
 	 */
 	function importFields(){
-		$tsv_file = dirname(__FILE__) . "/" . "custom_field.tsv";
-		if(!file_exists($tsv_file)) return false;
-
-		//まず削除
-		$this->deleteAllFields();
-
-		$tsv = mb_convert_encoding(file_get_contents($tsv_file), "UTF-8", "SJIS");
-
-		$tsv = str_replace(array("\r\n", "\r"),"\n",$tsv);
-		$array = explode("\n", $tsv);
-
-		foreach($array as $item){
-			$item = explode("\t", $item);
-			if(count($item)<2 OR empty($item[0]) OR empty($item[1])) continue;
-			if(@empty($item[2])) $item[2] = "input";
-			$this->insertField(new CustomField(array(
-				"id"    => @$item[0],
-				"label" => @$item[1],
-				"type"  => @$item[2],
-				"labelId"  => @$item[3],
-				"output"  => @$item[4],
-				"defaultValue"  => @$item[5],
-				"emptyValue"  => @$item[6],
-				"hideIfEmpty"  => (boolean)@$item[7],
-			)));
-		}
-
-		rename($tsv_file, dirname(__FILE__) . "/"."custom_field-imported_at_".date('Y-m-d\THis').".tsv");
-		CMSPlugin::savePluginConfig(CustomFieldPlugin::PLUGIN_ID,$this);
-		CMSUtil::notifyUpdate();
-		CMSPlugin::redirectConfigPage();
-
+		$csvLogic = SOY2Logic::createInstance("site_include.plugin.CustomField.logic.ExImportLogic", array("pluginObj" => $this));
+		$csvLogic->importFile();
 	}
 
 	/**
-	 * カスタムフィールド設定の削除
+	 * プラグイン管理画面 カスタムフィールド設定の削除
 	 */
 	function deleteAllFields(){
 		foreach($this->customFields as $field){
 			$this->deleteField($field->getId());
 		}
+	}
+	
+	/**
+	 * エクスポート
+	 */
+	function exportFields(){
+		$csvLogic = SOY2Logic::createInstance("site_include.plugin.CustomField.logic.ExImportLogic", array("pluginObj" => $this));
+		$csvLogic->exportFile($this->customFields);
+		exit;
 	}
 
 	/**

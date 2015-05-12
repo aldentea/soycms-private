@@ -24,7 +24,7 @@ class SOYShopLoginCheckConfigFormPage extends WebPage{
 			}
 			
 			CMSPlugin::savePluginConfig($this->pluginObj->getId(), $this->pluginObj);
-			CMSPlugin::redirectConfigPage();	
+			CMSPlugin::redirectConfigPage();
 		}
 	}
 	

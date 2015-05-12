@@ -101,6 +101,10 @@ function soy_cms_blog_output_entry_list($page,$entries){
 
 			var $entryPageUrl;
 			var $categoryPageUrl;
+			
+			var $blogLabelId;
+			
+			var $categoryLabelList;
 
 			var $_commentDAO;
 			var $_trackbackDAO;
@@ -126,6 +130,12 @@ function soy_cms_blog_output_entry_list($page,$entries){
 			}
 			function setCategoryPageUrl($categoryPageUrl){
 				$this->categoryPageUrl = $categoryPageUrl;
+			}
+			function setBlogLabelId($blogLabelId){
+				$this->blogLabelId = $blogLabelId;
+			}
+			function setCategoryLabelList($categoryLabelList){
+				$this->categoryLabelList = $categoryLabelList;
 			}
 
 			protected function populateItem($entry){
@@ -174,6 +184,12 @@ function soy_cms_blog_output_entry_list($page,$entries){
 				$this->createAdd("more_link","HTMLLink",array(
 					"soy2prefix"=>"cms",
 					"link" => $link ."#more",
+					"visible"=>(strlen($entry->getMore()) != 0)
+				));
+				
+				$this->createAdd("more_link_no_anchor", "HTMLLink", array(
+					"soy2prefix"=>"cms",
+					"link" => $link,
 					"visible"=>(strlen($entry->getMore()) != 0)
 				));
 
@@ -228,11 +244,13 @@ function soy_cms_blog_output_entry_list($page,$entries){
 
 		}
 	}
-
+	
 	$page->createAdd("entry_list","BlogPage_EntryList",array(
 		"list" => $entries,
 		"entryPageUrl" => $page->getEntryPageURL(),
 		"categoryPageUrl" => $page->getCategoryPageURL(),
+		"blogLabelId" => (int)$page->page->getBlogLabelId(),
+		"categoryLabelList" => $page->page->getCategoryLabelList(),
 		"soy2prefix" => "b_block"
 	));
 }

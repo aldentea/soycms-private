@@ -13,6 +13,16 @@ class CustomFieldPluginFormPage extends WebPage{
 	}
 
 	function doPost(){
+		
+		//CSVエクスポート
+		if(isset($_POST["csv"])){
+			$this->pluginObj->exportFields();
+		}
+		
+		//CSVインポート
+		if(isset($_POST["upload"])){
+			$this->pluginObj->importFields();
+		}
 
 		if(isset($_POST["display_config"])){
 			$this->pluginObj->updateDisplayConfig($_POST["display_config"]);

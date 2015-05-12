@@ -177,11 +177,11 @@ class SOYCMS_OutputContents{
 //			}
 
 			//直近の公開開始/終了日時を$lifetimeFileの更新日時として保存
-			$this->saveLifitime($CMSPageController->getCurrentContentsLifetime());
+			$this->saveLifetime($CMSPageController->getCurrentContentsLifetime());
 
 			//出力内容とヘッダーをキャッシュに保存する
 			$this->saveCache($contents);
-			$this->saveHeaders();
+			$this->saveHeaders($CMSPageController);
 
 			//生成中のマークを消す
 			unlink($this->cache_gen);
@@ -270,7 +270,7 @@ class SOYCMS_OutputContents{
 	/**
 	 * HTTPヘッダーを保存
 	 */
-	private function saveHeaders(){
+	private function saveHeaders($CMSPageController){
 		//404とContent-TypeをHTTPヘッダー出力用ファイルに保存する
 		$headers = headers_list();
 		$h = array();
@@ -299,7 +299,7 @@ class SOYCMS_OutputContents{
 	/**
 	 * $lifetimeFileを更新日時を指定して保存
 	 */
-	private function saveLifitime($lifetime){
+	private function saveLifetime($lifetime){
 		file_put_contents($this->lifetimeFile, $lifetime."\n".date("r",$lifetime));
 		touch($this->lifetimeFile, $lifetime);
 		if(file_exists($this->lifetimeFile) && filemtime($this->lifetimeFile) != $lifetime) @unlink($this->lifetimeFile);
