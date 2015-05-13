@@ -34,7 +34,7 @@ class CMSUtil {
 			return $date;
 		}
 	}
-	
+
 	/**
 	 * サイトURLをサイト側のデータベースから取得する。取得できなければUserInfoUtilの公開URLを調べる
 	 */
@@ -47,17 +47,17 @@ class CMSUtil {
 	    	}catch(Exception $e){
 	    		$siteConfig = new SiteConfig();
 	    	}
-	    	
+
 	    	//SiteConfigに入っているURLを取得する
 	    	if(!is_null($siteConfig->getConfigValue("url"))){
 	    		$siteUrlBySiteUrl = $siteConfig->getConfigValue("url");
-	    		
+
 	    	//SiteConfigにURLが入っていなかった場合はUserInfoUtilから公開URLを取得する
 	    	}else{
 	    		$siteUrlBySiteUrl = UserInfoUtil::getSitePublishURL();
 	    	}
 		}
-			
+
     	return $siteUrlBySiteUrl;
 	}
 
@@ -221,6 +221,53 @@ class CMSUtil {
 		return $text;
 	}
 
+	/**
+	 * バイト数をGBやMBなどの文字列に変換する
+	 */
+	public static function GetHumanReadableSize($byte){
+		$byte *= 10;
+
+		if($byte >= 1073741824){//1024*1024*1024 = 1073741824
+			$valueX10 = floor($byte / 1073741824);
+			$unit = "GB";
+		}elseif($byte >= 1048576){//1024*1024 = 1048576
+			$valueX10 = floor($byte / 1048576);
+			$unit = "MB";
+		}elseif($byte >= 1024){
+			$valueX10 = floor($byte / 1024);
+			$unit = "KB";
+		}else{
+			$valueX10 = floor($byte);
+			$unit = "B";
+		}
+
+		return ($valueX10/10).$unit;
+	}
+
+	/**
+	 * ◯GBや◯MBなどの文字列をバイト数に変換する
+	 */
+	function GetNumricByte($val) {
+		$val = trim($val);
+
+		//末尾のBを削除
+		if(strlen($val) && strtoupper($val[strlen($val)-1]) == "B" ){
+			$val = substr($val,0,strlen($val)-1);
+		}
+
+		$last = strtoupper($val[strlen($val)-1]);
+		switch($last) {
+			case 'G':
+				$val *= 1024;
+			case 'M':
+				$val *= 1024;
+			case 'K':
+				$val *= 1024;
+		}
+
+		return $val;
+	}
+
 	/* 以下ServerInfoUtilに移したメソッド */
 
 	/**
@@ -263,4 +310,5 @@ class CMSUtil {
 		SOY2DAOConfig::User($old["user"]);
 		SOY2DAOConfig::Pass($old["pass"]);
 	}
+
 }

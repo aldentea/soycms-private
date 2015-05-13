@@ -10,37 +10,37 @@ class SiteRoleLogic implements SOY2LogicInterface{
 	 * ユーザIDに登録されているサイト権限を取得する
 	 */
     function getSiteRoleByUserId($userId) {
-    	$dao = SOY2DAOFactory::create("admin.SiteDAO");
+    	$dao = SOY2DAOFactory::create("admin.SiteRoleDAO");
     	return $dao->getByUserId($userId);
     }
-    
+
     /**
      * サイトIDに登録されているサイト権限を取得する
      */
     function getSiteRoleBySiteId($siteId){
-    	$dao = SOY2DAOFactory::create("admin.SiteDAO");
+    	$dao = SOY2DAOFactory::create("admin.SiteRoleDAO");
     	return $dao->getBySiteId($siteId);
     }
-    
+
     /**
      * ユーザID、サイトIDを指定し、それに対応する権限を返す
      * @param flushBuffer trueを設定すると、サイト権限のバッファーを破棄し、新しくデータベースより取得します
      */
     public static function getSiteRole($siteId,$userId,$flushBuffer = false){
-    	
+
     	static $siteRoleBuffer = null;
-    	
+
     	$dao = SOY2DAOFactory::create("admin.SiteRoleDAO");
-    	
+
     	try{
     		$siteRole = $dao->getSiteRole($siteId,$userId);
     		return $siteRole->getSiteRole();
     	}catch(Exception $e){
     		return SiteRole::SITE_NO_ROLE;
     	}
-    		
+
     }
-    
+
     /**
      * 管理者権限を設定します。
      * @param siteRoleArray
@@ -52,23 +52,23 @@ class SiteRoleLogic implements SOY2LogicInterface{
      * の配列を渡します。
      * 明示的にSITE_NO_ROLEを渡すことによってデータベースからエントリーを削除します
      * 設定された値がない場合はデータベースは更新されません。
-     */    
+     */
     public function updateSiteRoles($siteRoleArray){
     	$dao = SOY2DAOFactory::create("admin.SiteRoleDAO");
     	$dao->begin();
     	foreach($siteRoleArray as $key => $siteRole){
 			if(!$this->updateSiteRole($siteRole)){
 				$dao->rollback();
-				return false;	
+				return false;
 			}
 		}
 		$dao->commit();
 		return true;
 	}
-    
+
     /**
      * 上のArrayでなく1個のときのupdate
-     * 
+     *
      * START
      *  ↓
      * <今の値が>┬[一般管理者orEntry管理者]→<データベースの内容と変化があるか>-(Y)→<新しい値はNO_ROLE>-(Y)→deleteSQL→END
@@ -76,11 +76,11 @@ class SiteRoleLogic implements SOY2LogicInterface{
      *           ├[権限なし]→<データベースの内容と変化があるか>-(Y)→insertSQL→END
      *           │                          └(N)→END
      *           ×└[予期しない値]→Exception→END　これはやらない
-     * 
+     *
      */
     public function updateSiteRole($siteRoleArray){
     	$dao = SOY2DAOFactory::create("admin.SiteRoleDAO");
-    	
+
     	try{
     		$siteRole = $dao->getSiteRole($siteRoleArray["siteId"],$siteRoleArray["userId"]);
     		$role = $siteRole->getSiteRole();
@@ -124,7 +124,7 @@ class SiteRoleLogic implements SOY2LogicInterface{
 			return false;
 		}
     }
-    
+
     /**
      * ユーザIDに関連付けられているすべての権限を削除する
      */
@@ -137,7 +137,7 @@ class SiteRoleLogic implements SOY2LogicInterface{
     		return false;
     	}
     }
-    
+
     /**
      * サイトIDに関連付けられているすべての権限を削除する
      */

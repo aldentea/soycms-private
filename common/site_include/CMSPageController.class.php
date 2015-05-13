@@ -217,6 +217,9 @@ class CMSPageController extends SOY2PageController{
 		}
 		//文字コード変換
 		$html = $this->convertCharset($html, $webPage);
+		
+		//404NotFoundが表示される直前で読み込まれる
+		CMSPlugin::callEventFunc('onSite404NotFound');
 
 		header("HTTP/1.1 404 Not Found");
 		header("Content-Type: text/html; charset=" . $this->siteConfig->getCharsetText());

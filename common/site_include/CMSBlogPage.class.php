@@ -840,7 +840,7 @@ class CMSBlogPage extends CMSPage{
 		}
 
 		//ブログ用のラベルIdも同時に指定して絞込み
-		if($label->getid() == $this->page->getBlogLabelId()){
+		if($label->getId() == $this->page->getBlogLabelId()){
 			$entries = $logic->getOpenEntryByLabelIds(array($label->getId()));
 		}else{
 			$entries = $logic->getOpenEntryByLabelIds(array($label->getId(),$this->page->getBlogLabelId()));

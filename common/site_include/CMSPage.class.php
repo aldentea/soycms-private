@@ -16,6 +16,8 @@ class CMSPage extends WebPage{
 
 	protected $_soy2_prefix = "block";
 
+	const SOYCMS_COMMENT_PHRASE = "cms:ignore";
+
 	function CMSPage($args){
 
 		$id = $args[0];
@@ -289,6 +291,11 @@ class CMSPage extends WebPage{
 	 * コメントを消去します。
 	 */
 	function parseComment($html){
+
+		//コメントがなければ何もせずにそのまま返す
+		if(strpos($html, self::SOYCMS_COMMENT_PHRASE) === false){
+			return $html;
+		}
 
 		$startRegex = '/(<[^>]*[^\/]cms:ignore[^>]*>)/';
 		$endRegex =  '/(<[^>]*\/cms:ignore[^>]*>)/';

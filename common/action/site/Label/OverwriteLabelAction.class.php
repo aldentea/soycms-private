@@ -9,42 +9,48 @@ class OverwriteLabelAction extends SOY2Action{
 			return SOY2Action::FAILED;
 		}
 
-    	$dao = SOY2DAOFactory::create("cms.EntryLabelDAO");
-    	$dao->begin();
-    	foreach($this->getLabelIds() as $label){
+		$dao = SOY2DAOFactory::create("cms.EntryLabelDAO");
+		try{
+			$dao->begin();
+			foreach($this->getLabelIds() as $label){
 
-    		if(in_array($label,$form->label)){
-    			//ラベルを設定
-    			foreach($form->entry as $entry){
-	    			try{
-	    				$dao->getByParam($label,$entry);
-	    				//すでに設定してある
-	    				//do nothing
-	    			}catch(Exception $e){
-	    				//設定してない
-	    				$obj = new EntryLabel();
-	    				$obj->setEntryId($entry);
-	    				$obj->setLabelId($label);
-	    				$obj->setMaxDisplayOrder();
-	    				$dao->insert($obj);
-	    			}
-	    		}
-    		}else{
-    			//ラベルを削除
-    			foreach($form->entry as $entry){
-	    			try{
-	    				$dao->getByParam($label,$entry);
-	    				//すでに設定してある
-	    				$dao->deleteByParams($entry,$label);
-	    			}catch(Exception $e){
-	    				//設定してない
-	    				//do nothing
-	    			}
-	    		}
-    		}
-    	}
-    	$dao->commit();
-    	return SOY2Action::SUCCESS;
+				if(in_array($label,$form->label)){
+					//ラベルを設定
+					foreach($form->entry as $entry){
+						try{
+							$dao->getByParam($label,$entry);
+							//すでに設定してある
+							//do nothing
+						}catch(Exception $e){
+							//設定してない
+							CMSPlugin::callEventFunc('onEntryLabelApply',array("entryId"=>$entry,"labelId"=>$label));
+							$dao->setByParams($entry,$label);
+						}
+					}
+				}else{
+					//ラベルを削除
+					foreach($form->entry as $entry){
+						$do = false;
+						try{
+							$dao->getByParam($label,$entry);
+							//すでに設定してある
+							$do = true;
+						}catch(Exception $e){
+							//設定してない
+							//do nothing
+						}
+						if($do){
+							CMSPlugin::callEventFunc('onEntryLabelRemove',array("entryId"=>$entry,"labelId"=>$label));
+							$dao->deleteByParams($entry,$label);
+						}
+					}
+				}
+			}
+			$dao->commit();
+		}catch(Exception $e){
+			$dao->rollback();
+		}
+		return SOY2Action::SUCCESS;
     }
 
     function getLabelIds(){

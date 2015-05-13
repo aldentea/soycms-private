@@ -73,8 +73,8 @@ class CMSPlugin {
 		"onOutput"=>array(),			//出力されるHTMLに対して最後に呼ばれるイベント（最終的に出力されるHTML）	array(html,page,webPage),
 		
 		//アクセス関連
-		"onSiteAccess"=>array()			//サイトにアクセスがあった場合 array()
-		
+		"onSiteAccess"=>array(),		//サイトにアクセスがあった場合 array()
+		"onSite404NotFound"=>array()	//404NotFoundページを開いた時
 	);
 	
 	var $_plugins = array();
