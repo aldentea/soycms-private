@@ -11,7 +11,12 @@ foreach($sites as $site){
 	SOY2DAOConfig::Dsn($site->getDataSourceName());
 				
 	$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
-	$siteConfig = $siteConfigDao->get();
+	try{
+		$siteConfig = $siteConfigDao->get();
+	}catch(Exception $e){
+		continue;
+	}
+	
 	$siteConfig->setConfigValue("url", $site->getUrl());
 	try{
 		$siteConfigDao->updateSiteConfig($siteConfig);

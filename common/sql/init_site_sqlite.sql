@@ -97,7 +97,6 @@ create table Template(
 create table Page(
 	id integer primary key AUTOINCREMENT,
 	title varchar(255),
-	parentPageId INTEGER,
 	template text,
 	uri varchar(255) unique,
 	page_type integer default 0,

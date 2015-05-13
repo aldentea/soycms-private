@@ -93,6 +93,7 @@ class SiteList extends HTMLList{
 		$this->addLink("site_link", array(
 			"link" => $entity->getUrl(),
 			"text" => $this->replaceTooLongHost($entity->getUrl()),
+			"visible" => (!$entity->getIsDomainRoot())
 		));
 
 		$rootLink = UserInfoUtil::getSiteURLBySiteId("");
@@ -123,6 +124,7 @@ class SiteList extends HTMLList{
 				"link" => SOY2PageController::createLink("Site.SiteRootDetach." . $entity->getId()),
 				"text"=>CMSMessageManager::get("ADMIN_ROOT_SETTING_OFF"),
 				"onclick"=> 'return confirm("' . CMSMessageManager::get("ADMIN_CONFIRM_ROOT_SETTING_OFF") . '");',
+				"id" => "root_site_link_" . $entity->getSiteId(),
 			));
 
     	}else{
@@ -130,6 +132,7 @@ class SiteList extends HTMLList{
 				"link" => SOY2PageController::createLink("Site.SiteRoot." . $entity->getId()),
 				"text"=>CMSMessageManager::get("ADMIN_ROOT_SETTING"),
 				"onclick"=> $onclick,
+				"id" => "root_site_link_" . $entity->getSiteId(),
 			));
     	}
 

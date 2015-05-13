@@ -81,17 +81,17 @@ class CMSPage extends WebPage{
 		$pageFormat = preg_replace('/%SITE%/',$this->siteConfig->getName(),$pageFormat);
 		$pageFormat = preg_replace('/%PAGE%/',$this->page->getTitle(),$pageFormat);
 		$this->setTitle($pageFormat);
-		
+
 		$this->createAdd("top_link", "HTMLLink", array(
 			"link" => $this->siteUrl,
 			"soy2prefix" => "cms"
 		));
-		
+
 		$this->createAdd("site_url", "HTMLLabel", array(
 			"text" => $this->siteUrl,
 			"soy2prefix" => "cms"
 		));
-		
+
 		//メッセージの設定
 		$this->createAdd("site_name","HTMLLabel",array(
 			"text" => $this->siteConfig->getName(),
@@ -105,14 +105,14 @@ class CMSPage extends WebPage{
 			"text" => $this->page->getTitle(),
 			"soy2prefix" => "cms"
 		));
-		
+
 		$this->addMessageProperty("site_name",'<?php echo $'.$this->_soy2_pageParam.'["site_name"]; ?>');
 		$this->addMessageProperty("page_title",'<?php echo $'.$this->_soy2_pageParam.'["page_title"]; ?>');
 		$this->addMessageProperty("raw_page_title",'<?php echo $'.$this->_soy2_pageParam.'["raw_page_title"]; ?>');
 
 
 		/**
-		 * SOY Appを複数呼び出す
+		 * SOY Appを複数呼び出す（実際に複数を呼び出した場合、APPLICATION_IDが繰り返しdefineされてしまうので問題が発生しうる。）
 		 * 記述例
 		 * <!-- cms:id="apps" cms:app="inquiry mail catalog" /-->
 		 */

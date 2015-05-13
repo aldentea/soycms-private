@@ -123,27 +123,34 @@ class SiteRootPage extends CMSUpdatePageBase{
 			//
     	}
 
-		//サイトURLの更新、サイト用DB SiteConfigに同期
+		//サイトURLの更新
 		$rootLink = UserInfoUtil::getSiteURLBySiteId("");
-		$dsn = SOY2DAOConfig::Dsn();
+		$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
 		try{
-			$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
 			$site = $siteDAO->getById($id);
 			$site->setUrl($rootLink);
 			$siteDAO->update($site);
 			
-			SOY2DAOConfig::Dsn($site->getDataSourceName());
-			
-			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
-			$siteConfig = $siteConfigDao->get();
-			$siteConfig->setConfigValue("url", $rootLink);
-			$siteConfigDao->updateSiteConfig($siteConfig);
-			
 		}catch(Exeption $e){
-			
+			$site = new Site();
 		}
-		
-		SOY2DAOConfig::Dsn($dsn);
+			
+		//サイト用DB SiteConfigに同期、SOY CMSのサイトの時だけSiteConfigにURLを格納する
+		if($site->getSiteType() == Site::TYPE_SOY_CMS){	
+			$dsn = SOY2DAOConfig::Dsn();
+			SOY2DAOConfig::Dsn($site->getDataSourceName());
+			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+			try{
+				$siteConfig = $siteConfigDao->get();
+				$siteConfig->setConfigValue("url", $rootLink);
+				$siteConfigDao->updateSiteConfig($siteConfig);
+			}catch(Exception $e){
+				
+			}
+			
+			SOY2DAOConfig::Dsn($dsn);
+		}
+			
 
 		//キャッシュ削除
 		$SiteLogic = SOY2Logic::createInstance("logic.admin.Site.SiteLogic");
@@ -151,10 +158,6 @@ class SiteRootPage extends CMSUpdatePageBase{
 		foreach($sites as $site){
 			CMSUtil::unlinkAllIn($site->getPath() . ".cache/");
 		}
-		
-		
-		
-		
     }
 }
 ?>

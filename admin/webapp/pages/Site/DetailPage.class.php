@@ -9,7 +9,15 @@ class DetailPage extends CMSUpdatePageBase{
 		if(soy2_check_token() && isset($_POST["siteUrl"])){
 			
 			$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
-			$site = $siteDAO->getById($this->id);
+			try{
+				$site = $siteDAO->getById($this->id);
+			}catch(Exception $e){
+				/**
+				 * @ToDo エラーメッセージを追加しないと
+				 */
+				$this->jump("Site.Detail." . $this->id);
+			}
+			
 			$site->setUrl($_POST["siteUrl"]);
 			
 			try{
@@ -28,16 +36,16 @@ class DetailPage extends CMSUpdatePageBase{
 			}
 			
 			//サイトURLを、サイト用DB SiteConfigに挿入
-			try{
-				$dsn = SOY2DAOConfig::Dsn();
-				SOY2DAOConfig::Dsn($site->getDataSourceName());
-				
-				$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+			$dsn = SOY2DAOConfig::Dsn();
+			SOY2DAOConfig::Dsn($site->getDataSourceName());				
+			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+
+			try{				
 				$siteConfig = $siteConfigDao->get();
 				$siteConfig->setConfigValue("url", $site->getUrl());
 				$siteConfigDao->updateSiteConfig($siteConfig);
 			}catch(Exception $e){
-				
+				//
 			}
 			
 			SOY2DAOConfig::Dsn($dsn);
@@ -101,9 +109,8 @@ class DetailPage extends CMSUpdatePageBase{
 			"visible" => ($site->getSiteType() == Site::TYPE_SOY_SHOP)
 		));
 
-		
 		$this->addLabel("default_url", array(
-			"text" => UserInfoUtil::getSiteURLBySiteId($site->getSiteId())
+			"text" => ($site->getIsDomainRoot()) ? SOY2PageController::createRelativeLink("/", true) : UserInfoUtil::getSiteURLBySiteId($site->getSiteId())
 		));
 		
 		$messages = CMSMessageManager::getMessages();

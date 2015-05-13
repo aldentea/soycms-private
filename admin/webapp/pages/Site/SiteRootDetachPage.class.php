@@ -116,30 +116,34 @@ class SiteRootDetachPage extends CMSUpdatePageBase {
     		if($htaccess) $logic->createHtaccess($htaccess);
     	}catch(Exception $e){
 			//
-    	}
+    	}	
     	
-    	//サイトURLの更新、サイト用DB SiteConfigに同期
-		$dsn = SOY2DAOConfig::Dsn();
+    	//サイトURLの更新
+    	$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
 		try{
-			$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
 			$site = $siteDAO->getById($id);
 			$defaultLink = UserInfoUtil::getSiteURLBySiteId($site->getSiteId());
 			$site->setUrl($defaultLink);
 			$siteDAO->update($site);
-			
-			SOY2DAOConfig::Dsn($site->getDataSourceName());
-			
-			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
-			$siteConfig = $siteConfigDao->get();
-			$siteConfig->setConfigValue("url", $defaultLink);
-			$siteConfigDao->updateSiteConfig($siteConfig);
-			
 		}catch(Exeption $e){
-			
+			$site = new Site();
 		}
-		
-		SOY2DAOConfig::Dsn($dsn);
-    	
+			
+		//サイト用DB SiteConfigに同期、SOY CMSのサイトの時だけSiteConfigにURLを格納する
+		if($site->getSiteType() == Site::TYPE_SOY_CMS){
+			$dsn = SOY2DAOConfig::Dsn();
+			SOY2DAOConfig::Dsn($site->getDataSourceName());
+			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+			try{
+				$siteConfig = $siteConfigDao->get();
+				$siteConfig->setConfigValue("url", $defaultLink);
+				$siteConfigDao->updateSiteConfig($siteConfig);
+			}catch(Exception $e){
+				//
+			}
+			
+			SOY2DAOConfig::Dsn($dsn);
+		}
     	
 
 		//キャッシュ削除

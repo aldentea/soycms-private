@@ -49,6 +49,11 @@ class SyncTemplatePlugin{
 		CMSPlugin::addPluginConfigPage($this->getId(),array(
 			$this,"config_page"
 		));
+
+		if($this->autoImport){
+			$this->auto_import();
+		}
+
 	}
 
 	function config_page($message){
@@ -88,7 +93,9 @@ class SyncTemplatePlugin{
 		}
 
 		if($this->autoImport){
-			$this->auto_import();
+			if($this->auto_import()){
+				CMSPlugin::redirectConfigPage();
+			}
 		}
 
 		if(isset($_POST["ignoreTimestamp"])){
@@ -116,7 +123,7 @@ class SyncTemplatePlugin{
 	 * ディレクトリを作る
 	 */
 	function makeDir(){
-		$this->targetDir = UserInfoUtil::getSiteDirectory().self::TARGET_DIR;
+		$this->targetDir = $this->getSiteDirectory().self::TARGET_DIR;
 		$res = false;
 
 		if(!file_exists($this->targetDir)){
@@ -141,7 +148,7 @@ class SyncTemplatePlugin{
 	 * 出力先ディレクトリにアクセス拒否の.htaccessを作る
 	 */
 	function checkDir(){
-		$this->targetDir = UserInfoUtil::getSiteDirectory().self::TARGET_DIR;
+		$this->targetDir = $this->getSiteDirectory().self::TARGET_DIR;
 		$res = false;
 
 		if(file_exists($this->targetDir)){
@@ -173,7 +180,7 @@ class SyncTemplatePlugin{
 		SOY2Debug::trace($_POST);
 
 //		if(empty($imports)){
-//			$imports = scandir(UserInfoUtil::getSiteDirectory().self::TARGET_DIR);
+//			$imports = scandir($this->getSiteDirectory().self::TARGET_DIR);
 //		}
 
 		$this->importTemplates($imports,$convert);
@@ -189,7 +196,7 @@ class SyncTemplatePlugin{
 			$this->importTemplates($targetFiles,$this->convertURL);
 			$this->sync_date = time();
 			CMSPlugin::savePluginConfig(SYNC_TEMPLATE_PLUGIN_NAME,$this);
-			CMSPlugin::redirectConfigPage();
+			return true;
 		}
 	}
 
@@ -197,7 +204,7 @@ class SyncTemplatePlugin{
 	 * 書き出されているファイルを削除する
 	 */
 	function delete(){
-		$export_dir = UserInfoUtil::getSiteDirectory().self::TARGET_DIR;
+		$export_dir = $this->getSiteDirectory().self::TARGET_DIR;
 		if(is_dir($export_dir)){
 			foreach(scandir($export_dir) as $file){
 				if($file[0] == ".")continue;
@@ -210,7 +217,7 @@ class SyncTemplatePlugin{
 	 * 出力ディレクトリを削除する
 	 */
 	function deleteDir(){
-		$export_dir = UserInfoUtil::getSiteDirectory().self::TARGET_DIR;
+		$export_dir = $this->getSiteDirectory().self::TARGET_DIR;
 		@unlink($export_dir."/.htaccess");
 		@rmdir($export_dir);
 	}
@@ -219,14 +226,14 @@ class SyncTemplatePlugin{
 	 * 出力ディレクトリが削除可能か
 	 */
 	function isDirDeletable(){
-		$export_dir = UserInfoUtil::getSiteDirectory().self::TARGET_DIR;
+		$export_dir = $this->getSiteDirectory().self::TARGET_DIR;
 		$parent_dir = dirname($export_dir);
 		return is_dir($export_dir) && is_writable($parent_dir) && is_executable($parent_dir);
 	}
 
 	function countExportedFiles(){
 		$count = 0;
-		$export_dir = UserInfoUtil::getSiteDirectory().self::TARGET_DIR;
+		$export_dir = $this->getSiteDirectory().self::TARGET_DIR;
 		if(is_dir($export_dir)){
 			foreach(scandir($export_dir) as $file){
 				if($file[0] == ".")continue;
@@ -237,7 +244,7 @@ class SyncTemplatePlugin{
 	}
 
 	function exportTemplates($convert = false){
-		 $targetDir = UserInfoUtil::getSiteDirectory().self::TARGET_DIR;
+		 $targetDir = $this->getSiteDirectory().self::TARGET_DIR;
 
 		 $siteConfig = SOY2DAOFactory::create("cms.SiteConfigDAO")->get();
 
@@ -311,7 +318,7 @@ class SyncTemplatePlugin{
 
 	function importTemplates($imports,$convert = false){
 
-		$targetDir = UserInfoUtil::getSiteDirectory().SyncTemplatePlugin::TARGET_DIR;
+		$targetDir = $this->getSiteDirectory().SyncTemplatePlugin::TARGET_DIR;
 		$this->pageDAO = SOY2DAOFactory::create("cms.PageDAO");
 		$this->blogPageDAO = SOY2DAOFactory::create("cms.BlogPageDAO");
 
@@ -397,7 +404,7 @@ class SyncTemplatePlugin{
 	 * 変更のあったファイルを配列にして返す
 	 */
 	function getModifiedFiles(){
-		$targetDir = UserInfoUtil::getSiteDirectory().self::TARGET_DIR;
+		$targetDir = $this->getSiteDirectory().self::TARGET_DIR;
 		$templates = array();
 		$dupulicatedIds = array();//IDの重複回数
 		$output_date = max($this->output_date,$this->sync_date);
@@ -465,6 +472,19 @@ class SyncTemplatePlugin{
 		}
 
 		return $templates;
+	}
+
+	/**
+	 * 公開側でも呼び出せるようにしておく
+	 */
+	function getSiteDirectory(){
+		if(defined("_SITE_ROOT_")){
+			return _SITE_ROOT_."/";
+		}elseif(class_exists("UserInfoUtil")){
+			return UserInfoUtil::getSiteDirectory();
+		}else{
+			return "";
+		}
 	}
 
 	/**

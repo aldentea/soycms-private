@@ -94,7 +94,7 @@
 </div>
 <div id="filemanager" style="display:none" soy:id="file_manager_iframe">
 	<button id="close_filemanager_button" onclick="toggle_Filemanager();return false;" style="display:none;">ファイルマネージャ終了</button>
-	<iframe id="file_manager_iframe" style="width:750px;height:480px;border:none;"></iframe>
+	<iframe id="file_manager_iframe" style="width:780px;height:560px;border:none;"></iframe>
 </div>
 
 <script type="text/javascript">
@@ -352,7 +352,7 @@
 					$("#close_filemanager_button").show();
 				},500);
 			}
-			_resizeWindow(800,600);
+			_resizeWindow(800,640);
 			$("#filemanager").show();			
 			mode = "filemanager";
 		}else{

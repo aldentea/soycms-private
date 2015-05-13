@@ -114,81 +114,39 @@
 
 <script>
 	$(document).ready(function() {
+		//元の記述は soycms/js/elfinder/elfinder.src.html にある
+		//オプション一覧：https://github.com/Studio-42/elFinder/wiki/Client-configuration-options
 		$('#finder').elfinder({
-			// requestType : 'post',
-
-			// url : 'php/connector.php',
 			url : '<!-- soy:id="connector_path" /-->',  // connector URL (REQUIRED)
-			// transport : new elFinderSupportVer1(),
 			getFileCallback : function(obj) {
 				window.parent.filemanager_ondblclick(obj.url);
 			},            
-			// handlers : {
-			// 	select : function(e) {
-			// 		console.log(e.data)
-			// 	}
-			// },
-			// onlyMimes : ['image', 'text/plain']
-			// sync : 20000,
 			lang : 'jp',
 			customData : {answer : 42},
-			// requestType : 'POST',
-			// rememberLastDir : false,
-			// ui : ['tree', 'toolbar'],
-			// ui : ['toolbar', 'path', 'stat'],
-			// commands : [],
-			// commandsOptions : {
-			// 	edit : {
-			// 		mimes : ['text/plain', 'text/html', 'text/javascript'],
-			// 		editors : [
-			// 			{
-			// 				mimes : ['text/html'],
-			// 				load : function(textarea) {
-			// 					tinyMCE.execCommand("mceAddControl", true, textarea.id);
-			// 				},
-			// 				close : function(textarea, instance) {
-			// 					tinyMCE.execCommand('mceRemoveControl', false, textarea.id);
-			// 				},
-			// 				save : function(textarea, editor) {
-			// 					textarea.value = tinyMCE.get(textarea.id).selection.getContent({format : 'html'});
-			// 					tinyMCE.execCommand('mceRemoveControl', false, textarea.id);
-			// 				}
-			// 
-			// 			}
-			// 		]
-			// 	}
-			// }
-			// uiOptions : {
-			// 	toolbar : [['help']]
-			// }
+			height: 540,
+			uiOptions : {
+				toolbar : [
+					//['home', 'up'],
+					//['back', 'forward'],
+					//['netmount'],
+					['reload'],
+					['mkdir', 'mkfile', 'upload'],
+					//['open', 'download', 'getfile'],
+					['download'],
+					['copy', 'cut', 'paste'],
+					['rm'],
+					['duplicate', 'rename', 'edit', 'resize'],
+					//['extract', 'archive'],
+					['quicklook', 'info'],
+					['view', 'sort'],
+					['search'],
+					['help']
+				]
+			}
 		});
 
-		// $('#finder2').elfinder({
-		// 	url : 'connectors/php/connector.php',
-		// 	width:650,
-		// 	lang : 'ru'
-		// })
-
-		// console.log(f1)
-		// 
-		// setTimeout(function() {
-		// 	console.log($('#finder').elfinder('instance'))
-		// }, 2000)
-
-		// new elFinder($('<div/>'))
-
-		// var f2 = $('#asd').elfinder({
-		// 	url : 'connectors/php/connector.php',
-		// 	lang : 'ru'
-		// }).elfinder('instance')
 	});
 </script>
-<style type="text/css">
-.elfinder-dialog {
-	position: absolute !important;
-	top: 100px !important;
-}
-</style>
 </head>
 <body>
 

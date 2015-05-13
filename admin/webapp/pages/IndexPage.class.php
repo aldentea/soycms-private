@@ -184,6 +184,7 @@ class SiteList extends HTMLList{
 		$this->addLink("site_link", array(
 			"link" => $entity->getUrl(),
 			"text" => $this->replaceTooLongHost($entity->getUrl()),
+			"visible" => (!$entity->getIsDomainRoot())
 		));
 
 		$rootLink = UserInfoUtil::getSiteURLBySiteId("");
