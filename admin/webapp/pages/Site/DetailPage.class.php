@@ -42,11 +42,24 @@ class DetailPage extends CMSUpdatePageBase{
 
 			try{				
 				$siteConfig = $siteConfigDao->get();
-				$siteConfig->setConfigValue("url", $site->getUrl());
-				$siteConfigDao->updateSiteConfig($siteConfig);
 			}catch(Exception $e){
 				//
 			}
+			
+			//ルート設定していることを考慮して、設定にあったリンク用のサイトURLを出力してサイト側のsiteConfigに放り込む
+			$defaultUrl = UserInfoUtil::getSiteURLBySiteId($site->getSiteId());
+			if($site->getIsDomainRoot() && strpos($defaultUrl, $site->getUrl()) !== false){
+				$siteUrl = UserInfoUtil::getSiteURLBySiteId("");
+			}else{
+				$siteUrl = $site->getUrl();
+			}
+			
+			$siteConfig->setConfigValue("url", $siteUrl);
+			try{
+				$siteConfigDao->updateSiteConfig($siteConfig);
+			}catch(Exception $e){
+				//
+			}			
 			
 			SOY2DAOConfig::Dsn($dsn);
 		}
@@ -110,7 +123,7 @@ class DetailPage extends CMSUpdatePageBase{
 		));
 
 		$this->addLabel("default_url", array(
-			"text" => ($site->getIsDomainRoot()) ? SOY2PageController::createRelativeLink("/", true) : UserInfoUtil::getSiteURLBySiteId($site->getSiteId())
+			"text" => UserInfoUtil::getSiteURLBySiteId($site->getSiteId())
 		));
 		
 		$messages = CMSMessageManager::getMessages();

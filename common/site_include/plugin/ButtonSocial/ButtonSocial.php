@@ -16,6 +16,12 @@ class ButtonSocialPlugin{
 	private $description;
 	private $image;
 	
+	//fb_rootの表示設定
+	//Array<ページID => 0 | 1> fb_rootを表示するは1
+	public $config_per_page = array();
+	//Array<ページID => Array<ページタイプ => 0 | 1>> fb_rootを表示するは1
+	public $config_per_blog = array();
+	
 	private $entryAttributeDao;
 
 	function init(){
@@ -25,7 +31,7 @@ class ButtonSocialPlugin{
 			"author"=>"日本情報化農業研究所",
 			"url"=>"http://www.n-i-agroinformatics.com/",
 			"mail"=>"soycms@soycms.net",
-			"version"=>"0.9"
+			"version"=>"1.0"
 		));
 
 		$logic = new ButtonSocialCommon();
@@ -50,6 +56,7 @@ class ButtonSocialPlugin{
 				CMSPlugin::setEvent('onEntryUpdate', $this->getId(), array($this, "onEntryUpdate"));
 				CMSPlugin::setEvent('onEntryCreate', $this->getId(), array($this, "onEntryUpdate"));
 				CMSPlugin::setEvent('onEntryCopy', $this->getId(), array($this, "onEntryCopy"));
+				CMSPlugin::setEvent('onEntryRemove', $this->getId(), array($this, "onEntryRemove"));
 	
 				CMSPlugin::addCustomFieldFunction($this->getId(), "Entry.Detail", array($this, "onCallCustomField"));
 				CMSPlugin::addCustomFieldFunction($this->getId(), "Blog.Entry", array($this, "onCallCustomField_inBlog"));
@@ -195,16 +202,28 @@ class ButtonSocialPlugin{
 		
 		//ダイナミック編集では挿入しない
 		if(defined("CMS_PREVIEW_MODE") && CMS_PREVIEW_MODE){
-			return null;
+			return $html;
 		}
 		
 		//app_idが入力されていない場合は表示しない
-		if(is_null($this->app_id) || strlen($this->app_id) ===0){
-			return null;
+		if(is_null($this->app_id) || strlen($this->app_id) === 0){
+			return $html;
+		}
+		
+		//ページの時のチェック
+		if(isset($this->config_per_page[$arg["page"]->getId()]) && $this->config_per_page[$arg["page"]->getId()] != 1){
+			return $html;
+		}
+		
+		//ブログページの時のチェック
+		if($arg["page"]->getPageType() == Page::PAGE_TYPE_BLOG){
+			if(isset($this->config_per_blog[$arg["page"]->getId()][$arg["webPage"]->mode]) && $this->config_per_blog[$arg["page"]->getId()][$arg["webPage"]->mode] != 1){
+				return $html;
+			}
 		}
 		
 		$logic = $this->logic;
-		
+			
 		if(stripos($html,'<body>') !== false){
 			$html = str_ireplace('<body>', '<body>' . "\n" . $logic->getFbRoot($this->app_id), $html);
 		}elseif(preg_match('/<body\\s[^>]+>/',$html)){
@@ -258,6 +277,18 @@ class ButtonSocialPlugin{
 		return true;
 	}
 	
+	function onEntryRemove($args){
+		foreach($args as $entryId){
+			try{
+				$this->entryAttributeDao->deleteByEntryId($entryId);
+			}catch(Exception $e){
+
+			}
+		}
+
+		return true;
+	}
+	
 	function onCallCustomField(){
 		$arg = SOY2PageController::getArguments();
 		$entryId = (isset($arg[0])) ? (int)$arg[0] : null;
@@ -272,7 +303,7 @@ class ButtonSocialPlugin{
 	
 	function buildForm($entryId){
 		$obj = $this->getOgImageObject($entryId);
-		
+				
 		$html = array();
 		$html[] = "<div class=\"section custom_field\">";
 		$html[] = "<p class=\"sub\">";
@@ -286,9 +317,10 @@ class ButtonSocialPlugin{
 		$html[] = "var \$custom_field_input = \$();";
 		$html[] = "function open_ogimage_filemanager(\$form){";
 		$html[] = "	\$custom_field_input = \$form;";
-		$html[] = "	common_to_layer(\"/main/soycms/index.php/Page/Editor/FileUpload\");";
+		$html[] = "	common_to_layer(\"" . SOY2PageController::createLink("Page.Editor.FileUpload?ogimage_field") . "\");";
 		$html[] = "}";
 		$html[] = "</script>";
+		$html[] = "</div>";
 		return implode("\n", $html);
 	}
 	
@@ -302,28 +334,55 @@ class ButtonSocialPlugin{
 	}
 
 	function config_page($message){
-		if(isset($_POST["save"])){
-			$this->app_id = $_POST["app_id"];
-			$this->admins = $_POST["admins"];
-			$this->description = $_POST["description"];
-			$this->image = $_POST["image"];
-			$this->mixi_check_key = $_POST["mixi_check_key"];
-			$this->mixi_like_key = $_POST["mixi_like_key"];
-
-			CMSPlugin::savePluginConfig(self::PLUGIN_ID,$this);
-			CMSPlugin::redirectConfigPage();
-			//CMSUtil::NotifyUpdate();
-
-			exit;
-		}
-
-		ob_start();
-		include_once(dirname(__FILE__) . "/config.php");
-		$html = ob_get_contents();
-		ob_end_clean();
-
-		return $html;
+		include(dirname(__FILE__) . "/config/ButtonSocialConfigFormPage.class.php");
+		$form = SOY2HTMLFactory::createInstance("ButtonSocialConfigFormPage");
+		$form->setPluginObj($this);
+		$form->execute();
+		return $form->getObject();
 	}
+		
+	function getAppId(){
+		return $this->app_id;
+	}
+	function setAppId($app_id){
+		$this->app_id = $app_id;
+	}
+	
+	function getMixiCheckKey(){
+		return $this->mixi_check_key;
+	}
+	function setMixiCheckKey($mixi_check_key){
+		$this->mixi_check_key = $mixi_check_key;
+	}
+	
+	function getMixiLikeKey(){
+		return $this->mixi_like_key;
+	}
+	function setMixiLikeKey($mixi_like_key){
+		$this->mixi_like_key = $mixi_like_key;
+	}
+	
+	function getAdmins(){
+		return $this->admins;
+	}
+	function setAdmins($admins){
+		$this->admins = $admins;
+	}
+	
+	function getDescription(){
+		return $this->description;
+	}
+	function setDescription($description){
+		$this->description = $description;
+	}
+	
+	function getImage(){
+		return $this->image;
+	}
+	function setImage($image){
+		$this->image = $image;
+	}
+	
 
 	public static function register(){
 

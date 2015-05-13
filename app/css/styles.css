@@ -304,10 +304,12 @@ table.list tfoot tr.search td{
 table.list tbody tr:nth-child(odd) td {
 	background-color:#F5FBD0;
 }
-table.list tbody tr:last-child td,tr:last-child th{
+table.list tbody tr:last-child td,
+table.list tbody tr:last-child th{
 	border-bottom:1px solid #AAAAAA !important;
 }
-table.list tbody th:last-child, td:last-child{
+table.list tbody th:last-child,
+table.list tbody td:last-child{
 	border-right:1px solid #AAAAAA !important;
 }
 

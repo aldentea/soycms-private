@@ -150,7 +150,7 @@ class TreePage extends CMSWebPageBase{
 
 	     		$function[] = '<a href="' . SOY2PageController::createLink("Page.Detail") . "/" . $page->getId() . '">'.$this->getMessage("SOYCMS_EDIT").'</a>';
 
-		    	$url = UserInfoUtil::getSiteUrl().$page->getUri();
+		    	$url = CMSUtil::getSiteUrl().$page->getUri();
 		    	if(!$visible){
 		     		$function[] = '<a href="'.htmlspecialchars($url, ENT_QUOTES, "UTF-8").'">'.$this->getMessage("SOYCMS_VIEW").'</a></span>';
 		    	}else{

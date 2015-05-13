@@ -7,7 +7,8 @@ tinymce.init({
 	tools : "inserttable",
 	language : soycms.language,
 	height : "300px",
-		
+	resize: "both",
+	
 	menubar : false,
 	toolbar1 : "save | cut copy paste pastetext | searchreplace | bold italic underline strikethrough | subscript superscript | forecolor backcolor | alignleft aligncenter alignright | formatselect fontselect fontsizeselect",
 	toolbar2 : "bullist numlist | outdent indent blockquote | undo redo | cleanup removeformat code styleprops attribs | fullscreen preview | insertdate inserttime | innerlink insertimage insertwidget | soycms_emoji charmap | table",

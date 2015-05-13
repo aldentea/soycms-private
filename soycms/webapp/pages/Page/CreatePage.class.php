@@ -184,7 +184,7 @@ class CreatePage extends CMSWebPageBase{
      * このページIDに対する呼び出しURIの定型部分を取得
      */
     function getURIPrefix(){
-    	return UserInfoUtil::getSiteUrl();
+    	return CMSUtil::getSiteUrl();
     }
 }
 ?>

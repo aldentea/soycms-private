@@ -123,8 +123,8 @@ class SiteRootDetachPage extends CMSUpdatePageBase {
 		try{
 			$site = $siteDAO->getById($id);
 			$defaultLink = UserInfoUtil::getSiteURLBySiteId($site->getSiteId());
-			$site->setUrl($defaultLink);
-			$siteDAO->update($site);
+//			$site->setUrl($defaultLink);
+//			$siteDAO->update($site);
 		}catch(Exeption $e){
 			$site = new Site();
 		}
@@ -134,6 +134,7 @@ class SiteRootDetachPage extends CMSUpdatePageBase {
 			$dsn = SOY2DAOConfig::Dsn();
 			SOY2DAOConfig::Dsn($site->getDataSourceName());
 			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+			$defaultLink = UserInfoUtil::getSiteURLBySiteId($site->getSiteId());
 			try{
 				$siteConfig = $siteConfigDao->get();
 				$siteConfig->setConfigValue("url", $defaultLink);
@@ -143,6 +144,22 @@ class SiteRootDetachPage extends CMSUpdatePageBase {
 			}
 			
 			SOY2DAOConfig::Dsn($dsn);
+		
+		//SOY Shopのサイトでも行うようにする
+		}else if($site->getSiteType() == Site::TYPE_SOY_SHOP){
+			SOY2::import("util.SOYShopUtil");
+			$old = SOYShopUtil::switchShopMode($site->getSiteId());
+
+			try{
+				$config = SOYShop_ShopConfig::load();
+				$config->setSiteUrl($defaultLink);
+				SOYShop_ShopConfig::save($config);
+				$res = true;
+			}catch(Exception $e){
+				$res = false;
+			}
+			
+			SOYShopUtil::resetShopMode($old);
 		}
     	
 

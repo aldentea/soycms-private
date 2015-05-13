@@ -34,6 +34,32 @@ class CMSUtil {
 			return $date;
 		}
 	}
+	
+	/**
+	 * サイトURLをサイト側のデータベースから取得する。取得できなければUserInfoUtilの公開URLを調べる
+	 */
+	public static function getSiteUrl(){
+		static $siteUrlBySiteUrl;
+		if(!$siteUrlBySiteUrl){
+			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+	    	try{
+	    		$siteConfig = $siteConfigDao->get();
+	    	}catch(Exception $e){
+	    		$siteConfig = new SiteConfig();
+	    	}
+	    	
+	    	//SiteConfigに入っているURLを取得する
+	    	if(!is_null($siteConfig->getConfigValue("url"))){
+	    		$siteUrlBySiteUrl = $siteConfig->getConfigValue("url");
+	    		
+	    	//SiteConfigにURLが入っていなかった場合はUserInfoUtilから公開URLを取得する
+	    	}else{
+	    		$siteUrlBySiteUrl = UserInfoUtil::getSitePublishURL();
+	    	}
+		}
+			
+    	return $siteUrlBySiteUrl;
+	}
 
 	public static function getEntryHiddenInputHTML($entryId,$title){
 		$str = CMSMessageManager::get("SOYCMS_PREVIEW_EDIT_BUTTON");

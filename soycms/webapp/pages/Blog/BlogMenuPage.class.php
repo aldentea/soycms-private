@@ -76,7 +76,7 @@ class BlogMenuPage extends CMSHTMLPageBase{
     		"visible" => (UserInfoUtil::hasSiteAdminRole())
     	));
     	
-		$pageUrl = UserInfoUtil::getSiteUrl() . ( (strlen($blog->getUri()) >0) ? $blog->getUri() ."/" : "" ) ;
+		$pageUrl = CMSUtil::getSiteUrl() . ( (strlen($blog->getUri()) >0) ? $blog->getUri() ."/" : "" ) ;
     	$this->createAdd("blog_confirm","HTMLLink",array(
     		"link" => $pageUrl,
     		"visible" => $blog->isActive()

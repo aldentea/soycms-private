@@ -58,10 +58,6 @@ class Site {
 	}
 
 	function getSiteName() {
-		//SOY Shop
-		if($this->getSiteType() == self::TYPE_SOY_SHOP){
-			return $this->getSOYShopName();
-		}
 		return $this->siteName;
 	}
 	function setSiteName($siteName) {
@@ -81,10 +77,6 @@ class Site {
 	}
 
 	function getUrl() {
-		//SOY Shop
-		if($this->getSiteType() == self::TYPE_SOY_SHOP){
-			$this->url = $this->getSOYShopUrl();
-		}
 		return $this->url;
 	}
 	function setUrl($url) {
@@ -138,21 +130,5 @@ class Site {
 
 		return is_int($res);
 	}
-
-	/**
-	 * 変更はSOY Shop内で行う
-	 * @return String SOY Shop のショップ名
-	 */
-	function getSOYShopName(){
-		SOY2::import("util.SOYShopUtil");
-		//切り替え
-		return SOYShopUtil::getSOYShopName($this->getSiteId());
-	}
-
-	function getSOYShopUrl(){
-		SOY2::import("util.SOYShopUtil");
-		return SOYShopUtil::getSOYShopUrl($this->getSiteId());
-	}
-
 }
 ?>

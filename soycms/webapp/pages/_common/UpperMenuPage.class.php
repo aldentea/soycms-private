@@ -11,7 +11,7 @@ class UpperMenuPage extends CMSHTMLPageBase{
     	//sitePath
 		$this->addLink("sitepath", array(
 			"text" => "/" . UserInfoUtil::getSite()->getSiteId(),
-			"link" => UserInfoUtil::getSiteUrl(),
+			"link" => CMSUtil::getSiteUrl(),
 			"style" => "text-decoration:none;color:black;"
 		));
 		

@@ -118,7 +118,7 @@ class CommentPage extends CMSWebPageBase{
     		DisplayPlugin::hide("must_exists_comment");	
     	}
 
-		$pageUrl = UserInfoUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
+		$pageUrl = CMSUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
 		$this->createAdd("comment_list","CommentList",array(
 			"list" => $list,
 			"url"  => $pageUrl.$page->getEntryPageUri()
@@ -141,7 +141,7 @@ class CommentPage extends CMSWebPageBase{
 		 * ツールボックス
 		 */
 		if($page->isActive() == Page::PAGE_ACTIVE){
-    		$pageUrl = UserInfoUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
+    		$pageUrl = CMSUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
     		CMSToolBox::addLink(CMSMessageManager::get("SOYCMS_SHOW_BLOGPAGE"),$pageUrl,false,"this.target = '_blank'");
     	}
     	CMSToolBox::addPageJumpBox();

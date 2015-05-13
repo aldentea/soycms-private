@@ -60,14 +60,13 @@ class IndexPage extends CMSWebPageBase{
 
 		$result = $this->run("Entry.RecentListAction");
 
-		
 		$this->createAdd("recentEntries", "RecentEntryList", array(
 			"list"=>$result->getAttribute("list"),
 			"labels"=>$result->getAttribute("labels")
 		));
 
 		$this->createAdd("recentPage", "RecentPageList", array(
-			"list"=>$this->run("Page.RecentPageListAction")->getAttribute("list")
+			"list" => $this->run("Page.RecentPageListAction")->getAttribute("list")
 		));
 
 		$result = $this->run("Page.PageListAction", array("buildTree" => true));
@@ -302,8 +301,9 @@ class RecentEntryList extends HTMLList{
 }
 
 class RecentPageList extends HTMLList{
-
+	
 	function populateItem($entity){
+		
 		$this->addLink("title", array(
 			"text"=>(strlen($entity->getTitle()) == 0) ? CMSMessageManager::get("SOYCMS_NO_TITLE") : $entity->getTitle(),
 			"link"=>SOY2PageController::createLink("Page.Detail.") . $entity->getId()
@@ -311,13 +311,13 @@ class RecentPageList extends HTMLList{
 
 		$this->addLink("content", array(
 			"text" => "/" . $entity->getUri(),
-			"link" => UserInfoUtil::getSiteUrl() . $entity->getUri()
+			"link" => CMSUtil::getSiteUrl() . $entity->getUri()
 		));
 		
 		$this->addLabel("udate", array(
 			"text"=>CMSUtil::getRecentDateTimeText($entity->getUdate()),
 			"title" => date("Y-m-d H:i:s", $entity->getUdate())
 		));
-	}
+	}	
 }
 ?>

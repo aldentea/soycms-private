@@ -74,7 +74,7 @@ class EntryPage extends CMSEntryEditorPageBase{
 
 		//公開側へのリンク
     	if($this->detail->isActive() == Page::PAGE_ACTIVE && $this->detail->getGenerateTopFlag()){
-    		CMSToolBox::addLink(CMSMessageManager::get("SOYCMS_SHOW_BLOGPAGE"),UserInfoUtil::getSiteUrl() . $this->detail->getTopPageURL(),false,"this.target = '_blank'");
+    		CMSToolBox::addLink(CMSMessageManager::get("SOYCMS_SHOW_BLOGPAGE"),CMSUtil::getSiteUrl() . $this->detail->getTopPageURL(),false,"this.target = '_blank'");
     	}
 
     	CMSToolBox::addPageJumpBox();
@@ -304,7 +304,7 @@ class EntryPage extends CMSEntryEditorPageBase{
     	if($this->detail->isActive() == Page::PAGE_ACTIVE && $this->detail->getGenerateEntryFlag() && $entry->getIsPublished()){
     		CMSToolBox::addLink(
 				CMSMessageManager::get("SOYCMS_SHOW_ENTRYPAGE"),
-				UserInfoUtil::getSiteUrl() . $this->detail->getEntryPageURL(true).rawurlencode($entry->getAlias()),
+				CMSUtil::getSiteUrl() . $this->detail->getEntryPageURL(true).rawurlencode($entry->getAlias()),
 				false,
 				"this.target = '_blank'"
 			);

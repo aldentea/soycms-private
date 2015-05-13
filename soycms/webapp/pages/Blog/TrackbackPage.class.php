@@ -122,7 +122,7 @@ class TrackbackPage extends CMSWebPageBase{
 			DisplayPlugin::hide("must_exists_trackback");
 		}
 		
-		$pageUrl = UserInfoUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
+		$pageUrl = CMSUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
 		$this->createAdd("trackback_list","TrackbackList",array(
 			"list" => $list,
 			"url"  => $pageUrl.$page->getEntryPageUri()
@@ -145,7 +145,7 @@ class TrackbackPage extends CMSWebPageBase{
 		 * ツールボックス
 		 */
 		if($page->isActive() == Page::PAGE_ACTIVE){
-    		$pageUrl = UserInfoUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
+    		$pageUrl = CMSUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
     		CMSToolBox::addLink(CMSMessageManager::get("SOYCMS_SHOW_BLOGPAGE"),$pageUrl,false,"this.target = '_blank'");
     	}
     	CMSToolBox::addPageJumpBox();

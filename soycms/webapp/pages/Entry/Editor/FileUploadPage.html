@@ -195,7 +195,6 @@
 	
 	function prepare(resObj){
 		if(!resObj.result){
-			console.log(resObj.message);
 			switch(resObj.errorCode){
 				case 1://already file exists
 				if(confirm("リモートフォルダに同名ファイルが存在しました。\n名前を変えてアップロードしますか？")){

@@ -128,9 +128,6 @@ class SiteRootPage extends CMSUpdatePageBase{
 		$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
 		try{
 			$site = $siteDAO->getById($id);
-			$site->setUrl($rootLink);
-			$siteDAO->update($site);
-			
 		}catch(Exeption $e){
 			$site = new Site();
 		}
@@ -149,6 +146,23 @@ class SiteRootPage extends CMSUpdatePageBase{
 			}
 			
 			SOY2DAOConfig::Dsn($dsn);
+		
+		//SOY Shopのサイトでも行うようにする
+		}else if($site->getSiteType() == Site::TYPE_SOY_SHOP){
+			
+			SOY2::import("util.SOYShopUtil");
+			$old = SOYShopUtil::switchShopMode($site->getSiteId());
+			
+			try{
+				$config = SOYShop_ShopConfig::load();
+				$config->setSiteUrl($rootLink);
+				SOYShop_ShopConfig::save($config);
+				$res = true;
+			}catch(Exception $e){
+				$res = false;
+			}
+			
+			SOYShopUtil::resetShopMode($old);
 		}
 			
 

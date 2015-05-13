@@ -224,7 +224,7 @@ class DetailPage extends CMSWebPageBase{
     	CMSToolBox::addLink($this->getMessage("SOYCMS_TEMPLATE_HISTORY"),SOY2PageController::createLink("Page.TemplateHistory.".$this->id),true);
     	CMSToolBox::addLink($this->getMessage("SOYCMS_DYNAMIC_EDIT"),SOY2PageController::createLink("Page.Preview.".$this->id),false,"this.target = '_blank'");
     	if($page->isActive() == Page::PAGE_ACTIVE){
-    		CMSToolBox::addLink($this->getMessage("SOYCMS_SHOW_WEBPAGE"),UserInfoUtil::getSiteUrl().$page->getUri(),false,"this.target = '_blank'");
+    		CMSToolBox::addLink($this->getMessage("SOYCMS_SHOW_WEBPAGE"),CMSUtil::getSiteUrl().$page->getUri(),false,"this.target = '_blank'");
     	}    	
     	CMSToolBox::addLink($this->getMessage("SOYCMS_DOWNLOAD_TEMPLATE"),SOY2PageController::createLink("Page.ExportTemplate.".$this->id),false);
     	
@@ -235,7 +235,7 @@ class DetailPage extends CMSWebPageBase{
      * このページIDに対する呼び出しURIの定型部分を取得
      */
     function getURIPrefix($pageId){
-    	return UserInfoUtil::getSiteUrl();
+    	return CMSUtil::getSiteUrl();
     }
     
     /**

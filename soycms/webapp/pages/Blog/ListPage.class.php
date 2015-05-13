@@ -126,7 +126,7 @@ class BlogPageList extends HTMLList{
 		$pageType = (int)$entity->getPageType();
 
    		$pageUrl = (strlen($entity->getUri()) >0) ? "/{$entity->getUri()}/" : "/" ;
-   		$pageFullUrl = UserInfoUtil::getSiteUrl() . ( (strlen($entity->getUri()) >0) ? $entity->getUri() ."/" : "" ) ;
+   		$pageFullUrl = CMSUtil::getSiteUrl() . ( (strlen($entity->getUri()) >0) ? $entity->getUri() ."/" : "" ) ;
 		
 		$this->createAdd("page_icon","HTMLModel",array(
 			"style" => "background-image:url('".$entity->getIconUrl()."')"

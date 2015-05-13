@@ -196,7 +196,7 @@ class CustomIconFieldPlugin{
 		$icons_array = explode(",",$icons);
 		$html .= '<div id="custom_icon_field_current">';
 		foreach($icons_array as $str){
-			$str = str_replace(UserInfoUtil::getSiteUrl(), "", $str);
+			$str = str_replace(CMSUtil::getSiteUrl(), "", $str);
 			if(strlen($str)){
 				$tmpStr = str_replace($this->iconDirecotry,"",$str);
 				$html .= '<img id="custom_icon_field_hidden_'.str_replace(".","_",substr($tmpStr,strrpos("/",$tmpStr)+1)).'" src="'.htmlspecialchars(UserInfoUtil::getSiteURL().$str,ENT_QUOTES).'" />';	
@@ -245,7 +245,7 @@ class CustomIconFieldPlugin{
 		$icons_array = explode(",",$icons);
 		$html .= '<div id="custom_icon_field_current">';
 		foreach($icons_array as $str){
-			$str = str_replace(UserInfoUtil::getSiteUrl(), "", $str);
+			$str = str_replace(CMSUtil::getSiteUrl(), "", $str);
 			if(strlen($str)){
 				$tmpStr = str_replace($this->iconDirecotry,"",$str);
 				$html .= '<img id="custom_icon_field_hidden_'.str_replace(".","_",substr($tmpStr,strrpos("/",$tmpStr)+1)).'" src="'.htmlspecialchars(UserInfoUtil::getSiteURL().$str,ENT_QUOTES).'" />';	

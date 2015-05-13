@@ -109,7 +109,7 @@ class CustomAliasPlugin{
 			
 			$html = "";
 			if($page){
-				$entryPageUri = UserInfoUtil::getSiteUrl().$page->getEntryPageURL();
+				$entryPageUri = CMSUtil::getSiteUrl().$page->getEntryPageURL();
 				$entryUri = $entryPageUri.rawurlencode($alias);
 	
 				$html .= "<div class=\"section custom_alias\">";

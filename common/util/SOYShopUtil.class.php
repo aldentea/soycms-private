@@ -18,6 +18,12 @@ class SOYShopUtil {
 	 * 
 	 */
 	public static function switchShopMode($siteId){
+		
+		//SOYShop_ShopConfig::saveをするために必要な定数の設定をしておく
+		if(!defined("SOYSHOP_ID")) define("SOYSHOP_ID", $siteId);
+		if(!defined("SOYSHOP_ROOT")) define("SOYSHOP_ROOT", str_replace("common", "soyshop", SOY2::RootDir()));
+		if(!defined("SOYSHOP_ADMIN_URL")) define("SOYSHOP_ADMIN_URL", SOY2PageController::createRelativeLink("../soyshop/") . "index.php");
+		
 		$old = array();
 		
 		$old["root"] = SOY2::RootDir();
@@ -40,6 +46,10 @@ class SOYShopUtil {
 		SOY2DAOConfig::Dsn(SOYSHOP_SITE_DSN);
 		SOY2DAOConfig::user(SOYSHOP_SITE_USER);
 		SOY2DAOConfig::pass(SOYSHOP_SITE_PASS);
+		
+		//SOYShop_ShopConfig::saveで利用するクラスの読み込み
+		SOY2::import("domain.config.SOYShop_DataSets");
+		SOY2::import("domain.config.SOYShop_ShopConfig");
 		
 		return $old;
 	}
@@ -199,6 +209,8 @@ class SOYShopUtil {
 	 * @return String SOY Shop site name
 	 */
 	public static function getSOYShopName($id){
+		$name = "";
+		
 		$conf = dirname((SOYSHOP_COMMON_DIR))."/conf/shop/".$id.".admin.conf.php";
 		if(file_exists($conf)){
 			self::includeSOYShopConfig($id);
@@ -220,7 +232,7 @@ class SOYShopUtil {
 			return $name;
 		}
 		
-		return false;
+		return $name;
 	}
 
 	/**
@@ -238,7 +250,7 @@ class SOYShopUtil {
 			eval("\$url = ".$id."_SOYSHOP_SITE_URL;");
 			return $url;
 		}
-		return false;
+		return $url;
 	}
 	
 	/**

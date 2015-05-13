@@ -71,5 +71,43 @@ class SOYAppUtil {
 		SOY2DAOConfig::user($old["user"]);
 		SOY2DAOConfig::pass($old["pass"]);
 	}
+	
+	public static function switchAppMode($appId = "shop"){
+		$old = array();
+		
+		$old["root"] = SOY2::RootDir();
+		$old["dao"] = SOY2DAOConfig::DaoDir();
+		$old["entity"] = SOY2DAOConfig::EntityDir();
+		$old["dsn"] = SOY2DAOConfig::Dsn();
+		$old["user"] = SOY2DAOConfig::user();
+		$old["pass"] = SOY2DAOConfig::pass();
+
+		SOY2::RootDir(dirname(SOYCMS_COMMON_DIR) . "/webapp/" . $appId . "/src/");
+		SOY2DAOConfig::DaoDir(SOY2::RootDir() . "domain/");
+		SOY2DAOConfig::EntityDir(SOY2::RootDir() . "domain/");
+		
+		if(SOYCMS_DB_TYPE == "sqlite"){
+			//SOYMailはdbファイル名がappIdと異なるから修正
+			if($appId == "mail") $appId = "soymail";
+			
+			SOY2DAOConfig::Dsn(SOYCMS_COMMON_DIR . "db/" . $appId . ".db");
+		//MySQLの場合は管理側のDB
+		}else{
+			SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
+			SOY2DAOConfig::user(ADMIN_DB_USER);
+			SOY2DAOConfig::pass(ADMIN_DB_PASS);
+		}
+
+		return $old;
+	}
+	
+	public static function resetAppMode($old){
+		SOY2::RootDir($old["root"]);
+		SOY2DAOConfig::DaoDir($old["dao"]);
+		SOY2DAOConfig::EntityDir($old["entity"]);
+		SOY2DAOConfig::Dsn($old["dsn"]);
+		SOY2DAOConfig::user($old["user"]);
+		SOY2DAOConfig::pass($old["pass"]);
+	}
 }
 ?>

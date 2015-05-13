@@ -241,7 +241,7 @@ class PageList extends HTMlList{
 		
 		$this->createAdd("uri","HTMLLink",array(
 			"text" => "/".$entity->getUri(),
-			"link"=>UserInfoUtil::getSiteUrl().$entity->getUri(),
+			"link"=>CMSUtil::getSiteUrl().$entity->getUri(),
 		));
 		
 		$this->createAdd("update_date","HTMLLabel",array(
@@ -283,7 +283,7 @@ class PageList extends HTMlList{
 		));
 		
 		$this->createAdd("client_view","HTMLLink",array(
-			"link"=>UserInfoUtil::getSiteUrl().$entity->getUri(),
+			"link"=>CMSUtil::getSiteUrl().$entity->getUri(),
 			"html" => ($entity->isActive()>0) ? CMSMessageManager::get("SOYCMS_VIEW") : "<s>".CMSMessageManager::get("SOYCMS_VIEW")."</s>" 
 		));		
 		

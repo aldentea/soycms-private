@@ -328,7 +328,7 @@ class ConfigPage extends CMSWebPageBase{
 		//ツールボックス
 		CMSToolBox::addLink(CMSMessageManager::get("SOYCMS_DYNAMIC_EDIT"),SOY2PageController::createLink("Page.Preview.".$this->id),false,"this.target = '_blank'"); 	
     	if($page->isActive() == Page::PAGE_ACTIVE){
-    		$pageUrl = UserInfoUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
+    		$pageUrl = CMSUtil::getSiteUrl() . ( (strlen($page->getUri()) >0) ? $page->getUri() ."/" : "" ) ;
 
     		CMSToolBox::addLink(CMSMessageManager::get("SOYCMS_SHOW_BLOGPAGE"),
     			$pageUrl,
@@ -368,7 +368,7 @@ class ConfigPage extends CMSWebPageBase{
      * このページIDに対する呼び出しURIの定型部分を取得
      */
     function getURIPrefix($pageId){
-    	return UserInfoUtil::getSiteUrl();
+    	return CMSUtil::getSiteUrl();
     }
     
     /**

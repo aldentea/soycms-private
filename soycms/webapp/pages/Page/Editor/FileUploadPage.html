@@ -194,10 +194,19 @@
 		var alt = $("#image_alt").val();
 		var width = $("#image_width").val();
 		var height = $("#image_height").val();
-			
-		window.parent.insertHTML(
-			html,src,alt,width,height
-		);
+		
+		//GETの値があるか調べる
+		var query = window.location.search.substring(1);
+		
+		if(query.length === 0){
+			//queryの指定がない場合
+			window.parent.insertHTML(
+				html,src,alt,width,height
+			);
+		}else{
+			//queryの指定がある場合
+			window.parent.$("#" + query).val(src);
+		}
 		
 		//おまじない
 		iframe = null;

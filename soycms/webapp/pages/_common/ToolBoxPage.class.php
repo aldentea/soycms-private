@@ -30,7 +30,7 @@ class ToolBoxPage extends CMSHTMLPageBase{
     	foreach($htmls as $html){
     		$linkHtml .= "<div>".$html."</div>";    		
     	}
-
+    	
     	$this->createAdd("toolbox_linkbox","HTMLLabel",array(
     		"html" => $linkHtml    	
     	));
