@@ -144,20 +144,18 @@ class SiteDeleteLogic extends SOY2LogicBase{
 		}
 
 		$d = dir( $dir );
-		while(($entry = $d->read())!=false){
+		while(($entry = $d->read())!==false){// != だと 0  というディレクトリが消せない
 			if ($entry == '.'| $entry == '..'){continue;}
 			$entry = $dir . '/' . $entry;
 
-			//ディレクトリ
-			if(is_dir($entry)){
-				if (!$this->deleteFiles($entry)){
-				    return false;
-				}
-				continue;
-			}
-
-			//ファイル
-			if (!@unlink($entry)){
+			if(
+				//ディレクトリ
+				is_dir($entry) && !$this->deleteFiles($entry)
+				||
+				//ファイル
+				file_exists($entry) && !@unlink($entry)
+			){
+				error_log("Failed to delete ".$entry);
 				$d->close();
 				return false;
 			}
@@ -167,7 +165,7 @@ class SiteDeleteLogic extends SOY2LogicBase{
 		if(is_link($dir)){
 			//リンクの場合
 			@unlink($dir);
-		}else{
+		}elseif(is_dir($dir)){
 			//実ディレクトリの場合
 			rmdir( $dir );
 		}

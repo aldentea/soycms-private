@@ -210,16 +210,22 @@ class UtilMultiLanguagePlugin{
 	function checkRedirectPath($path){
 		if($path === false) return false;
 		
+		$path = $this->formatPath($path);
+		$requestUri = $this->formatPath($_SERVER["REQUEST_URI"]);
+				
+		return ($path !== $requestUri);
+	}
+	
+	function formatPath($path){
 		if(strpos($path, "/") !== 0){
 			$path = "/" . $path;
 		}
 		
-		$requestUri = $_SERVER["REQUEST_URI"];
-		if(strpos($requestUri, "/") !== 0){
-			$requestUri = "/" . $requestUri;
+		if(strpos($path, "/?") !== 0){
+			$path = str_replace("/?", "?", $path);
 		}
 		
-		return ($path !== $requestUri);
+		return $path;		
 	}
 
 	function getConfig(){

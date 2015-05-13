@@ -26,11 +26,11 @@ class UpdateAction extends SOY2Action{
 	    	$dao->update($admin);
 
     		//セッション内のユーザー名も更新する
-    		$name = $admin->getName();
-    		if(!$name)$name = $admin->getUserId();
-
-    		$this->getUserSession()->setAttribute('username',$name);
-
+    		if($this->adminId == UserInfoUtil::getUserId()){
+    			$name = $admin->getName();
+    			if(!$name)$name = $admin->getUserId();
+    			$this->getUserSession()->setAttribute('username',$name);
+    		}
 
 	    	return SOY2Action::SUCCESS;
     	}catch(Exception $e){

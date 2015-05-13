@@ -21,6 +21,8 @@ function soy_cms_blog_output_top_link($page){
 
 このブロックは、繰り返しブロックであり、該当するカテゴリーの個数だけブロックの内容が繰り返し出力されます。
 
+ラベルの表示順が反映されます。
+
 <ul>
 <!-- b_block:id="category" -->
 	<li><a cms:id="category_link">
@@ -78,9 +80,9 @@ function soy_cms_blog_output_category_link($page){
 		}
 	}
 
-	//ラベル一覧を取得
+	//ラベル一覧を取得：ラベルの表示順を反映する
 	$labelDao = SOY2DAOFactory::create("cms.LabelDAO");
-	$labels = $labelDao->get();
+	$labels = $labelDao->get();//表示順に並んでいる
 
 	$logic = SOY2Logic::createInstance("logic.site.Entry.EntryLogic");
 
@@ -90,24 +92,16 @@ function soy_cms_blog_output_category_link($page){
 	$categories = $page->page->getCategoryLabelList();
 	$categoryLabel = array();
 	$entryCount = array();
-	foreach($categories as $category){
-		if(isset($labels[$category])){
-			$categoryLabel[] =  $labels[$category];
-
+	foreach($labels as $labelId => $label){
+		if(in_array($labelId, $categories)){
+			$categoryLabel[] =  $label;
 			try{
-				$labelIds = array($blogLabelId,$category);
-
-				$labelIds = array_unique($labelIds);
-
 				//記事の数を数える。
-				$counts = $logic->getOpenEntryCountByLabelIds($labelIds);
-
-
-
+				$counts = $logic->getOpenEntryCountByLabelIds(array_unique(array($blogLabelId,$labelId)));
 			}catch(Exception $e){
 				$counts= 0;
 			}
-			$entryCount[$category] = $counts;
+			$entryCount[$labelId] = $counts;
 		}
 	}
 

@@ -591,6 +591,7 @@ class CMSApplication {
     public static function switchAdminMode(){
 
 		//Root
+		self::RestoreSOY2RootDir();
 		SOY2::RootDir(CMS_COMMON);
 
 		//DAO, Entity
@@ -601,7 +602,6 @@ class CMSApplication {
 		SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
 		SOY2DAOConfig::user(ADMIN_DB_USER);
 		SOY2DAOConfig::pass(ADMIN_DB_PASS);
-
     }
 
     /**
@@ -610,7 +610,7 @@ class CMSApplication {
     public static function switchAppMode(){
 
     	//Root
-    	SOY2::RootDir(self::getApplicationRoot());
+		self::RestoreSOY2RootDir();
 
     	//DAO, Entity
     	self::switchDomain(SOY2::RootDir() . "domain/");
@@ -623,9 +623,16 @@ class CMSApplication {
 			SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
 			SOY2DAOConfig::user(ADMIN_DB_USER);
 			SOY2DAOConfig::pass(ADMIN_DB_PASS);
-
 		}
+    }
 
+	/**
+	 * SOY2::RootDir()を保持し復元する
+	 */
+    private static function RestoreSOY2RootDir(){
+    	static $rootDir;
+    	if(!$rootDir) $rootDir = SOY2::RootDir();
+    	SOY2::RootDir($rootDir);
     }
 
     /**

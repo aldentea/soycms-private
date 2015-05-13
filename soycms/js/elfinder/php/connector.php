@@ -3,9 +3,6 @@
 set_time_limit(0); // just in case it too long, not recommended for production
 error_reporting(E_ALL | E_STRICT); // Set E_ALL for debuging
 
-//GETの値がなければelfinderを実行させない
-//if(!isset($_GET["site_id"]) || !isset($_GET["shop_id"])) exit;
-
 //ログインしていなければelfinderを実行させない
 include_once("../../../../common/common.inc.php");
 SOY2::import("util.UserInfoUtil");
@@ -27,89 +24,13 @@ include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderConnector.class.php'
 include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinder.class.php';
 include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderVolumeDriver.class.php';
 include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderVolumeLocalFileSystem.class.php';
-include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderVolumeMySQL.class.php';
-include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderVolumeFTP.class.php';
-
-/**
- * # Dropbox volume driver need "dropbox-php's Dropbox" and "PHP OAuth extension" or "PEAR's HTTP_OAUTH package"
- * * dropbox-php: http://www.dropbox-php.com/
- * * PHP OAuth extension: http://pecl.php.net/package/oauth
- * * PEAR's HTTP_OAUTH package: http://pear.php.net/package/http_oauth
- *  * HTTP_OAUTH package require HTTP_Request2 and Net_URL2
- */
-// Required for Dropbox.com connector support
-// include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderVolumeDropbox.class.php';
-
-// Dropbox driver need next two settings. You can get at https://www.dropbox.com/developers
-// define('ELFINDER_DROPBOX_CONSUMERKEY',    '');
-// define('ELFINDER_DROPBOX_CONSUMERSECRET', '');
-// define('ELFINDER_DROPBOX_META_CACHE_PATH',''); // optional for `options['metaCachePath']`
+//include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderVolumeMySQL.class.php';
+//include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderVolumeFTP.class.php';
 
 function debug($o) {
 	echo '<pre>';
 	print_r($o);
 }
-
-
-
-/**
- * Smart logger function
- * Demonstrate how to work with elFinder event api
- *
- * @param  string   $cmd       command name
- * @param  array    $result    command result
- * @param  array    $args      command arguments from client
- * @param  elFinder $elfinder  elFinder instance
- * @return void|true
- * @author Troex Nevelin
- **/
-function logger($cmd, $result, $args, $elfinder) {
-
-
-	$log = sprintf("[%s] %s: %s \n", date('r'), strtoupper($cmd), var_export($result, true));
-	$logfile = '../files/temp/log.txt';
-	$dir = dirname($logfile);
-	if (!is_dir($dir) && !mkdir($dir)) {
-		return;
-	}
-	if (($fp = fopen($logfile, 'a'))) {
-		fwrite($fp, $log);
-		fclose($fp);
-	}
-	return;
-
-	foreach ($result as $key => $value) {
-		if (empty($value)) {
-			continue;
-		}
-		$data = array();
-		if (in_array($key, array('error', 'warning'))) {
-			array_push($data, implode(' ', $value));
-		} else {
-			if (is_array($value)) { // changes made to files
-				foreach ($value as $file) {
-					$filepath = (isset($file['realpath']) ? $file['realpath'] : $elfinder->realpath($file['hash']));
-					array_push($data, $filepath);
-				}
-			} else { // other value (ex. header)
-				array_push($data, $value);
-			}
-		}
-		$log .= sprintf(' %s(%s)', $key, implode(', ', $data));
-	}
-	$log .= "\n";
-
-	$logfile = '../files/temp/log.txt';
-	$dir = dirname($logfile);
-	if (!is_dir($dir) && !mkdir($dir)) {
-		return;
-	}
-	if (($fp = fopen($logfile, 'a'))) {
-		fwrite($fp, $log);
-		fclose($fp);
-	}
-}
-
 
 /**
  * Simple logger function.
@@ -152,7 +73,9 @@ class elFinderSimpleLogger {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	public function log($cmd, $result, $args, $elfinder) {
-		$log = $cmd.' ['.date('d.m H:s')."]\n";
+		$log = '['.date('Y-m-d H:i:s')."] ".$cmd;
+		if(class_exists("UserInfoUtil")) $log .= " by ".UserInfoUtil::getLoginId() . " (".UserInfoUtil::getUserId().")";
+		$log .= "\n";
 
 		if (!empty($result['error'])) {
 			$log .= "\tERROR: ".implode(' ', $result['error'])."\n";
@@ -194,7 +117,7 @@ class elFinderSimpleLogger {
 	protected function write($log) {
 
 		if (($fp = @fopen($this->file, 'a'))) {
-			fwrite($fp, $log."\n");
+			fwrite($fp, $log);
 			fclose($fp);
 		}
 	}
@@ -219,42 +142,9 @@ function access($attr, $path, $data, $volume, $isDir) {
 		:  null;                                    // else elFinder decide it itself
 }
 
-/**
- * Access control example class
- *
- * @author Dmitry (dio) Levashov
- **/
-class elFinderTestACL {
-
-	/**
-	 * make dotfiles not readable, not writable, hidden and locked
-	 *
-	 * @param  string  $attr  attribute name (read|write|locked|hidden)
-	 * @param  string  $path  file path. Attention! This is path relative to volume root directory started with directory separator.
-	 * @param  mixed   $data  data which seted in 'accessControlData' elFinder option
-	 * @param  elFinderVolumeDriver  $volume  volume driver
-	 * @return bool
-	 * @author Dmitry (dio) Levashov
-	 **/
-	public function fsAccess($attr, $path, $data, $volume) {
-
-		if ($volume->name() == 'localfilesystem') {
-			return strpos(basename($path), '.') === 0
-				? !($attr == 'read' || $attr == 'write')
-				: $attr == 'read' || $attr == 'write';
-		}
-
-		return true;
-	}
-
-} // END class
-
-$acl = new elFinderTestACL();
-
-function validName($name) {
-	return strpos($name, '.') !== 0;
-}
-
+//function validName($name) {
+//	return strpos($name, '.') !== 0;
+//}
 
 $logger = new elFinderSimpleLogger('../files/temp/log.txt');
 
@@ -290,7 +180,7 @@ $opts = array(
 	'locale' => 'ja_JP.UTF-8',
 	'bind' => array(
 		// '*' => 'logger',
-		'mkdir mkfile rename duplicate upload rm paste' => 'logger'
+		'mkdir mkfile rename duplicate upload rm paste' => array($logger, "log")
 	),
 	'debug' => true,
 	'netVolumesSessionKey' => 'netVolumes',
@@ -311,18 +201,16 @@ $opts = array(
 			'acceptedName'    => '/^[^\.].*$/',
 			// 'disabled' => array('extract', 'archive'),
 			// 'tmbSize' => 128,
-//			'attributes' => array(
-//				array(
-//					'pattern' => '/\.db$/',
-//					'read' => true,
-//					'write' => false
-//				),
-//				array(
-//					'pattern' => '/^\/icons$/',
-//					'read' => true,
-//					'write' => false
-//				)
-//			)
+			'attributes' => array(
+				//フロントコントローラー
+				array(
+					'pattern' => '/(index|im)\\.php(\\.old(\\.[0-9][0-9])?)?$/',
+					'read' => false,
+					'write' => false,
+					'locked' => true,
+					'hidden' => true,
+				),
+			)
 			// 'uploadDeny' => array('application', 'text/xml')
 		),
 		// array(
@@ -356,98 +244,6 @@ $opts = array(
 		// 	),
 		// 	// 'defaults' => array('read' => false, 'write' => true)
 		// ),
-
-		// array(
-		// 	'driver' => 'FTP',
-		// 	'host' => '192.168.1.38',
-		// 	'user' => 'dio',
-		// 	'pass' => 'hane',
-		// 	'path' => '/Users/dio/Documents',
-		// 	'tmpPath' => '../files/ftp',
-		// 	'utf8fix' => true,
-		// 	'attributes' => array(
-		// 		array(
-		// 			'pattern' => '~/\.~',
-		// 			'read' => false,
-		// 			'write' => false,
-		// 			'hidden' => true,
-		// 			'locked' => false
-		// 		),
-		//
-		// 	)
-		// ),
-//		array(
-//			'driver' => 'FTP',
-//			'host' => 'work.std42.ru',
-//			'user' => 'dio',
-//			'pass' => 'wallrus',
-//			'path' => '/',
-//			'tmpPath' => '../files/ftp',
-//		),
-		// array(
-		// 	'driver' => 'FTP',
-		// 	'host' => '10.0.1.3',
-		// 	'user' => 'frontrow',
-		// 	'pass' => 'frontrow',
-		// 	'path' => '/',
-		// 	'tmpPath' => '../files/ftp',
-		// ),
-
-		// array(
-		// 	'driver'     => 'LocalFileSystem',
-		// 	'path'       => '../files2/',
-		// 	'URL'        => dirname($_SERVER['PHP_SELF']) . '/../files2/',
-		// 	'alias'      => 'Files',
-		// 	'mimeDetect' => 'internal',
-		// 	'tmbPath'    => '.tmb',
-		// 	// 'copyOverwrite' => false,
-		// 	'utf8fix'    => true,
-		// 	'attributes' => array(
-		// 		array(
-		// 			'pattern' => '~/\.~',
-		// 			// 'pattern' => '/^\/\./',
-		// 			// 'read' => false,
-		// 			// 'write' => false,
-		// 			'hidden' => true,
-		// 			'locked' => false
-		// 		),
-		// 	)
-		// ),
-
-		// array(
-		// 	'driver' => 'MySQL',
-		// 	'path' => 1,
-		// 	// 'treeDeep' => 2,
-		// 	// 'socket'          => '/opt/local/var/run/mysql5/mysqld.sock',
-		// 	'user' => 'root',
-		// 	'pass' => 'hane',
-		// 	'db' => 'elfinder',
-		// 	'user_id' => 1,
-		// 	// 'accessControl' => 'access',
-		// 	// 'separator' => ':',
-		// 	'tmbCrop'         => true,
-		// 	// thumbnails background color (hex #rrggbb or 'transparent')
-		// 	'tmbBgColor'      => '#000000',
-		// 	'files_table' => 'elfinder_file',
-		// 	// 'imgLib' => 'imagick',
-		// 	// 'uploadOverwrite' => false,
-		// 	// 'copyTo' => false,
-		// 	// 'URL'    => 'http://localhost/git/elfinder',
-		// 	'tmpPath' => '../filesdb/tmp',
-		// 	'tmbPath' => '../filesdb/tmb',
-		// 	'tmbURL' => dirname($_SERVER['PHP_SELF']) . '/../filesdb/tmb/',
-		// 	// 'attributes' => array(
-		// 	// 	array(),
-		// 	// 	array(
-		// 	// 		'pattern' => '/\.jpg$/',
-		// 	// 		'read' => false,
-		// 	// 		'write' => false,
-		// 	// 		'locked' => true,
-		// 	// 		'hidden' => true
-		// 	// 	)
-		// 	// )
-		//
-		// )
 	)
 
 );
@@ -459,5 +255,3 @@ header('Access-Control-Allow-Origin: *');
 $connector = new elFinderConnector(new elFinder($opts), true);
 $connector->run();
 
-// echo '<pre>';
-// print_r($connector);

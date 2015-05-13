@@ -139,6 +139,11 @@ class AdministratorList extends HTMLList{
 			"text"=>(UserInfoUtil::isDefaultUser() || $entity->getId() == UserInfoUtil::getUserId()) ? CMSMessageManager::get("ADMIN_DETAIL_EDIT") : CMSMessageManager::get("ADMIN_DISPLAY_DETAILS")
 		));
 
+		$this->addLink("update_password_link", array(
+			"link" => SOY2PageController::createLink("Administrator.Password.".$entity->getId()),
+			"visible"=> UserInfoUtil::isDefaultUser() && $entity->getId() != UserInfoUtil::getUserId(),
+		));
+
 		$this->addLink("remove_link", array(
 			"link" => SOY2PageController::createLink("Administrator.Remove." . $entity->getId()),
 			"visible"=> UserInfoUtil::isDefaultUser() && !$entity->getIsDefaultUser(),
@@ -161,7 +166,7 @@ class AdministratorList extends HTMLList{
 			"html"=>implode("<br />", $siteName)
 		));
 	}
-	
+
 	function setSites($sites){
 		$this->sites = $sites;
 	}

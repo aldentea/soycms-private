@@ -85,7 +85,7 @@
 
 		<div id="resolve_message">
 			<h3>詳細/解決策</h3>
-			<div><?php echo get_resolve_message($exception, true); ?></div>
+			<div><?php echo get_resolve_message($exception); ?></div>
 			<p style="margin-top:30px">
 				解決策や内容がご不明な場合は<a href="http://www.soycms.org">フォーラム</a>をご利用ください。<br>
 				その際、以下のレポートをご利用いただけると解決の役に立つ場合がございます。

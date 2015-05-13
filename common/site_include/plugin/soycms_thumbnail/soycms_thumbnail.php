@@ -34,7 +34,7 @@ class SOYCMSThumbnailPlugin{
 			"author"=>"日本情報化農業研究所",
 			"url"=>"http://www.n-i-agroinformatics.com/",
 			"mail"=>"soycms@soycms.net",
-			"version"=>"0.6.1"
+			"version"=>"0.7"
 		));
 
 		if(CMSPlugin::activeCheck($this->getId())){
@@ -76,6 +76,16 @@ class SOYCMSThumbnailPlugin{
 		}else{
 			$thumbnailPath = $this->no_thumbnail_path;
 		}
+		
+		$htmlObj->addModel("is_thumbnail", array(
+			"soy2prefix" => "cms",
+			"visible" => (strlen($thumbnailPath) > 0)
+		));
+		
+		$htmlObj->addModel("no_thumbnail", array(
+			"soy2prefix" => "cms",
+			"visible" => (strlen($thumbnailPath) === 0)
+		));
 		
 		$htmlObj->addImage("thumbnail", array(
 			"soy2prefix" => "cms",
@@ -275,7 +285,7 @@ class SOYCMSThumbnailPlugin{
 		$htmls[] = "アップロード";
 		$htmls[] = "<img src=\"" . SOY2PageController::createLink("") . "image/icon/help.gif\" class=\"help_icon\" onMouseOver=\"this.style.cursor='pointer'\" onMouseOut=\"this.style.cursor='auto'\" onclick=\"common_show_message_popup(this,'サムネイルの生成用の画像を選択します。')\" />";
 		$htmls[] = "</th>";
-		$htmls[] = "<td><input type=\"text\" class=\"jcrop_field_input\" style=\"width:70%\" id=\"jcrop_upload_field\" name=\"jcrop_upload_field\" value=\"" . $objects["upload"]->getValue() . "\" readonly=\"readonly\" />";
+		$htmls[] = "<td><input type=\"text\" class=\"jcrop_field_input\" style=\"width:70%\" id=\"jcrop_upload_field\" name=\"jcrop_upload_field\" value=\"" . $objects["upload"]->getValue() . "\" />";
 		$htmls[] = "<input type=\"button\" onclick=\"open_jcrop_filemanager($('#jcrop_upload_field'));\" value=\"ファイルを指定する\">";
 		if(strlen($objects["upload"]->getValue()) > 0){
 			$htmls[] = "<a href=\"#\" onclick=\"return preview_thumbnail_plugin(\$('#jcrop_upload_field'));\">Preview</a>";
@@ -321,7 +331,7 @@ class SOYCMSThumbnailPlugin{
 		$htmls[] = "}";
 		$htmls[] = "function open_jcrop_trimming(\$form){";
 		$htmls[] = "	if(\$(\"#jcrop_upload_field\").val().length > 0){";
-		$htmls[] = "		common_to_layer(\"" . SOY2PageController::createLink("Plugin.Editor.Trimming") . "?jcrop_trimming_field&path=\" + \$(\"#jcrop_upload_field\").val() + \"&w=\" + \$(\"#ratio_w\").val() + \"&h=\" + \$(\"#ratio_h\").val())";
+		$htmls[] = "		common_to_layer(\"" . SOY2PageController::createLink("Entry.Editor.Trimming") . "?jcrop_trimming_field&path=\" + \$(\"#jcrop_upload_field\").val() + \"&w=\" + \$(\"#ratio_w\").val() + \"&h=\" + \$(\"#ratio_h\").val())";
 		$htmls[] = "	}else{";
 		$htmls[] = "		alert(\"画像が選択されていません。\")";
 		$htmls[] = "	}";

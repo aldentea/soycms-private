@@ -28,7 +28,6 @@ class SOYShopLoginCheckConfigFormPage extends WebPage{
 			$this->pluginObj->setAllowBrowseEntryByPurchased($allowBrowseEntryByPurchased);
 				
 			$this->pluginObj->setDoRedirectAfterLogin($_POST["Config"]["doRedirectAfterLogin"]);
-			$this->pluginObj->setDoRedirectAfterLogout($_POST["Config"]["doRedirectAfterLogout"]);
 			$this->pluginObj->setDoRedirectAfterRemind($_POST["Config"]["doRedirectAfterRemind"]);
 			
 			if(isset($_POST["config_per_page"])){
@@ -78,18 +77,6 @@ class SOYShopLoginCheckConfigFormPage extends WebPage{
 			"value" => 1,
 			"selected" => $this->pluginObj->getDoRedirectAfterLogin(),
 			"label" => "ログイン後に元のページに戻る"
-		));
-		
-		$this->addInput("do_redirect_after_logout_hidden", array(
-			"name" => "Config[doRedirectAfterLogout]",
-			"value" => 0,
-		));
-		
-		$this->addCheckBox("do_redirect_after_logout", array(
-			"name" => "Config[doRedirectAfterLogout]",
-			"value" => 1,
-			"selected" => $this->pluginObj->getDoRedirectAfterLogout(),
-			"label" => "ログアウト後に元のページに戻る"
 		));
 		
 		$this->addInput("do_redirect_after_remind_hidden", array(

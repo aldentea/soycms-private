@@ -30,7 +30,7 @@ class LoginLogic extends SOY2LogicBase {
 		$logoutPageUrl = soyshop_get_mypage_url() . "/logout";
 		
 		if($config->getDisplayPageAfterLogout() == 1){
-			$logoutPageUrl .= "?r=" . rawurldecode($_SERVER["REQUEST_URI"]);
+			$logoutPageUrl .= "?r=" . soyshop_remove_get_value(rawurldecode($_SERVER["REQUEST_URI"]));
 		}
 		
 		SOYShopUtil::resetShopMode($old);

@@ -94,6 +94,10 @@ html .clearfix {height: 1%;}
 		<!--中央コンテンツの記述-->
 		<div id="content">
 			<div class="post">
+
+				<!-- b_block:id="current_category_or_archive" -->
+					<h2><a cms:id="archive_link"><!-- cms:id="archive_name" cms:format="%Y:Y年%%M:n月%%D:j日%" /--></a></h2>
+				<!-- /b_block:id="current_category_or_archive" -->
 			
 				<div class="navi">
 					<a b_block:id="prev_link">&lt;&lt;</a>
@@ -120,11 +124,11 @@ html .clearfix {height: 1%;}
 				<!-- /cms:ignore 表示用のダミー ここまで -->
 	
 				<!-- /b_block:id="entry_list" エントリーの記述-->
-				
+
 				<div class="navi">
-					<a b_block:id="prev_link*">&lt;&lt;</a>
+					<a b_block:id="prev_month">前の月</a>
 					<a b_block:id="top_link*">TOP</a>
-					<a b_block:id="next_link*">&gt;&gt;</a>
+					<a b_block:id="next_month">次の月</a>
 				</div>
 				
 				<div class="pager">

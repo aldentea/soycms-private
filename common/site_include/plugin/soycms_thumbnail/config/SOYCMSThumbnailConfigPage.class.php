@@ -56,6 +56,10 @@ class SOYCMSThumbnailConfigPage extends WebPage{
 			"value" => $this->pluginObj->getNoThumbnailPath(),
 			"style" => "width:60%"
 		));
+		
+		$this->addModel("display_noimage_ppreview_button", array(
+			"visible" => (strlen($this->pluginObj->getNoThumbnailPath()) > 0)
+		));
 	}
 	
 	function setPluginObj($pluginObj){
