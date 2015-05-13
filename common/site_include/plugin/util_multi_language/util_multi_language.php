@@ -7,6 +7,8 @@ class UtilMultiLanguagePlugin{
 
 	private $config;
 	private $check_browser_language;
+	
+	private $mobileConfig;
 
 
 	function getId(){
@@ -20,7 +22,7 @@ class UtilMultiLanguagePlugin{
 			"author"=>"日本情報化農業研究所",
 			"url"=>"http://www.n-i-agroinformatics.com/",
 			"mail"=>"soycms@soycms.net",
-			"version"=>"0.5"
+			"version"=>"0.6"
 		));
 		CMSPlugin::addPluginConfigPage(self::PLUGIN_ID,array(
 			$this,"config_page"
@@ -65,7 +67,7 @@ class UtilMultiLanguagePlugin{
 	function redirect(){
 		
 		//端末振り分けプラグインの方とのバッティングを避けるため、モバイルもしくはスマホのリダイレクトの状態ならば処理を止める
-		if((defined("SOYCMS_IS_MOBILE") && SOYCMS_IS_MOBILE) || (defined("SOYCMS_IS_SMARTPHONE") && SOYCMS_IS_SMARTPHONE)) return;
+		if((defined("SOYCMS_IS_MOBILE") && SOYCMS_IS_MOBILE)) return;
 		
 		$config = $this->getConfig();
 		
@@ -86,6 +88,7 @@ class UtilMultiLanguagePlugin{
 			if(isset($_GET["language"])){
 				$languageConfig = trim($_GET["language"]);
 				$userSession->setAttribute("soycms_publish_language", $languageConfig);
+				$userSession->setAttribute("soyshop_publish_language", $languageConfig);
 			//押してないとき
 			}else{
 				$languageConfig = $userSession->getAttribute("soycms_publish_language");
@@ -119,6 +122,7 @@ class UtilMultiLanguagePlugin{
 	function getRedirectPath($config){
 		//REQUEST_URI
 		$requestUri = $_SERVER['REQUEST_URI'];
+		
 		//$_GETの値（QUERY_STRING）を削除しておく
 		if(strpos($requestUri, "?") !== false){
 			$requestUri = substr($requestUri, 0, strpos($requestUri, "?"));
@@ -126,18 +130,20 @@ class UtilMultiLanguagePlugin{
 
 		//PATH_INFO
 		$pathInfo = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : "" ;
+		
 		//先頭はスラッシュ
 		if(strlen($pathInfo) && $pathInfo[0] !== "/"){
 			$pathInfo = "/" . $pathInfo;
 		}
 		
-		$prefix = (isset($config[SOYCMS_PUBLISH_LANGUAGE]["prefix"])) ? $config[SOYCMS_PUBLISH_LANGUAGE]["prefix"] : "";
-
-		//無限ループになるときはfalseを返す
-		if( $pathInfo === "/" . $prefix || strpos($pathInfo, "/" . $prefix . "/") === 0 ){
+		//リダイレクトループを止める
+		if(self::checkLoop($pathInfo, $config)){
 			return false;
 		}
-
+		
+		//プレフィックスを取得(スマホ版も考慮)
+		$prefix = self::getPrefix($config);
+		
 		//サイトID：最初と最後に/を付けておく
 		$siteDir = strlen($pathInfo) ? strtr(rawurldecode($requestUri), array($pathInfo => "")) : $requestUri;//strtrのキーは空文字列であってはいけない
 		//最初と最後に/を付けておく
@@ -152,15 +158,12 @@ class UtilMultiLanguagePlugin{
 		$pathInfo = "/" . substr($requestUri, strlen($siteDir));
 		
 		//prefixが0文字の場合はpathInfoの値から他のprefixがないかを調べる
-		if(strlen($prefix) === 0){
+		if(strlen($prefix) === 0 || $prefix === self::getSmartPhonePrefix()){
 			$pathInfo = $this->removeInsertPrefix($pathInfo, $config);
 		}
 
 		//prefixを付ける
-		$path = $siteDir. $prefix. $pathInfo;
-		
-		//prefixを付けると//になることがあるので、ここで//の場合は/にする様に処理
-		$path = str_replace("//", "/", $path);
+		$path = self::convertPath($siteDir, $prefix, $pathInfo);
 		
 		//絶対パスにQuery Stringを追加する
 		if(isset($_SERVER["QUERY_STRING"]) && strlen($_SERVER["QUERY_STRING"]) > 0){
@@ -197,7 +200,21 @@ class UtilMultiLanguagePlugin{
 		}
 	}
 	
+	//無限ループになるかチェック
+	private function checkLoop($path, $config){
+		$prefix = (isset($config[SOYCMS_PUBLISH_LANGUAGE]["prefix"])) ? $config[SOYCMS_PUBLISH_LANGUAGE]["prefix"] : "";
+		if(defined("SOYCMS_IS_SMARTPHONE") && SOYCMS_IS_SMARTPHONE && strlen(self::getSmartPhonePrefix())){
+			$path = str_replace("/" . self::getSmartPhonePrefix(), "", $path);
+		}
+		return ($path === "/" . $prefix || strpos($path, "/" . $prefix . "/") === 0 );
+	}
+	
 	function removeInsertPrefix($path, $config){
+		//スマホ分のプレフィックスを先に削除
+		if(defined("SOYCMS_IS_SMARTPHONE") && SOYCMS_IS_SMARTPHONE && strlen(self::getSmartPhonePrefix())){
+			$path = str_replace("/" . self::getSmartPhonePrefix(), "", $path);
+		}
+		
 		foreach($config as $conf){
 			if(!isset($conf["prefix"])) continue;
 			if(preg_match('/\/' . $conf["prefix"] . '\//', $path) || $path == "/" . $conf["prefix"]){
@@ -205,6 +222,28 @@ class UtilMultiLanguagePlugin{
 				break;
 			}
 		}
+		return $path;
+	}
+	
+	private function convertPath($siteDir, $prefix, $pathInfo){
+		//パスの結合を行う前にpathInfoからスマホプレフィックスを除く
+		if(defined("SOYCMS_IS_SMARTPHONE") && SOYCMS_IS_SMARTPHONE && strlen(self::getSmartPhonePrefix())){
+			$smartPrefix = self::getSmartPhonePrefix();
+			if($pathInfo === "/" . $smartPrefix || strpos($pathInfo, "/" . $smartPrefix . "/") === 0){
+				$pathInfo = str_replace("/" . $smartPrefix, "", $pathInfo);
+			}
+		}
+		
+		$path = $siteDir . $prefix . $pathInfo;
+		
+		//おまじない(util_mobile_utilですでにプレフィックスがついているので、ここで一つ除く)
+		if(strpos($path, "/" . $prefix . "/" . $prefix) === 0){
+			$path = str_replace("/" . $prefix . "/" . $prefix, "/" . $prefix, $path);
+		}
+		
+		//スラッシュが二つになった場合は一つにする
+		$path = str_replace("//", "/", $path);
+		
 		return $path;
 	}
 	
@@ -228,6 +267,33 @@ class UtilMultiLanguagePlugin{
 		}
 		
 		return $path;		
+	}
+	
+	private function getPrefix($config){
+		$prefix = (isset($config[SOYCMS_PUBLISH_LANGUAGE]["prefix"])) ? $config[SOYCMS_PUBLISH_LANGUAGE]["prefix"] : "";
+		
+		//スマホページを見ている場合、requestUriにスマホページ分も考慮する
+		if(defined("SOYCMS_IS_SMARTPHONE") && SOYCMS_IS_SMARTPHONE){
+			if(strlen($prefix)){
+				$prefix = self::getSmartPhonePrefix() . "/" . $prefix;
+			}else{
+				$prefix = self::getSmartPhonePrefix();
+			}
+		}
+		
+		return $prefix;
+	}
+	
+	private function getSmartPhonePrefix(){
+		if(!$this->mobileConfig){
+			$obj = CMSPlugin::loadPluginConfig("UtilMobileCheckPlugin");
+			if(is_null($obj)){
+				$obj = new UtilMobileCheckPlugin;
+			}
+			$this->mobileConfig = $obj;
+		}
+		
+		return $this->mobileConfig->getSmartPrefix();
 	}
 
 	function getConfig(){

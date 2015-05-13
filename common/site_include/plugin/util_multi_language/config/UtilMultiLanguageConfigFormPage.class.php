@@ -22,27 +22,12 @@ class UtilMultiLanguageConfigFormPage extends WebPage{
 		$config = $this->pluginObj->getConfig();
 		
 		$this->addForm("form");
-				
-		$languages = array("jp", "en");
-		foreach($languages as $language){
-			if($language !== "jp"){
-				$text = (isset($config[$language]["prefix"])) ? $config[$language]["prefix"] : $language;
-			}else{
-				$text = (isset($config[$language]["prefix"])) ? $config[$language]["prefix"] : "";
-			}
-			
-			$this->addInput($language . "_prefix", array(
-				"name" => "Config[" . $language . "][prefix]",
-				"value" => $text
-			));
-			
-			$this->addLabel($language . "_prefix_text", array(
-				"text" => (strlen($text)) ? "/" . $text : ""
-			));
-		}
-				
-		$this->addLabel("domain", array(
-			"text" => $_SERVER["HTTP_HOST"]
+		
+		SOY2::import("site_include.plugin.util_multi_language.config.LanguageListComponent");
+		$this->createAdd("language_list", "LanguageListComponent", array(
+			"list" => array("jp" => "日本語", "en" => "英語"),
+			"config" => $config,
+			"smartPrefix" => self::getSmartPhonePrefix()
 		));
 		
 		$this->addCheckBox("confirm_browser_language", array(
@@ -51,6 +36,25 @@ class UtilMultiLanguageConfigFormPage extends WebPage{
 			"selected" => $this->pluginObj->getCheckBrowserLanguage(),
 			"label" => "確認する"
 		));	
+	}
+	
+	private function getSmartPhonePrefix(){
+		//携帯振り分けプラグインがアクティブかどうか
+		$pluginDao = SOY2DAOFactory::create("PluginDAO");
+		try{
+			$plugin = $pluginDao->getById("UtilMobileCheckPlugin");
+		}catch(Exception $e){
+			$plugin = new Plugin();
+		}
+		
+		if(!$plugin->getIsActive()) return null;
+		
+		$obj = CMSPlugin::loadPluginConfig("UtilMobileCheckPlugin");
+		if(is_null($obj)){
+			$obj = new UtilMobileCheckPlugin;
+		}
+		
+		return $obj->smartPrefix;
 	}
 	
 	function setPluginObj($pluginObj){

@@ -161,6 +161,7 @@ class PluginDAO {
     	@$plugin->setVersion($array["version"]);
     	@$plugin->setConfig($array["config"]);
     	@$plugin->setCustom($array["custom"]);
+    	@$plugin->setIsActive( (file_exists(CMSPlugin::getSiteDirectory().'/.plugin/'. $id .".active")? 1 :0) );
     	return $plugin;
     } 
     

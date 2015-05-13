@@ -45,7 +45,7 @@ class UtilMobileCheckPlugin{
 			"author"=>"日本情報化農業研究所",
 			"url"=>"http://www.n-i-agroinformatics.com/",
 			"mail"=>"soycms@soycms.net",
-			"version"=>"0.6"
+			"version"=>"0.7"
 		));
 		CMSPlugin::addPluginConfigPage(self::PLUGIN_ID,array(
 			$this,"config_page"
@@ -152,7 +152,7 @@ class UtilMobileCheckPlugin{
 		if(!defined("SOYCMS_IS_SMARTPHONE")){
 			define("SOYCMS_IS_SMARTPHONE",$isSmartPhone);
 		}
-
+		
 		if($redirect != self::REDIRECT_PC){
 			//prefixの決定
 			if($redirect == self::REDIRECT_MB && strlen($config->prefix)){
@@ -300,6 +300,24 @@ class UtilMobileCheckPlugin{
 
 		return $isSmartPhone;
 	}
+	
+	//多言語化プラグインがすでに実行されているか調べる
+	private function checkMultiLanguage($path){
+		$reg = "/" . $this->smartPrefix . "/";
+		include_once(dirname(dirname(__FILE__)) . "/util_multi_language/util_multi_language.php");
+		$obj = CMSPlugin::loadPluginConfig("UtilMultiLanguagePlugin");
+		if(is_null($obj)){
+			$obj = new UtilMultiLanguagePlugin();
+		}
+		$config = $obj->getConfig();
+		if(isset($config["check_browser_language_config"])) unset($config["check_browser_language_config"]);
+		foreach($config as $conf){
+			if(!isset($conf["prefix"]) || strlen($conf["prefix"]) === 0) continue;
+			if(strpos($path, $reg . $conf["prefix"]) === 0) return true;
+		}
+		
+		return false;
+	}
 
 	/**
 	 * キャリア判定でパスとキャリアが間違っている時、
@@ -321,8 +339,13 @@ class UtilMobileCheckPlugin{
 		//REQUEST_URI
 		$requestUri = $_SERVER['REQUEST_URI'];
 		//$_GETの値（QUERY_STRING）を削除しておく
-		if(strpos($requestUri,"?")!==false){
-			$requestUri = substr($requestUri,0,strpos($requestUri,"?"));
+		if(strpos($requestUri,"?") !== false){
+			$requestUri = substr($requestUri, 0, strpos($requestUri, "?"));
+		}
+		
+		//スマホのプレフィックスと多言語のプレフィックスが付与されている場合はfalseを返す
+		if(self::checkMultiLanguage($requestUri)){
+			return false;
 		}
 
 		//PATH_INFO
@@ -424,7 +447,10 @@ class UtilMobileCheckPlugin{
 
 		return $path;
 	}
-
+	
+	function getSmartPrefix(){
+		return $this->smartPrefix;
+	}
 	function setSmartPrefix($smartPrefix){
 		$this->smartPrefix = $smartPrefix;
 	}
