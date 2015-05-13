@@ -4,6 +4,10 @@
 		<!-- soy:id="language_list" -->
 		<dt><!-- soy:id="language_type" /-->サイトのプリフィックスの設定</dt>
 		<dd>
+			<input type="hidden" soy:id="no_use_hidden">
+			<input type="checkbox" soy:id="is_use_checkbox">
+		</dd>
+		<dd>
 			<input type="text" soy:id="prefix_input" /><br />
 			※http://<!-- soy:id="domain" /-->/siteの場合、http://<!-- soy:id="domain*" /-->/site<strong><!-- soy:id="prefix_text" /--></strong>にリダイレクトします<br />
 			※http://<!-- soy:id="domain*" /-->/site/blog/article/testの場合、http://<!-- soy:id="domain*" /-->/site<strong><!-- soy:id="prefix_text*" /--></strong>/blog/article/testにリダイレクトします
@@ -33,4 +37,5 @@
 <pre style="border:1px solid #000000;padding:5px 10px;margin:0 15px;">
 &lt;a cms:id="language_jp_link"&gt;日本語サイト&lt;/a&gt;
 &lt;a cms:id="language_en_link"&gt;英語サイト&lt;/a&gt;
+&lt;a cms:id="language_zh_link"&gt;中国語サイト&lt;/a&gt;
 </pre>

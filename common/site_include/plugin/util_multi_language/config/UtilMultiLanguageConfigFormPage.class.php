@@ -3,7 +3,8 @@
 class UtilMultiLanguageConfigFormPage extends WebPage{
 	
 	function UtilMultiLanguageConfigFormPage(){
-		
+		SOY2::import("site_include.plugin.util_multi_language.util.SOYCMSUtilMultiLanguageUtil");
+		SOY2::import("site_include.plugin.util_multi_language.config.LanguageListComponent");
 	}
 	
 	function doPost(){
@@ -23,9 +24,8 @@ class UtilMultiLanguageConfigFormPage extends WebPage{
 		
 		$this->addForm("form");
 		
-		SOY2::import("site_include.plugin.util_multi_language.config.LanguageListComponent");
 		$this->createAdd("language_list", "LanguageListComponent", array(
-			"list" => array("jp" => "日本語", "en" => "英語"),
+			"list" => SOYCMSUtilMultiLanguageUtil::allowLanguages(),
 			"config" => $config,
 			"smartPrefix" => self::getSmartPhonePrefix()
 		));

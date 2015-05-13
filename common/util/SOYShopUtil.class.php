@@ -19,10 +19,6 @@ class SOYShopUtil {
 	 */
 	public static function switchShopMode($siteId){
 		
-		//SOYShop_ShopConfig::saveをするために必要な定数の設定をしておく
-		if(!defined("SOYSHOP_ROOT")) define("SOYSHOP_ROOT", str_replace("common", "soyshop", SOY2::RootDir()));
-		if(!defined("SOYSHOP_ADMIN_URL")) define("SOYSHOP_ADMIN_URL", SOY2PageController::createRelativeLink("../soyshop/") . "index.php");
-		
 		$old = array();
 		
 		$old["root"] = SOY2::RootDir();
@@ -33,14 +29,20 @@ class SOYShopUtil {
 		$old["user"] = SOY2DAOConfig::user();
 		$old["pass"] = SOY2DAOConfig::pass();
 		
-		$soyshopRoot = dirname($old["root"]) . "/soyshop/"; 
+		$old["page"] = SOY2HTMLConfig::PageDir();
+		
+		$soyshopRoot = dirname($old["root"]) . "/soyshop/";
 		
 		SOY2::RootDir($soyshopRoot . "webapp/src/");
+		
+		//SOYShop_ShopConfig::saveをするために必要な定数の設定をしておく
+		include_once(dirname(SOY2::RootDir()) . "/conf/common.conf.php");
+		
 		SOY2DAOConfig::DaoDir(SOY2::RootDir() . "domain/");
 		SOY2DAOConfig::EntityDir(SOY2::RootDir() . "domain/");
 		SOY2DAOConfig::DaoCacheDir($soyshopRoot . "cache/");
 		
-		include_once($soyshopRoot . "webapp/conf/shop/" . $siteId . ".conf.php");
+		include_once(dirname(SOY2::RootDir()) . "/conf/shop/" . $siteId . ".conf.php");
 		
 		SOY2DAOConfig::Dsn(SOYSHOP_SITE_DSN);
 		SOY2DAOConfig::user(SOYSHOP_SITE_USER);
@@ -57,9 +59,12 @@ class SOYShopUtil {
 		SOY2::RootDir($old["root"]);
 		SOY2DAOConfig::DaoDir($old["dao"]);
 		SOY2DAOConfig::EntityDir($old["entity"]);
+		SOY2DAOConfig::DaoCacheDir($old["cache"]);
 		SOY2DAOConfig::Dsn($old["dsn"]);
 		SOY2DAOConfig::user($old["user"]);
 		SOY2DAOConfig::pass($old["pass"]);
+		
+		SOY2HTMLConfig::PageDir($old["page"]);
 	}
 	
 	/**

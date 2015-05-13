@@ -27,7 +27,7 @@ class SOYShopItemImportPlugin{
 			"mail"=>"info@n-i-agroinformatics.com",
 			"label" => "",
 			"entry" => "",
-			"version"=>"0.6"
+			"version"=>"0.7"
 		));
 		
 		//二回目以降の動作
@@ -74,7 +74,6 @@ class SOYShopItemImportPlugin{
 			$old = SOYShopUtil::switchShopMode($this->siteId);
 						
 			if(!defined("SOYSHOP_SITE_PREFIX")) define("SOYSHOP_SITE_PREFIX", "cms");
-			include_once(dirname(SOY2::RootDir()) . "/conf/common.conf.php");
 			SOY2::import("logic.plugin.SOYShopPlugin");
 			SOY2::import("base.site.classes.SOYShop_ItemListComponent");
 			SOY2::import("base.func.common", ".php");
@@ -112,15 +111,16 @@ class SOYShopItemImportPlugin{
 		//設定を元に戻す
 		SOYShopUtil::resetShopMode($old);
 				
+		$entry = $arg["entry"];
+		$entryAttributeDao = SOY2DAOFactory::create("cms.EntryAttributeDAO");
+		try{
+			$entryAttributeDao->delete($entry->getId(), self::PLUGIN_ID);
+		}catch(Exception $e){
+			//
+		}		
+		
+		//商品コードがあれば登録
 		if(!is_null($item->getCode())){
-			$entry = $arg["entry"];
-				
-			$entryAttributeDao = SOY2DAOFactory::create("cms.EntryAttributeDAO");
-			try{
-				$entryAttributeDao->delete($entry->getId(), self::PLUGIN_ID);
-			}catch(Exception $e){
-				//
-			}
 			
 			$attr = new EntryAttribute();
 			$attr->setEntryId($entry->getId());
@@ -133,7 +133,7 @@ class SOYShopItemImportPlugin{
 				return false;
 			}
 		}
-			
+
 		return true;
 	}
 	
@@ -141,22 +141,24 @@ class SOYShopItemImportPlugin{
 		$arg = SOY2PageController::getArguments();
 		$entryId = (isset($arg[0])) ? (int)$arg[0] : null;	
 
-		$item = $this->getItem($entryId);	
-				
+		$item = self::getItem($entryId);	
+		
 		ob_start();
 		include(dirname(__FILE__) . "/form.php");
 		$html = ob_get_contents();
 		ob_end_clean();
 
-		echo $html;		
+		echo $html;
+
+		echo "";
 	}
 	
 	function onCallCustomField_inBlog(){
 		$arg = SOY2PageController::getArguments();
 		$entryId = (isset($arg[1])) ? (int)$arg[1] : null;
 		
-		$item = $this->getItem($entryId);	
-
+		$item = self::getItem($entryId);
+		
 		ob_start();
 		include(dirname(__FILE__) . "/form.php");
 		$html = ob_get_contents();
@@ -165,7 +167,7 @@ class SOYShopItemImportPlugin{
 		echo $html;
 	}
 		
-	function getItem($entryId){
+	private function getItem($entryId){
 		
 		$entryAttributeDao = SOY2DAOFactory::create("cms.EntryAttributeDAO");
 		try{
@@ -174,6 +176,7 @@ class SOYShopItemImportPlugin{
 			$attr = new EntryAttribute();
 		}
 		
+
 		$old = SOYShopUtil::switchShopMode($this->siteId);
 		$itemDao = SOY2DAOFactory::create("shop.SOYShop_ItemDAO");	
 
@@ -184,7 +187,7 @@ class SOYShopItemImportPlugin{
 		}
 		
 		SOYShopUtil::resetShopMode($old);
-
+		
 		return $item;
 	}
 	

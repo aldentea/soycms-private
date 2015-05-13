@@ -26,19 +26,19 @@ class UtilMobileCheckPluginConfigFormPage extends WebPage{
 
 		WebPage::WebPage();
 
-		$this->createAdd("form","HTMLForm");
+		$this->addForm("form");
 
-		$this->createAdd("smart_prefix","HTMLInput",array(
+		$this->addInput("smart_prefix", array(
 			"name" => "config[smartPrefix]",
 			"value" => $this->pluginObj->smartPrefix,
 		));
 
-		$this->createAdd("prefix","HTMLInput",array(
+		$this->addInput("prefix", array(
 			"name" => "config[prefix]",
 			"value" => $this->pluginObj->prefix,
 		));
 
-		$this->createAdd("auto_redirect","HTMLCheckBox",array(
+		$this->addCheckBox("auto_redirect", array(
 			"name" => "config[redirect]",
 			"value" => 1,
 			"elementId" => "auto_redirect",
@@ -46,40 +46,40 @@ class UtilMobileCheckPluginConfigFormPage extends WebPage{
 			"isBoolean" => true
 		));
 
-		$this->createAdd("message","HTMLTextArea",array(
+		$this->addTextArea("message", array(
 			"name" => "config[message]",
 			"value" => $this->pluginObj->message,
 		));
 
-		$this->createAdd("do_not_redirect_ipad","HTMLCheckBox",array(
+		$this->addCheckBox("do_not_redirect_ipad", array(
 			"name" => "config[redirectIpad]",
 			"value" => UtilMobileCheckPlugin::CONFIG_SP_REDIRECT_PC,
 			"elementId" => "do_not_redirect_ipad",
 			"selected" => $this->pluginObj->redirectIpad == UtilMobileCheckPlugin::CONFIG_SP_REDIRECT_PC
 		));
 
-		$this->createAdd("redirect_ipad_smartphone","HTMLCheckBox",array(
+		$this->addCheckBox("redirect_ipad_smartphone", array(
 			"name" => "config[redirectIpad]",
 			"value" => UtilMobileCheckPlugin::CONFIG_SP_REDIRECT_SP,
 			"elementId" => "redirect_ipad_smartphone",
 			"selected" => $this->pluginObj->redirectIpad == UtilMobileCheckPlugin::CONFIG_SP_REDIRECT_SP
 		));
 
-		$this->createAdd("do_not_redirect","HTMLCheckBox",array(
+		$this->addCheckBox("do_not_redirect", array(
 			"name" => "config[redirectIphone]",
 			"value" => UtilMobileCheckPlugin::CONFIG_SP_REDIRECT_PC,
 			"elementId" => "do_not_redirect",
 			"selected" => $this->pluginObj->redirectIphone == UtilMobileCheckPlugin::CONFIG_SP_REDIRECT_PC
 		));
 
-		$this->createAdd("redirect_smartphone","HTMLCheckBox",array(
+		$this->addCheckBox("redirect_smartphone", array(
 			"name" => "config[redirectIphone]",
 			"value" => UtilMobileCheckPlugin::CONFIG_SP_REDIRECT_SP,
 			"elementId" => "redirect_smartphone",
 			"selected" => $this->pluginObj->redirectIphone == UtilMobileCheckPlugin::CONFIG_SP_REDIRECT_SP
 		));
 
-		$this->createAdd("redirect_mobile","HTMLCheckBox",array(
+		$this->addCheckBox("redirect_mobile", array(
 			"name" => "config[redirectIphone]",
 			"value" => UtilMobileCheckPlugin::CONFIG_SP_REDIRECT_MB,
 			"elementId" => "redirect_mobile",

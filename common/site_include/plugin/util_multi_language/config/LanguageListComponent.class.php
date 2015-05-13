@@ -6,7 +6,7 @@ class LanguageListComponent extends HTMLList{
 	private $smartPrefix;
 	
 	function populateItem($entity, $lang){
-
+		
 		$this->addLabel("language_type", array(
 			"text" => $entity
 		));
@@ -19,6 +19,18 @@ class LanguageListComponent extends HTMLList{
 		
 		$this->addLabel("prefix_text", array(
 			"text" => (strlen($prefix)) ? "/" . $prefix : $prefix
+		));
+		
+		$this->addHidden("no_use_hidden", array(
+			"name" => "Config[" . $lang . "][is_use]",
+			"value" => SOYCMSUtilMultiLanguageUtil::NO_USE
+		));
+		
+		$this->addCheckBox("is_use_checkbox", array(
+			"name" => "Config[" . $lang . "][is_use]",
+			"value" => SOYCMSUtilMultiLanguageUtil::IS_USE,
+			"selected" => ($this->checkIsUse($lang)),
+			"label" => " " . $entity . "サイトを表示する"
 		));
 		
 		$this->addLabel("domain", array(
@@ -41,6 +53,12 @@ class LanguageListComponent extends HTMLList{
 			$text = (isset($this->config[$lang]["prefix"])) ? $this->config[$lang]["prefix"] : "";
 		}
 		return $text;
+	}
+	
+	function checkIsUse($lang){
+		if($lang == SOYCMSUtilMultiLanguageUtil::LANGUAGE_JP) return true;
+		
+		return (isset($this->config[$lang]["is_use"]) && $this->config[$lang]["is_use"] == SOYCMSUtilMultiLanguageUtil::IS_USE);
 	}
 	
 	function setConfig($config){
