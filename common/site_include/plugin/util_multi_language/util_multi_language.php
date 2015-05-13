@@ -101,8 +101,10 @@ class UtilMultiLanguagePlugin{
 			}
 		}
 		
-		if(!defined("SOYCMS_PUBLISH_LANGUAGE")) define("SOYCMS_PUBLISH_LANGUAGE", $languageConfig);
-		
+		if(!defined("SOYCMS_PUBLISH_LANGUAGE")){
+			define("SOYCMS_PUBLISH_LANGUAGE", $languageConfig);
+			define("SOYSHOP_PUBLISH_LANGUAGE", $languageConfig);
+		}
 		$redirectPath = $this->getRedirectPath($config);
 		
 		if($this->checkRedirectPath($redirectPath)){
