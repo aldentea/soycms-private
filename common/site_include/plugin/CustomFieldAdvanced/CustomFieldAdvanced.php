@@ -112,12 +112,21 @@ class CustomFieldPluginAdvanced{
 					$attr["link"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
 					unset($attr["html"]);
 					$resetFlag = false;
+					
 				//画像の場合
 				}else if($master->getType() == "image"){
 					$class = "HTMLImage";
 					$attr["src"] = (strlen($field->getValue()) > 0) ? $field->getValue() : null;
 					unset($attr["html"]);
 					$resetFlag = false;
+				}
+				
+				//リンク、もしくは画像の場合、パスを表示するためのcms:id
+				if($master->getType() == "link" || $master->getType() == "image"){
+					$htmlObj->addLabel($field->getId() . "_text", array(
+						"soy2prefix" => "cms",
+						"text" => $field->getValue()
+					));
 				}
 
 				//値が設定されていないなら初期値を使う

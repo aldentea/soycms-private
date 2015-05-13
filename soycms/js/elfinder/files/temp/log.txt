@@ -1,0 +1,21 @@
+[Wed, 16 Jul 2014 06:55:51 +0400] UPLOAD: array (
+  'added' => 
+  array (
+    0 => 
+    array (
+      'mime' => 'image/jpeg',
+      'ts' => 1405479351,
+      'read' => 1,
+      'write' => 1,
+      'size' => 77035,
+      'hash' => 'l1_aW1hZ2VcUDcxNDMyNTguanBn',
+      'name' => 'P7143258.jpg',
+      'phash' => 'l1_aW1hZ2U',
+      'tmb' => 1,
+    ),
+  ),
+  'header' => false,
+  'removed' => 
+  array (
+  ),
+) 

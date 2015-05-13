@@ -243,11 +243,12 @@ class ButtonSocialPlugin{
 	function onEntryCopy($args){
 		list($old, $new) = $args;
 		$custom = $this->getOgImageObject($old);
+		var_dump($custom);exit;
 		
 		try{
 			$obj = new EntryAttribute();
 			$obj->setEntryId($new);
-			$obj->setFieldId($custom->getId());
+			$obj->setFieldId($custom->getFieldId());
 			$obj->setValue($custom->getValue());
 			$obj->setExtraValuesArray($custom->getExtraValues());
 			$this->entryAttributeDao->insert($obj);

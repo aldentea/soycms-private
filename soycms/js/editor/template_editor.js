@@ -59,12 +59,12 @@ $(function(){
 	
 	//tabキーの実行
 	textarea.keydown(function(e){
-        // キーコードが Tabキー押下時と一致した場合
+		// キーコードが Tabキー押下時と一致した場合
         if (e.which == 9 || e.keyCode == 9) {
-            var current_position = this.selectionStart;
-            var end_position = this.selectionEnd;
+        	var current_position = this.selectionStart;
+            //var end_position = this.selectionEnd;	//end_positionの取得が無くてもtext2のsubstrは動く
             var text1 = $(this).val().substr(0, current_position);
-            var text2 = $(this).val().substr(current_position, end_position);
+            var text2 = $(this).val().substr(current_position);
             
             // タブを挿入
             var value = text1 + '\t' + text2;

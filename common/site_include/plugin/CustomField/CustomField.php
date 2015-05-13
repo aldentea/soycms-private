@@ -83,6 +83,14 @@ class CustomFieldPlugin{
 					unset($attr["html"]);
 					$resetFlag = false;
 				}
+				
+				//リンク、もしくは画像の場合、パスを表示するためのcms:id
+				if($master->getType() == "link" || $master->getType() == "image"){
+					$htmlObj->addLabel($field->getId() . "_text", array(
+						"soy2prefix" => "cms",
+						"text" => $field->getValue()
+					));
+				}
 
 				//値が設定されていないなら初期値を使う
 				if(is_null($field->getValue())){
