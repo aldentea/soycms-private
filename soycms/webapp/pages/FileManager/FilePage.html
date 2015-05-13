@@ -120,19 +120,9 @@
 			// url : 'php/connector.php',
 			url : '<!-- soy:id="connector_path" /-->',  // connector URL (REQUIRED)
 			// transport : new elFinderSupportVer1(),
-			// getFileCallback : function(files, fm) {
-			// 	console.log(files);
-			// },
-			handlers : {
-                select : function(event, elfinderInstance) {
-                    var selected = event.data.selected;
-					
-					if (selected.length) {
-						// console.log(elfinderInstance.file(selected[0]))
-					}
-					
-                }
-            },
+			getFileCallback : function(obj) {
+				window.parent.filemanager_ondblclick(obj.url);
+			},            
 			// handlers : {
 			// 	select : function(e) {
 			// 		console.log(e.data)

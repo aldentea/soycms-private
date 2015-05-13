@@ -24,9 +24,9 @@
 <div id="layer_content">
 
 	<div class="list_panel_buttons">
-		<input type="submit" value="はずす" onclick='prepare(); $("#op_code").val("unstick");   $("#main_form").submit();'>
-		<input type="submit" value="つける" onclick='prepare(); $("#op_code").val("stick");     $("#main_form").submit();'>
-		<input type="submit" value="上書き" onclick='prepare(); $("#op_code").val("overwrite"); $("#main_form").submit();'>
+		<input type="submit" id="list_panel_remove_label" value="はずす" onclick='prepare(); $("#op_code").val("unstick");   $("#main_form").submit();'>
+		<input type="submit" id="list_panel_add_label" value="つける" onclick='prepare(); $("#op_code").val("stick");     $("#main_form").submit();'>
+		<input type="submit" id="list_panel_update_label" value="上書き" onclick='prepare(); $("#op_code").val("overwrite"); $("#main_form").submit();'>
 	</div>
 
 	<div id="list_panel_wrapper">

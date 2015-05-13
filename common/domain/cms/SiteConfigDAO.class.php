@@ -12,6 +12,17 @@ abstract class SiteConfigDAO extends SOY2DAO{
 	 */
 	abstract function update(SiteConfig $bean);
 	
+	function updateSiteConfig(SiteConfig $bean){
+		
+		$this->executeUpdateQuery(
+			"update SiteConfig set siteConfig = :siteConfig",
+			array(
+				":siteConfig" => $bean->getSiteConfig()
+			)
+		);
+		
+	}
+	
 	/**
 	 * @final 
 	 */

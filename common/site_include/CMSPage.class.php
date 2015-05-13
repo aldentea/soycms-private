@@ -10,7 +10,8 @@ class CMSPage extends WebPage{
 	var $siteRoot;
 	var $parseTime;
 	var $title;
-
+	
+	protected $siteUrl;
 	protected $pageUrl;
 
 	protected $_soy2_prefix = "block";
@@ -24,6 +25,9 @@ class CMSPage extends WebPage{
 		$pageDao = SOY2DAOFactory::create("cms.PageDAO");
 		$this->page = $pageDao->getById($id);
 		$this->id = $id;
+
+		//サイトのURL
+		$this->siteUrl = $this->getSiteUrl();
 
 		//application用に追加
 		$this->pageUrl = SOY2PageController::createLink("") . $this->page->getUri();
@@ -79,12 +83,12 @@ class CMSPage extends WebPage{
 		$this->setTitle($pageFormat);
 		
 		$this->createAdd("top_link", "HTMLLink", array(
-			"link" => SOY2PageController::createLink(""),
+			"link" => $this->siteUrl,
 			"soy2prefix" => "cms"
 		));
 		
 		$this->createAdd("site_url", "HTMLLabel", array(
-			"text" => SOY2PageController::createLink(""),
+			"text" => $this->siteUrl,
 			"soy2prefix" => "cms"
 		));
 		
@@ -351,6 +355,40 @@ class CMSPage extends WebPage{
     }
     function setPageUrl($pageUrl) {
     	$this->pageUrl = $pageUrl;
+    }
+    
+    /**
+     * @return string リンク用 $page->siteRootを使わないで、このメソッドを用いる
+     */
+    function getSiteRootUrl(){
+		if($this->siteConfig->getConfigValue("url")){
+			return $this->siteConfig->getConfigValue("url");
+		}else{
+			return $this->siteRoot;
+		}
+    }
+    
+    /**
+     * @return string サイトURL
+     */
+    function getSiteUrl(){
+		if($this->siteConfig->getConfigValue("url")){
+			return $this->siteConfig->getConfigValue("url");
+		}else{
+			return CMSPageController::createLink("", true);
+		}
+    }
+    
+    /**
+     * @param string $path
+     * @return string http~からの絶対パスをページURL
+     */
+    function getAbusolutePageUrl($path){
+		if($this->siteConfig->getConfigValue("url")){
+			return $this->siteConfig->getConfigValue("url");
+		}else{
+			return CMSPageController::createRelativeLink($path, true);
+		}
     }
 
 }

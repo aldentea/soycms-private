@@ -51,7 +51,7 @@ class LimitationBrowseBlogEntryPlugin{
 	
 	function onEntryOutput($arg){
 		$htmlObj = $arg["SOY2HTMLObject"];
-		$entryId = $arg["entryId"];
+		$entryId = (int)$arg["entryId"];
 		
 		$allowBrowse = false;
 		
@@ -105,10 +105,10 @@ class LimitationBrowseBlogEntryPlugin{
 				
 				$attr = $this->getCustomFieldObject($entryId);
 				
-				if(soy2_check_token() && isset($_POST["browse_password"])){
+				if(soy2_check_token() && isset($_POST[self::FIELD_ID])){
 					
 					//入力したパスワードが一致しているならば
-					if($_POST["browse_password"] == $attr->getValue()){
+					if($_POST[self::FIELD_ID] == $attr->getValue()){
 						$userSession = SOY2ActionSession::getUserSession();
 						$userSession->setAttribute("allow_browse_" . $entryId, true);
 					}	

@@ -117,40 +117,40 @@
 				
 				<!-- soy:display="publish" -->		
 				<div class="section">
-						<p class="sub">公開期間<img soy:message="HELP_ENTRY_OPEN_PERIOD"/></p>
-						
-						<span soy:id="open_period_show" id="open_period_show"></span>
-						<button id="open_period_show_button" type="button" onclick="$('#open_period_show').hide();$('#open_period_input').show();$('#open_period_show_button').hide();">公開期間を設定する</button>
+					<p class="sub">公開期間<img soy:message="HELP_ENTRY_OPEN_PERIOD"/></p>
+					
+					<span soy:id="open_period_show" id="open_period_show"></span>
+					<button id="open_period_show_button" type="button" onclick="$('#open_period_show').hide();$('#open_period_input').show();$('#open_period_show_button').hide();">公開期間を設定する</button>
 
-						<div id="open_period_input" style="display:none;">
-							<table style="width: 28em">
-								<tr>
-									<td style="vertical-align:top;">
-										<input type="text" soy:id="start_date" id="start_date" size="25" maxlength="19" style="width:100%">
-										
-										<div style="font-size:10px;margin-top:5px;margin-left:5px;">
-											<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,0,0,0,0,0),true,false));return false;">今日</a><br/>
-											<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,0,1,0,0,0),true,false));return false;">明日</a><br/>
-											<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,0,7,0,0,0),true,false));return false;">来週</a><br/>
-											<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,1,0,0,0,0),true,false));return false;">来月</a><br/>
-											<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,0,0,0,0,0),false,false));return false;">現在の時刻</a><br/>
-											<a href="#" onclick="$('#start_date').val('');return false;">日時のクリア</a>
-										</div>
-									</td>
-									<td style="vertical-align:top;text-align:center;width:4em;">から</td>
-									<td style="vertical-align:top;">
-										<input type="text" soy:id="end_date" id="end_date" size="25" maxlength="19" style="width:100%">
-										<div style="font-size:10px;">
-											<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,0,1,0,0,0),true,true));return false;">明日</a><br/>
-											<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,0,7,0,0,0),true,true));return false;">来週</a><br/>
-											<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,1,0,0,0,0),true,true));return false;">来月</a><br/>
-											<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,0,0,0,0,0),false,true));return false;">現在の時刻</a><br/>
-											<a href="#" onclick="$('#end_date').val('');return false;">日時のクリア</a>
-										</div>
-									</td>
-								</tr>
-							</table>
-						</div>
+					<div id="open_period_input" style="display:none;">
+						<table style="width: 28em">
+							<tr>
+								<td style="vertical-align:top;">
+									<input type="text" soy:id="start_date" id="start_date" size="25" maxlength="19" style="width:100%">
+									
+									<div style="font-size:10px;margin-top:5px;margin-left:5px;">
+										<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,0,0,0,0,0),true,false));return false;">今日</a><br/>
+										<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,0,1,0,0,0),true,false));return false;">明日</a><br/>
+										<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,0,7,0,0,0),true,false));return false;">来週</a><br/>
+										<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,1,0,0,0,0),true,false));return false;">来月</a><br/>
+										<a href="#" onclick="$('#start_date').val(buildDateString(movedate(new Date,0,0,0,0,0,0),false,false));return false;">現在の時刻</a><br/>
+										<a href="#" onclick="$('#start_date').val('');return false;">日時のクリア</a>
+									</div>
+								</td>
+								<td style="vertical-align:top;text-align:center;width:4em;">から</td>
+								<td style="vertical-align:top;">
+									<input type="text" soy:id="end_date" id="end_date" size="25" maxlength="19" style="width:100%">
+									<div style="font-size:10px;">
+										<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,0,1,0,0,0),true,true));return false;">明日</a><br/>
+										<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,0,7,0,0,0),true,true));return false;">来週</a><br/>
+										<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,1,0,0,0,0),true,true));return false;">来月</a><br/>
+										<a href="#" onclick="$('#end_date').val(buildDateString(movedate(new Date,0,0,0,0,0,0),false,true));return false;">現在の時刻</a><br/>
+										<a href="#" onclick="$('#end_date').val('');return false;">日時のクリア</a>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
 				</div>
 				<!-- /soy:display="publish" -->
 				
@@ -166,6 +166,7 @@
 				<div style="clear:both"></div>
 											
 				<input type="hidden" name="style" id="style" soy:id="style" />
+				</div>
 			</div>
 		</form soy:id="detail_form">
 

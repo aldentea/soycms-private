@@ -127,34 +127,42 @@ class CMSPageLinkPlugin extends PluginBase{
 		try{
 			$pageId = $arguments["page"];
 
-			if(isset($arguments["site"]) && !is_null($arguments["site"])){
 
-				$siteId = $arguments["site"];
+			$oldDsn = SOY2DAOConfig::Dsn();
+			$oldSiteRoot = $siteRoot;
+			SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
 
-				$oldDsn = SOY2DAOConfig::Dsn();
-				$oldUser = SOY2DAOConfig::user();
-				$oldPass = SOY2DAOConfig::pass();
-				$oldSiteRoot = $siteRoot;
+			/* サイトのURLを取得する */
+			try{
+				$dao = SOY2DAOFactory::create("admin.SiteDAO");
 
-				SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
-
-				try{
-					$dao = SOY2DAOFactory::create("admin.SiteDAO");
-					$site = $dao->getById($siteId);
-					$siteRoot = $site->getUrl();
-
-					if($site->getIsDomainRoot()){
-						$siteRoot = "/";
-					}
-
-					SOY2DAOConfig::Dsn($site->getDataSourceName());
-
-				}catch(Exception $e){
+				if(isset($arguments["site"]) && !is_null($arguments["site"])){
+					// リンク先が他のサイトの場合
+					$site = $dao->getById($arguments["site"]);
+				}else{
+					$site = $dao->getBySiteId(basename(_SITE_ROOT_));
 				}
+				$siteRoot = $site->getUrl();
+
+				if($site->getIsDomainRoot()){
+					$siteRoot = "/";
+				}
+
+				//指定したサイトのDSNを使う
+				SOY2DAOConfig::Dsn($site->getDataSourceName());
+			}catch(Exception $e){
+				SOY2DAOConfig::Dsn($oldDsn);
+				$siteRoot = $oldSiteRoot;
+			}
+
+			//末尾に/を付けておく
+			if(strlen($siteRoot) === 0){
+				$siteRoot = "/";
+			}elseif($siteRoot[strlen($siteRoot)-1] !== "/"){
+				$siteRoot .= "/";
 			}
 
 			$pageDao = SOY2DAOFactory::create("cms.PageDAO");
-
 			try{
 				$page = $pageDao->getById($pageId);
 			}catch(Exception $e){
@@ -230,10 +238,7 @@ class CMSPageLinkPlugin extends PluginBase{
 			}
 
 			if(isset($arguments["site"]) && !is_null($arguments["site"])){
-
 				SOY2DAOConfig::Dsn($oldDsn);
-				SOY2DAOConfig::user($oldUser);
-				SOY2DAOConfig::pass($oldPass);
 				$siteRoot = $oldSiteRoot;
 			}
 

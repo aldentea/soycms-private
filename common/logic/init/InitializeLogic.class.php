@@ -52,6 +52,7 @@ class InitializeLogic implements SOY2LogicInterface{
 
 			//DBのバージョンを入れておく
 			$this->registerDbVersion();
+			$this->registerAdminVersion();
 
 		}catch(Exception $e){
 			//return false;
@@ -74,6 +75,14 @@ class InitializeLogic implements SOY2LogicInterface{
 			"target" => "admin"
 		));
 		$logic->registerCurrentSQLVersion();
+	}
+	
+	/**
+	 * データベース（admin）のバージョンを保存する
+	 */
+	function registerAdminVersion(){
+		$logic = SOY2LogicContainer::get("logic.admin.Upgrade.AdminVersionLogic");
+		$logic->registerCurrentScriptVersion();
 	}
 
 }

@@ -243,7 +243,6 @@ class ButtonSocialPlugin{
 	function onEntryCopy($args){
 		list($old, $new) = $args;
 		$custom = $this->getOgImageObject($old);
-		var_dump($custom);exit;
 		
 		try{
 			$obj = new EntryAttribute();

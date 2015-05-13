@@ -4,6 +4,11 @@
 		<select soy:id="shop_list"></select>&nbsp;
 		<input type="submit" value="選択">
 	</p>
+	
+	<h4>コメントフォーム設定</h4>
+	<p>
+		<input type="checkbox" soy:id="is_insert_comment_form">
+	</p>
 
 	<h4>ログイン時のコメント投稿者へのポイント付与設定</h4>
 	<p>
@@ -31,6 +36,13 @@
 	
 		<input type="submit" style="padding:10px 20px;" value="保存" />
 	</fieldset>
+	
+	<h4>記事詳細の閲覧制限(SOY Shopの商品と紐づける)</h4>
+	<p>
+		<input type="checkbox" soy:id="allow_browse_entry_by_purchased">&nbsp;
+		<input type="submit" value="保存"><br>
+		※購入済み商品を含む注文のステータスを支払確認済みにした時に閲覧できるようになります。
+	</p>
 </form>
 
 <h3>テンプレートへの記述例</h3>
@@ -60,6 +72,14 @@ password:&lt;input type="password" <strong>cms:id="login_email"</strong>&gt;
 &lt;input type="checkbox" <strong>cms:id="auto_login"</strong>&gt; 自動ログイン
 &lt;input type="submit" <strong>cms:id="login_submit"</strong> value="login"&gt;
 
+&lt;!-- コメントフォームの設置 --&gt;
+&lt;form b_block:id="comment_form"&gt;
+	name:&lt;input type="text" <strong>cms:id="author_login"</strong>&gt;
+	email:&lt;input type="email" <strong>cms:id="mail_address_login"</strong>&gt;
+	url:&lt;input type="text" <strong>cms:id="url_login"</strong>&gt;
+	content:&lt;textarea cms:id="body"&gt;&lt;/textarea&gt;
+	&lt;input type="submit" value="コメント投稿"&gt;
+&lt;/form&gt;
 </pre>
 
 <script type="text/javascript">

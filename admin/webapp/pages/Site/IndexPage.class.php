@@ -85,13 +85,14 @@ class SiteList extends HTMLList{
 		));
 
 		$this->addLink("login_link", array(
-			"link" => $entity->getLoginLink()
+			"link" => $entity->getLoginLink(),
+			"id" => ($entity->getSiteType() == Site::TYPE_SOY_CMS) ? "site_id_" . $entity->getSiteId() : "shop_id_" . $entity->getSiteId()
 		));
 
 		$siteLink = (isset($_SERVER["HTTPS"]) ? "https://" : "http://") . $_SERVER['HTTP_HOST'] . '/' . $entity->getSiteId();
 		$this->addLink("site_link", array(
 			"link" => $entity->getUrl(),
-			"text" => $this->replaceTooLongHost($entity->getUrl())
+			"text" => $this->replaceTooLongHost($entity->getUrl()),
 		));
 
 		$rootLink = UserInfoUtil::getSiteURLBySiteId("");

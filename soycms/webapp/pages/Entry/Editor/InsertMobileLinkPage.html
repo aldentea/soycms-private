@@ -19,7 +19,7 @@
 
 		<script type="text/JavaScript">
 
-    var tinymce = top.tinymce;
+    var tinymce = top.tinymce || parent.tinymce;
     var tinymce_window_manager = tinymce.activeEditor.windowManager;
 
 		function on_submit(){

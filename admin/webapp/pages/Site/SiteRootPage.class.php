@@ -123,12 +123,38 @@ class SiteRootPage extends CMSUpdatePageBase{
 			//
     	}
 
+		//サイトURLの更新、サイト用DB SiteConfigに同期
+		$rootLink = UserInfoUtil::getSiteURLBySiteId("");
+		$dsn = SOY2DAOConfig::Dsn();
+		try{
+			$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
+			$site = $siteDAO->getById($id);
+			$site->setUrl($rootLink);
+			$siteDAO->update($site);
+			
+			SOY2DAOConfig::Dsn($site->getDataSourceName());
+			
+			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+			$siteConfig = $siteConfigDao->get();
+			$siteConfig->setConfigValue("url", $rootLink);
+			$siteConfigDao->updateSiteConfig($siteConfig);
+			
+		}catch(Exeption $e){
+			
+		}
+		
+		SOY2DAOConfig::Dsn($dsn);
+
 		//キャッシュ削除
 		$SiteLogic = SOY2Logic::createInstance("logic.admin.Site.SiteLogic");
 		$sites = $SiteLogic->getSiteList();
 		foreach($sites as $site){
 			CMSUtil::unlinkAllIn($site->getPath() . ".cache/");
 		}
+		
+		
+		
+		
     }
 }
 ?>

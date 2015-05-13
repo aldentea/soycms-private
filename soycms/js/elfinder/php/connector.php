@@ -4,11 +4,12 @@ set_time_limit(0); // just in case it too long, not recommended for production
 error_reporting(E_ALL | E_STRICT); // Set E_ALL for debuging
 
 //GETの値がなければelfinderを実行させない
-if(!isset($_GET["site_id"])) exit;
+//if(!isset($_GET["site_id"]) || !isset($_GET["shop_id"])) exit;
 
 //ログインしていなければelfinderを実行させない
 include_once("../../../../common/common.inc.php");
-SOY2::import("util.UserInfoUtil");
+SOY2::import("util.UserInfoUtil");	
+
 if(!UserInfoUtil::isLoggined()) exit;
 
 // error_reporting(0);
@@ -257,19 +258,32 @@ function validName($name) {
 
 $logger = new elFinderSimpleLogger('../files/temp/log.txt');
 
-//SOY CMSとの接続:サイトのパスを取得
-SOY2::import("domain.admin.Site");
-SOY2::import("domain.admin.SiteDAO");
-
-include_once(SOY2::RootDir() . "/config/db/" . SOYCMS_DB_TYPE . ".php");
-SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
-SOY2DAOConfig::user(ADMIN_DB_USER);
-SOY2DAOConfig::pass(ADMIN_DB_PASS);
-$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
-try{
-	$site = $siteDAO->getBySiteId($_GET["site_id"]);
-}catch(Exception $e){
-	exit;
+if(isset($_GET["site_id"])){
+	//SOY CMSとの接続:サイトのパスを取得
+	SOY2::import("domain.admin.Site");
+	SOY2::import("domain.admin.SiteDAO");
+	
+	include_once(SOY2::RootDir() . "/config/db/" . SOYCMS_DB_TYPE . ".php");
+	SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
+	SOY2DAOConfig::user(ADMIN_DB_USER);
+	SOY2DAOConfig::pass(ADMIN_DB_PASS);
+	$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
+	try{
+		$site = $siteDAO->getBySiteId($_GET["site_id"]);
+	}catch(Exception $e){
+		exit;
+	}
+	
+	$path = $site->getPath();
+	$url = $site->getUrl();
+}else if(isset($_GET["shop_id"])){
+	//SOY Shopとの接続:サイトのパスを取得
+	$path = str_replace("soycms", "soyshop", dirname(dirname(dirname(dirname(__FILE__)))) . "/webapp/conf/shop/" . $_GET["shop_id"] . ".conf.php");
+	if(!file_exists($path)) exit;
+	include_once($path);
+	
+	$path = SOYSHOP_SITE_DIRECTORY;
+	$url = SOYSHOP_SITE_URL;
 }
 
 $opts = array(
@@ -283,9 +297,9 @@ $opts = array(
 	'roots' => array(
 		array(
 			'driver'     => 'LocalFileSystem',
-			'path'       => $site->getPath(),
+			'path'       => $path,
 			//'startPath'  => $site->getPath(),
-			'URL'        => $site->getUrl(),
+			'URL'        => $url,
 			// 'treeDeep'   => 3,
 			// 'alias'      => 'File system',
 			'mimeDetect' => 'internal',
@@ -297,18 +311,18 @@ $opts = array(
 			'acceptedName'    => '/^[^\.].*$/',
 			// 'disabled' => array('extract', 'archive'),
 			// 'tmbSize' => 128,
-			'attributes' => array(
-				array(
-					'pattern' => '/\.js$/',
-					'read' => true,
-					'write' => false
-				),
-				array(
-					'pattern' => '/^\/icons$/',
-					'read' => true,
-					'write' => false
-				)
-			)
+//			'attributes' => array(
+//				array(
+//					'pattern' => '/\.db$/',
+//					'read' => true,
+//					'write' => false
+//				),
+//				array(
+//					'pattern' => '/^\/icons$/',
+//					'read' => true,
+//					'write' => false
+//				)
+//			)
 			// 'uploadDeny' => array('application', 'text/xml')
 		),
 		// array(

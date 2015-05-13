@@ -47,9 +47,10 @@
 <script type="text/javascript">
 
 	var mode = "upload";
-  var tinymce = top.tinymce;
+	
+	var tinymce = top.tinymce || parent.tinymce;
 	var tinymce_window_manager = tinymce.activeEditor.windowManager;
-
+	
 	common_init_custom_button();
 
   $(function(){

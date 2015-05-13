@@ -20,22 +20,28 @@ class SOYShopConnectorPlugin{
 			"mail"=>"soycms@soycms.net",
 			"version"=>"1.0"
 		));
-		CMSPlugin::addPluginConfigPage($this->getId(),array(
-			$this,"config_page"
-		));
 
 		//プラグインのアクティブかつ、SOY Shopがインストールされているか？
 		$soyshopRoot = dirname(SOY2::RootDir()) . "/soyshop/"; 
 		if(CMSPlugin::activeCheck($this->getId()) && file_exists($soyshopRoot)){
+			
+			if(!class_exists("SOYShopUtil")) SOY2::import("util.SOYShopUtil");
+			
+			//SOY Shopがインストールされていれば動く
+			if(SOYShopUtil::checkSOYShopInstall()){
+				
+				CMSPlugin::addPluginConfigPage($this->getId(),array(
+					$this,"config_page"
+				));
 
-			//activeな時だけロード
-			CMSPlugin::setEvent('onPageLoad'
-				,$this->getId()
-				,array($this,"onPageLoad")
-				,array("filter" => "all")
-			);
+				//activeな時だけロード
+				CMSPlugin::setEvent('onPageLoad'
+					,$this->getId()
+					,array($this,"onPageLoad")
+					,array("filter" => "all")
+				);	
+			}
 		}
-
 	}
 	
 	function onPageLoad($args){
@@ -70,6 +76,12 @@ class SOYShopConnectorPlugin{
 	 */
 	function config_page($message){
 		
+		include_once(dirname(__FILE__) . "/config/SOYShopConnectorConfigPage.class.php");
+		$form = SOY2HTMLFactory::createInstance("SOYShopConnectorConfigPage");
+		$form->setPluginObj($this);
+		$form->execute();
+		return $form->getObject();
+/**		
 		if(isset($_POST["save"])){
 
 			if(isset($_POST["siteId"])){
@@ -87,6 +99,7 @@ class SOYShopConnectorPlugin{
 		ob_end_clean();
 		
 		return $html;
+**/
 	}
 	
 	public static function register(){
@@ -97,6 +110,14 @@ class SOYShopConnectorPlugin{
 		}
 			
 		CMSPlugin::addPlugin(self::PLUGIN_ID, array($obj, "init"));
+	}
+	
+	function getSiteId(){
+		return $this->siteId;
+	}
+	
+	function setSiteId($siteId){
+		$this->siteId = $siteId;
 	}
 }
 

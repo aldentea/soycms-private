@@ -30,6 +30,7 @@ class IndexPage extends CMSWebPageBase{
 				$root = dirname(SOY2::RootDir());
 				CMSUtil::unlinkAllIn($root . "/admin/cache/");
 				CMSUtil::unlinkAllIn($root . "/soycms/cache/");
+				CMSUtil::unlinkAllIn($root . "/soyshop/cache/");
 				CMSUtil::unlinkAllIn($root . "/app/cache/", true);
 
 				$sites = $this->getSiteList();
@@ -54,7 +55,8 @@ class IndexPage extends CMSWebPageBase{
 		 * @TODO 初期管理者以外ではバージョンアップを促す文言を出すとか
 		 */
 		$this->run("Database.CheckVersionAction");
-
+		$this->run("Administrator.CheckAdminVersionAction");
+		
 		//ユーザに割り当てられたサイト/Appが１つのときは、そのサイトにログイン(redirect)するようにする。
 		$this->run("SiteRole.DefaultLoginAction");
 
@@ -175,12 +177,13 @@ class SiteList extends HTMLList{
 		$param = array();
 		if(isset($_GET["r"]) && strlen($_GET["r"]) && strpos($_GET["r"],"/soycms/")) $param["r"] = $_GET["r"];
 		$this->addLink("login_link", array(
-			"link" => $entity->getLoginLink($param)
+			"link" => $entity->getLoginLink($param),
+			"id" => ($entity->getSiteType() == Site::TYPE_SOY_CMS) ? "site_id_" . $entity->getSiteId() : "shop_id_" . $entity->getSiteId()
 		));
-
+		
 		$this->addLink("site_link", array(
 			"link" => $entity->getUrl(),
-			"text" => $this->replaceTooLongHost($entity->getUrl())
+			"text" => $this->replaceTooLongHost($entity->getUrl()),
 		));
 
 		$rootLink = UserInfoUtil::getSiteURLBySiteId("");

@@ -9,7 +9,7 @@ function soy_cms_blog_get_current_url($page, $offset = 0){
 
 		switch($page->mode){
     		case CMSBlogPage::MODE_MONTH_ARCHIVE:
-    			$url = $page->getMonthPageURL();
+    			$url = $page->getMonthPageURL(true);
     			if(strlen($page->year)){
     				$url .=  $page->year;//末尾にスラッシュは付けない
 	    			if(strlen($page->month)){
@@ -18,11 +18,11 @@ function soy_cms_blog_get_current_url($page, $offset = 0){
     			}
     			break;
     		case CMSBlogPage::MODE_CATEGORY_ARCHIVE:
-    			$url = $page->getCategoryPageURL() . rawurlencode($page->label->getAlias());//末尾にスラッシュは付けない
+    			$url = $page->getCategoryPageURL(true) . rawurlencode($page->label->getAlias());//末尾にスラッシュは付けない
     			break;
     		case CMSBlogPage::MODE_TOP:
     		default:
-    			$url = $page->getTopPageURL();//トップページのURIが空の時は末尾にスラッシュが付く
+    			$url = $page->getTopPageURL(true);//トップページのURIが空の時は末尾にスラッシュが付く
     			break;
     	}
 
@@ -247,8 +247,8 @@ function soy_cms_blog_output_entry_list($page,$entries){
 	
 	$page->createAdd("entry_list","BlogPage_EntryList",array(
 		"list" => $entries,
-		"entryPageUrl" => $page->getEntryPageURL(),
-		"categoryPageUrl" => $page->getCategoryPageURL(),
+		"entryPageUrl" => $page->getEntryPageURL(true),
+		"categoryPageUrl" => $page->getCategoryPageURL(true),
 		"blogLabelId" => (int)$page->page->getBlogLabelId(),
 		"categoryLabelList" => $page->page->getCategoryLabelList(),
 		"soy2prefix" => "b_block"
@@ -617,7 +617,7 @@ function soy_cms_blog_output_current_category_or_archive($page){
 							"text"=> ( ($page->label) ? $page->label->getCaption() : "" ),
 							"soy2prefix"=>"cms"
 						));
-						$link = ($page->label)? $page->getCategoryPageURL() . rawurlencode($page->label->getAlias()) : "";
+						$link = ($page->label)? $page->getCategoryPageURL(true) . rawurlencode($page->label->getAlias()) : "";
 						break;
 
 					case CMSBlogPage::MODE_MONTH_ARCHIVE :
@@ -642,7 +642,7 @@ function soy_cms_blog_output_current_category_or_archive($page){
 							"soy2prefix"=>"cms",
 							"defaultFormat"=>"Y年n月"
 						));
-						$link = $page->getMonthPageURL() . $link;
+						$link = $page->getMonthPageURL(true) . $link;
 						break;
 				}
 				$this->createAdd("archive_link","HTMLLink",array(
@@ -680,7 +680,7 @@ function soy_cms_blog_output_current_category($page){
 				));
 
 				$this->createAdd("category_link","HTMLLink",array(
-					"link"=>($page->label)? $page->getCategoryPageURL() . rawurlencode($page->label->getAlias()) : "",
+					"link"=>($page->label)? $page->getCategoryPageURL(true) . rawurlencode($page->label->getAlias()) : "",
 					"soy2prefix"=>"cms"
 				));
 			}
@@ -759,7 +759,7 @@ function soy_cms_blog_output_current_archive($page){
 				));
 
 				$this->createAdd("archive_link","HTMLLink",array(
-					"link"=> $page->getMonthPageURL() . $link,
+					"link"=> $page->getMonthPageURL(true) . $link,
 					"soy2prefix"=>"cms"
 				));
 			}

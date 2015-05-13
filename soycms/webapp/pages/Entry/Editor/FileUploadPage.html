@@ -102,11 +102,11 @@
 	var originalWidth,originalHeight;
 	
 	var mode = "upload";
+	var tinymce = top.tinymce || parent.tinymce;
+	var tinymce_window_manager = tinymce.activeEditor.windowManager;
 
-  var tinymce_window_manager = top.tinymce.activeEditor.windowManager;
-
-  defaultWidth = tinymce_window_manager.getParams().width;
-  defaultHeight= tinymce_window_manager.getParams().height;
+	defaultWidth = tinymce_window_manager.getParams().width;
+	defaultHeight= tinymce_window_manager.getParams().height;
 		
 	$("#image_width").attr("onkeypress", validateNumber());
 	$("#image_height").attr("onkeypress", validateNumber());
@@ -266,7 +266,7 @@
 			html = '<a href="'+$("#preview_image").attr("src")+'" target="_blank">' + html + '</a>';
 		}
 
-		top.tinymce.execCommand('mceInsertRawHTML', false,	html);
+		tinymce.execCommand('mceInsertRawHTML', false,	html);
 		
 		//おまじない
 		iframe = null;

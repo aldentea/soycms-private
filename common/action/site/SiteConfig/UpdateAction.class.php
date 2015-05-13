@@ -5,6 +5,7 @@ class UpdateAction extends SOY2Action{
     protected function execute(SOY2ActionRequest &$request,SOY2ActionForm &$form,SOY2ActionResponse &$response){
     	SOY2::import("domain.cms.SiteConfig");
     	$siteConfig = SOY2::cast("SiteConfig",$form);
+    	$siteConfig->setConfigValue("url", $_POST["url"]);
     	$logic = SOY2Logic::createInstance("logic.site.SiteConfig.SiteConfigLogic");
     	try{
     		$logic->update($siteConfig);

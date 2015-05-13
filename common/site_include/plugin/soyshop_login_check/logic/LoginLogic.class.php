@@ -4,32 +4,23 @@ class LoginLogic extends SOY2LogicBase {
 	
 	private $siteId;
 	
-	function LoginkLogic(){
-		SOY2::import("site_include.plugin.soyshop_login_check.common.SOYShopLoginCheckCommon");
-	}
+	function LoginkLogic(){}
 	
-	function getLoginPageUrl(){
-		
-		//SOY Shopがインストールされていない場合は空文字を返す
-		if(!SOYShopLoginCheckCommon::checkSOYShopInstall()) return "";
-		
-		$old = SOYShopLoginCheckCommon::switchShopDsn($this->siteId);
+	function getLoginPageUrl(){		
+		$old = SOYShopUtil::switchShopMode($this->siteId);
 		
 		SOY2::import("domain.config.SOYShop_DataSets");
 		include_once(SOY2::RootDir() . "base/func/common.php");
 		
 		$loginPageUrl = soyshop_get_mypage_url() . "/login";
 		
-		SOYShopLoginCheckCommon::resetShopDsn($old);
+		SOYShopUtil::resetShopMode($old);
 		
 		return $loginPageUrl;
 	}
 	
-	function getLogoutPageUrl(){
-		
-		if(!SOYShopLoginCheckCommon::checkSOYShopInstall()) return "";
-		
-		$old = SOYShopLoginCheckCommon::switchShopDsn($this->siteId);
+	function getLogoutPageUrl(){		
+		$old = SOYShopUtil::switchShopMode($this->siteId);
 		
 		SOY2::import("domain.config.SOYShop_DataSets");
 		SOY2::import("domain.config.SOYShop_ShopConfig");
@@ -42,7 +33,7 @@ class LoginLogic extends SOY2LogicBase {
 			$logoutPageUrl .= "?r=" . rawurldecode($_SERVER["REQUEST_URI"]);
 		}
 		
-		SOYShopLoginCheckCommon::resetShopDsn($old);
+		SOYShopUtil::resetShopMode($old);
 		
 		return $logoutPageUrl;
 	}

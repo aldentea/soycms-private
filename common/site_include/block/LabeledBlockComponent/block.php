@@ -71,7 +71,7 @@ class LabeledBlockComponent implements BlockComponent{
 				}
 			}
 		}
-
+		
 		$articlePageUrl = "";
 		if($this->isStickUrl){
 			try{
@@ -81,7 +81,7 @@ class LabeledBlockComponent implements BlockComponent{
 				if(defined("CMS_PREVIEW_MODE")){
 					$articlePageUrl = SOY2PageController::createLink("Page.Preview") ."/". $blogPage->getId() . "?uri=". $blogPage->getEntryPageURL();
 				}else{
-					$articlePageUrl = $page->siteRoot . $blogPage->getEntryPageURL();
+					$articlePageUrl = $page->getSiteRootUrl() . $blogPage->getEntryPageURL();
 				}
 			}catch(Exception $e){
 				$this->isStickUrl = false;

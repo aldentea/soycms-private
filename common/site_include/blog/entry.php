@@ -191,8 +191,8 @@ function soy_cms_blog_output_entry($page,$entry){
 
 	$page->createAdd("entry","BlogPage_EntryComponent",array(
 		"soy2prefix" => "b_block",
-		"entryPageUri"=> $page->getEntryPageURL(),
-		"categoryPageUri" => $page->getCategoryPageURL(),
+		"entryPageUri"=> $page->getEntryPageURL(true),
+		"categoryPageUri" => $page->getCategoryPageURL(true),
 		"blogLabelId" => $page->page->getBlogLabelId(),
 		"categoryLabelList" => $page->page->getCategoryLabelList(),
 		"visible" => ($entry->getId()),
@@ -238,14 +238,14 @@ function soy_cms_blog_output_entry_navi($page,$next,$prev){
 	}
 	
 	$page->createAdd("next_entry","BlogPage_Entry_Navigation",array(
-		"entryPageUri"=> $page->getEntryPageURL(),
+		"entryPageUri"=> $page->getEntryPageURL(true),
 		"entry" => $next,
 		"soy2prefix" => "b_block",
 		"visible" => $next->getId()
 	));
 	
 	$page->createAdd("prev_entry","BlogPage_Entry_Navigation",array(
-		"entryPageUri"=> $page->getEntryPageURL(),
+		"entryPageUri"=> $page->getEntryPageURL(true),
 		"entry" => $prev,
 		"soy2prefix" => "b_block",
 		"visible" => $prev->getId()
@@ -333,7 +333,7 @@ function soy_cms_blog_output_comment_form($page,$entry,$entryComment){
 	}
 	
 	$page->createAdd("comment_form","BlogPage_CommentForm",array(
-		"action" => $page->getEntryPageURL() . $entry->getId() ."?comment",
+		"action" => $page->getEntryPageURL(true) . $entry->getId() ."?comment",
 		"soy2prefix" => "b_block",
 		"entryComment" => (is_null($entryComment)) ? new EntryComment() : $entryComment,
 		"visible" => ($entry->getId())

@@ -52,6 +52,12 @@ class IndexPage extends CMSWebPageBase{
 			"selected"=>$entity->getCharset(),
 			"options"=>SiteConfig::getCharsetLists()
 		));
+		
+		//hidden
+		$this->createAdd("url", "HTMLInput", array(
+			"name" => "url",
+			"value" => $entity->getConfigValue("url")
+		));
 
 		$this->createAdd("useLabelCategory","HTMLCheckBox",array(
 			"name" => "useLabelCategory",

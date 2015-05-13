@@ -26,6 +26,21 @@ class DetailPage extends CMSUpdatePageBase{
 			}catch(Exception $e){
 				//
 			}
+			
+			//サイトURLを、サイト用DB SiteConfigに挿入
+			try{
+				$dsn = SOY2DAOConfig::Dsn();
+				SOY2DAOConfig::Dsn($site->getDataSourceName());
+				
+				$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+				$siteConfig = $siteConfigDao->get();
+				$siteConfig->setConfigValue("url", $site->getUrl());
+				$siteConfigDao->updateSiteConfig($siteConfig);
+			}catch(Exception $e){
+				
+			}
+			
+			SOY2DAOConfig::Dsn($dsn);
 		}
 		
 		$this->jump("Site.Detail." . $this->id);

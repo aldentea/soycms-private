@@ -10,7 +10,7 @@
 function soy_cms_blog_output_top_link($page){
 	$page->createAdd("top_link","HTMLLink",array(
 		"soy2prefix" => "b_block",
-		"link" => $page->getTopPageURL()
+		"link" => $page->getTopPageURL(true)
 	));
 }
 
@@ -114,7 +114,7 @@ function soy_cms_blog_output_category_link($page){
 	$page->createAdd("category","BlogPage_CategoryList",array(
 		"list" => $categoryLabel,
 		"entryCount" => $entryCount,
-		"categoryUrl" => $page->getCategoryPageURL(),
+		"categoryUrl" => $page->getCategoryPageURL(true),
 		"soy2prefix" => "b_block"
 	));
 
@@ -195,7 +195,7 @@ function soy_cms_blog_output_archive_link($page){
 
 	$page->createAdd("archive","BlogPage_MonthArciveList",array(
 		"list" => $month_list,
-		"monthPageUri" => $page->getMonthPageURL(),
+		"monthPageUri" => $page->getMonthPageURL(true),
 		"soy2prefix" => "b_block"
 	));
 }
@@ -274,7 +274,7 @@ function soy_cms_blog_output_archive_link_by_year($page){
 
 	$page->createAdd("archive_by_year","BlogPage_YearArciveList",array(
 		"list" => $year_list,
-		"yearPageUri" => $page->getMonthPageURL(),
+		"yearPageUri" => $page->getMonthPageURL(true),
 		"soy2prefix" => "b_block"
 	));
 }
@@ -355,7 +355,7 @@ function soy_cms_blog_output_recent_entry_list($page,$entries){
 
 	$page->createAdd("recent_entry_list","Blog_RecentEntryList",array(
 		"list" => $entries,
-		"entryPageUri"=> $page->getEntryPageURL(),
+		"entryPageUri"=> $page->getEntryPageURL(true),
 		"soy2prefix" => "b_block"
 	));
 
@@ -456,7 +456,7 @@ function soy_cms_blog_output_recent_comment_list($page){
 	try{
 		$page->createAdd("recent_comment_list","Blog_RecentCommentList",array(
 			"list" => $comments,
-			"entryPageUri" => $page->getEntryPageURL(),
+			"entryPageUri" => $page->getEntryPageURL(true),
 			"soy2prefix" => "b_block"
 		));
 	}catch(Exception $e){
@@ -543,7 +543,7 @@ function soy_cms_blog_output_recent_trackback_list($page){
 	try{
 		$page->createAdd("recent_trackback_list","Blog_RecentTrackBackList",array(
 			"list" => $trackbacks,
-			"entryPageUri" => $page->getEntryPageURL(),
+			"entryPageUri" => $page->getEntryPageURL(true),
 			"soy2prefix" => "b_block"
 		));
 	}catch(Exception $e){
@@ -697,7 +697,7 @@ function soy_cms_blog_output_meta_feed_info($page){
  */
 function soy_cms_blog_output_feed_link($page){
 
-	$url = $page->getRssPageURL();
+	$url = $page->getRssPageURL(true);
 
 	$page->createAdd("rss_link","HTMLLink",array(
 		"link" => $url ."?feed=rss",

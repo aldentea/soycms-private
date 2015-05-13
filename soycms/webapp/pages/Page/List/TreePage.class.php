@@ -152,9 +152,9 @@ class TreePage extends CMSWebPageBase{
 
 		    	$url = UserInfoUtil::getSiteUrl().$page->getUri();
 		    	if(!$visible){
-		     		$function[] = '<a href="'.$url.'">'.$this->getMessage("SOYCMS_VIEW").'</a></span>';
+		     		$function[] = '<a href="'.htmlspecialchars($url, ENT_QUOTES, "UTF-8").'">'.$this->getMessage("SOYCMS_VIEW").'</a></span>';
 		    	}else{
-		     		$function[] = '<span style="color:#fB9733;text-decoration:line-through;"><a style="color:#fB9733;text-decoration:underline" href="'.$url.'">'.$this->getMessage("SOYCMS_VIEW").'</a></span>';
+		     		$function[] = '<span style="color:#fB9733;text-decoration:line-through;"><a style="color:#fB9733;text-decoration:underline" href="'.htmlspecialchars($url, ENT_QUOTES, "UTF-8").'">'.$this->getMessage("SOYCMS_VIEW").'</a></span>';
 		    	}
 
 	     		if($page->getIsTrash()){
@@ -163,11 +163,11 @@ class TreePage extends CMSWebPageBase{
 	     		}elseif($page->isDeletable()){
 		     		$function[] = '<a href="' .SOY2PageController::createLink("Page.PutTrash") . "/" . $page->getId(). "?soy2_token=" . soy2_get_token() . '">'.$this->getMessage("SOYCMS_DELETE").'</a>';
 	     		}
-				
+
 	     		if($page->isCopyable()){
 					$function[] = '<a href="'.SOY2PageController::createLink("Page.Copy.".$page->getId())."?soy2_token=" . soy2_get_token() . '">'.$this->getMessage("SOYCMS_COPY").'</a>';
 	     		}
-	     		
+
 				$function[] = '<a href="'.SOY2PageController::createLink("Page.Preview.".$page->getId()).'" target="_blank">'.$this->getMessage("SOYCMS_DYNAMIC_EDIT").'</a>';
 
      		$html[] = implode("&nbsp;&nbsp;", $function);

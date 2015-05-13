@@ -12,9 +12,20 @@ class SOYShopLoginCheckConfigFormPage extends WebPage{
 	function doPost(){
 		
 		if(soy2_check_token()){
+			
+			//キャッシュを捨てる
+			$root = dirname(SOY2::RootDir());
+			CMSUtil::unlinkAllIn($root . "/soycms/cache/");
+			CMSUtil::unlinkAllIn($root . "/soyshop/cache/");
 						
 			$this->pluginObj->setSiteId($_POST["Config"]["siteId"]);
 			$this->pluginObj->setPoint((int)$_POST["Config"]["point"]);
+			
+			$isInsertCommentForm = (isset($_POST["Config"]["isInsertCommentForm"]) && $_POST["Config"]["isInsertCommentForm"] == 1);
+			$this->pluginObj->setIsInsertCommentForm($isInsertCommentForm);
+			
+			$allowBrowseEntryByPurchased = (isset($_POST["Config"]["allowBrowseEntryByPurchased"]) && $_POST["Config"]["allowBrowseEntryByPurchased"] == 1) ? 1 : 0;
+			$this->pluginObj->setAllowBrowseEntryByPurchased($allowBrowseEntryByPurchased);
 			
 			if(isset($_POST["config_per_page"])){
 				$this->pluginObj->config_per_page = $_POST["config_per_page"];
@@ -40,6 +51,13 @@ class SOYShopLoginCheckConfigFormPage extends WebPage{
 			"selected" => $this->pluginObj->getSiteId()
 		));
 		
+		$this->addCheckBox("is_insert_comment_form", array(
+			"name" => "Config[isInsertCommentForm]",
+			"value" => 1,
+			"selected" => ($this->pluginObj->getIsInsertCommentForm()),
+			"label" => " ログイン中のユーザ情報をコメントフォームに挿入する"
+		));
+		
 		$this->addInput("point", array(
 			"name" => "Config[point]",
 			"value" => $this->pluginObj->getPoint(),
@@ -54,6 +72,13 @@ class SOYShopLoginCheckConfigFormPage extends WebPage{
 		$this->createAdd("page_list", "PageList", array(
 			"list"  => $this->getPages(),
 			"pluginObj" => $this->pluginObj
+		));
+		
+		$this->addCheckBox("allow_browse_entry_by_purchased", array(
+			"name" => "Config[allowBrowseEntryByPurchased]",
+			"value" => 1,
+			"selected" => ($this->pluginObj->getAllowBrowseEntryByPurchased() == 1),
+			"label" => "記事詳細を開く時に特定の商品を購入していることを条件とする"
 		));
 	}
 	

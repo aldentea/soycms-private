@@ -6,16 +6,11 @@ class PointLogic extends SOY2LogicBase{
 	private $point;
 	private $entry;
 			
-	function PointLogic(){
-		SOY2::import("site_include.plugin.soyshop_login_check.common.SOYShopLoginCheckCommon");
-	}
+	function PointLogic(){}
 	
 	function addPoint(){
-		
-		//SOY Shopがインストールされていない場合は処理を停止する
-		if(!SOYShopLoginCheckCommon::checkSOYShopInstall()) return;
-		
-		$old = SOYShopLoginCheckCommon::switchShopDsn($this->siteId);
+				
+		$old = SOYShopUtil::switchShopMode($this->siteId);
 		
 		//データベースがあるかを調べる
 		if($this->checkPointPluginInstall()){
@@ -29,7 +24,7 @@ class PointLogic extends SOY2LogicBase{
 			
 		}
 		
-		SOYShopLoginCheckCommon::resetShopDsn($old);
+		SOYShopUtil::resetShopMode($old);
 	}
 	
 	//ポイントプラグインがインストールされているかを調べる

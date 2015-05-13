@@ -37,6 +37,23 @@ class CreateAction extends SOY2Action{
 		$site = $dao->getById($result);
 		$this->setAttribute("Site",$site);
 		
+		
+		//サイトURLを、サイト用DB SiteConfigに挿入
+		try{
+			$dsn = SOY2DAOConfig::Dsn();
+			SOY2DAOConfig::Dsn($site->getDataSourceName());
+			
+			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+			$siteConfig = $siteConfigDao->get();
+			$siteConfig->setConfigValue("url", $site->getUrl());
+			$siteConfigDao->updateSiteConfig($siteConfig);
+			
+			SOY2DAOConfig::Dsn($dsn);
+		}catch(Exception $e){
+			return SOY2Action::FAILED;
+		}
+		
+		
 		return SOY2Action::SUCCESS;
     }
     

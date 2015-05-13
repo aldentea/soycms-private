@@ -118,6 +118,7 @@ foreach($pages as $key => $page){
 		$value = $page->getTopTitleFormat();
 		$value = htmlspecialchars($value,ENT_QUOTES);
 		$value2 = htmlspecialchars($page->getTopPageUri(),ENT_QUOTES);
+		$sortValue = htmlspecialChars($page->getTopEntrySort(), ENT_QUOTES);
 		
 		echo '<table>';
 		echo '<col style="width:3em" />';
@@ -126,25 +127,51 @@ foreach($pages as $key => $page){
 		echo '<tr>';		
 		echo "<td>top</td><td>:</td><td><input class=\"text\" name=\"format[".$page->getId()."][topTitleFormat]\" value=\"$value\"/>";
 		echo "</td><td>"."<input class=\"text\" name=\"format[".$page->getId()."][topPageUrl]\" value=\"$value2\"/>";
-		echo '</td></tr>';
+		echo '</td><td><select name="format['.$page->getId().'][topEntrySort]">';
+		if($sortValue != "desc"){
+			echo '<option value="desc">降順</option>';
+			echo '<option value="asc" selected>昇順</option>';
+		}else{
+			echo '<option value="desc" selected>降順</option>';
+			echo '<option value="asc">昇順</option>';
+		}
+		echo '</select></td></tr>';
 		
 		$value = $page->getMonthTitleFormat();
 		$value = htmlspecialchars($value,ENT_QUOTES);
 		$value2 = htmlspecialchars($page->getMonthPageUri(),ENT_QUOTES);
+		$sortValue = htmlspecialChars($page->getMonthEntrySort(), ENT_QUOTES);
 		
 		echo '<tr>';
 		echo "<td>month</td><td>:</td><td><input class=\"text\" name=\"format[".$page->getId()."][monthTitleFormat]\" value=\"$value\"/>";
 		echo '</td><td>'."<input class=\"text\" name=\"format[".$page->getId()."][monthPageUri]\" value=\"$value2\"/>";
-		echo '</td></tr>';
+		echo '</td><td><select name="format['.$page->getId().'][monthEntrySort]">';
+		if($sortValue != "desc"){
+			echo '<option value="desc">降順</option>';
+			echo '<option value="asc" selected>昇順</option>';
+		}else{
+			echo '<option value="desc" selected>降順</option>';
+			echo '<option value="asc">昇順</option>';
+		}
+		echo '</select></td></tr>';
 		
 		$value = $page->getCategoryTitleFormat();
 		$value = htmlspecialchars($value,ENT_QUOTES);
 		$value2 = htmlspecialchars($page->getCategoryPageUri(),ENT_QUOTES);
+		$sortValue = htmlspecialChars($page->getCategoryEntrySort(), ENT_QUOTES);
 		
 		echo '<tr>';
 		echo "<td>category</td><td>:</td><td><input class=\"text\" name=\"format[".$page->getId()."][categoryTitleFormat]\" value=\"$value\"/>";
 		echo '</td><td>'."<input class=\"text\" name=\"format[".$page->getId()."][categoryPageUri]\" value=\"$value2\"/>";
-		echo '</td></tr>';
+		echo '</td><td><select name="format['.$page->getId().'][categoryEntrySort]">';
+		if($sortValue != "desc"){
+			echo '<option value="desc">降順</option>';
+			echo '<option value="asc" selected>昇順</option>';
+		}else{
+			echo '<option value="desc" selected>降順</option>';
+			echo '<option value="asc">昇順</option>';
+		}
+		echo '</select></td></tr>';
 		
 		$value = $page->getEntryTitleFormat();
 		$value = htmlspecialchars($value,ENT_QUOTES);

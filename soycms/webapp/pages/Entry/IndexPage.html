@@ -123,15 +123,19 @@
 				$(function(){
 					var regexp = new RegExp(' label_list_[^=]+?=[^;]+?;','g');
 					var match  = (' ' + document.cookie + ';').match(regexp);
-					regexp = new RegExp('label_list_([^=]+?)=([^;]+?);');
-					match.forEach(function(e){
-						var match2  = e.match(regexp);
-						var target_id = match2[1];
-						var is_opened = (match2) ? match2[2] : 1;
-						if(is_opened != 1){
-							toggle_label_list($("#toggle_"+target_id+"_opened"), target_id);
-						}
-					});
+					
+					if(match instanceof Array){
+						regexp = new RegExp('label_list_([^=]+?)=([^;]+?);');
+						
+						match.forEach(function(e){
+							var match2  = e.match(regexp);
+							var target_id = match2[1];
+							var is_opened = (match2) ? match2[2] : 1;
+							if(is_opened != 1){
+								toggle_label_list($("#toggle_"+target_id+"_opened"), target_id);
+							}
+						});
+					}
 				});
 			//-->
 			</script>

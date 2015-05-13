@@ -69,23 +69,20 @@ class MultiLabelBlockComponent implements BlockComponent{
 
 		try{
 			//DSNを切り替える、ついでにサイトのURLを取得
-			if(!is_null($this->siteId)){
-				$oldDsn = SOY2DAOConfig::Dsn();
-				SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
-				$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
+			//自サイトでもサイトのURL取得
+			$oldDsn = SOY2DAOConfig::Dsn();
+			SOY2DAOConfig::Dsn(ADMIN_DB_DSN);
+			$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
 
-				$site = $siteDAO->getById($this->siteId);
-				SOY2DAOConfig::Dsn($site->getDataSourceName());
+			$site = $siteDAO->getById($this->siteId);
+			SOY2DAOConfig::Dsn($site->getDataSourceName());
 
-				$dsn = $site->getDataSourceName();
+			$dsn = $site->getDataSourceName();
 
-				$siteUrl = $site->getUrl();
+			$siteUrl = $site->getUrl();
 
-				if($site->getIsDomainRoot()){
-					$siteUrl = "/";
-				}
-			}else{
-				$siteUrl = SOY2PageController::createLink("");
+			if($site->getIsDomainRoot()){
+				$siteUrl = "/";
 			}
 
 			//アクセスしているサイトと同じドメインなら / からの絶対パスにしておく（ケータイでURLに自動でセッションIDが付くように）

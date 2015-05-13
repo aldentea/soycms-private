@@ -11,11 +11,18 @@ SOYShopLoginCheckPlugin::register();
 class SOYShopLoginCheckPlugin{
 	
 	const PLUGIN_ID = "SOYShopLoginCheck";
+	const ALLOW_BROWSE = 1;
+	const NOT_ALLOW_BROWSE = 0;
 	
 	private $siteId = "shop";
 	private $isLoggedIn;
 	private $loginPageUrl;
 	private $logoutPageUrl;
+	
+	//特定の商品を購入していないと記事詳細を閲覧できないモード
+	private $allowBrowseEntryByPurchased = self::NOT_ALLOW_BROWSE;
+	
+	private $userId;
 	
 	//フォームへリダイレクトするページ
 	//Array<ページID => 0 | 1> リダイレクトしないページが1
@@ -25,6 +32,9 @@ class SOYShopLoginCheckPlugin{
 	
 	//コメント投稿者へのポイント付与設定
 	private $point = 0;
+	
+	//ログインしたユーザの情報をコメントフォームに挿入するか？
+	private $isInsertCommentForm;
 	
 	function getId(){
 		return self::PLUGIN_ID;	
@@ -37,39 +47,58 @@ class SOYShopLoginCheckPlugin{
 			"author"=>"日本情報化農業研究所",
 			"url"=>"http://www.n-i-agroinformatics.com",
 			"mail"=>"info@n-i-agroinformatics.com",
-			"version"=>"0.7"
+			"version"=>"0.8"
 		));
 		
 		if(CMSPlugin::activeCheck($this->getId())){
-		
-			CMSPlugin::addPluginConfigPage(self::PLUGIN_ID, array(
-				$this,"config_page"	
-			));
-		
-			//公開画面側
-			if(defined("_SITE_ROOT_")){
 			
-				//ここでログインチェックをしてしまう。
-				$checkLogic = SOY2Logic::createInstance("site_include.plugin.soyshop_login_check.logic.LoginCheckLogic", array("siteId" => $this->siteId));
-				$this->isLoggedIn = $checkLogic->isLoggedIn();
+			if(!class_exists("util.SOYShopUtil")) SOY2::import("util.SOYShopUtil");
 
-				$loginLogic = SOY2Logic::createInstance("site_include.plugin.soyshop_login_check.logic.LoginLogic", array("siteId" => $this->siteId));
+			//SOY Shopがインストールされていれば動く
+			if(SOYShopUtil::checkSOYShopInstall()){
 				
-				//ログインページのURLもここで取得する
-				if(!$this->isLoggedIn){
-					$this->loginPageUrl = $loginLogic->getLoginPageUrl();
+				CMSPlugin::addPluginConfigPage(self::PLUGIN_ID, array(
+					$this,"config_page"	
+				));
 				
-				//ログアウトページのURLをここで取得する
+				//公開画面側
+				if(defined("_SITE_ROOT_")){
+				
+					//ここでログインチェックをしてしまう。
+					$checkLogic = SOY2Logic::createInstance("site_include.plugin.soyshop_login_check.logic.LoginCheckLogic", array("siteId" => $this->siteId));
+					$this->isLoggedIn = $checkLogic->isLoggedIn();
+	
+					$loginLogic = SOY2Logic::createInstance("site_include.plugin.soyshop_login_check.logic.LoginLogic", array("siteId" => $this->siteId));
+					
+					//ログインページのURLもここで取得する
+					if(!$this->isLoggedIn){
+						$this->loginPageUrl = $loginLogic->getLoginPageUrl();
+					
+					//ログアウトページのURLをここで取得する
+					}else{
+						$this->logoutPageUrl = $loginLogic->getLogoutPageUrl();
+						$this->userId = $checkLogic->getUserId();
+					}
+					
+					CMSPlugin::setEvent('onEntryOutput',self::PLUGIN_ID, array($this, "onEntryOutput"));
+					CMSPlugin::setEvent('onPageOutput', self::PLUGIN_ID, array($this, "onPageOutput"));
+					
+					//コメント時のポイント付与
+					if($this->isLoggedIn && (is_numeric($this->point) && $this->point > 0)){
+						CMSPlugin::setEvent('onSubmitComment',self::PLUGIN_ID, array($this, "onSubmitComment"));
+					}
+				//管理画面側
 				}else{
-					$this->logoutPageUrl = $loginLogic->getLogoutPageUrl();
-				}
-				
-				CMSPlugin::setEvent('onEntryOutput',self::PLUGIN_ID, array($this, "onEntryOutput"));
-				CMSPlugin::setEvent('onPageOutput', self::PLUGIN_ID, array($this, "onPageOutput"));
-				
-				//コメント時のポイント付与
-				if($this->isLoggedIn && (is_numeric($this->point) && $this->point > 0)){
-					CMSPlugin::setEvent('onSubmitComment',self::PLUGIN_ID, array($this, "onSubmitComment"));
+					//特定の商品を購入していないと記事詳細を閲覧できないモードをアクティブにした時
+					if($this->allowBrowseEntryByPurchased == self::ALLOW_BROWSE){
+						CMSPlugin::setEvent('onEntryUpdate', self::PLUGIN_ID, array($this, "onEntryUpdate"));
+						CMSPlugin::setEvent('onEntryCreate', self::PLUGIN_ID, array($this, "onEntryUpdate"));
+						CMSPlugin::setEvent('onEntryCopy', self::PLUGIN_ID, array($this, "onEntryCopy"));
+						CMSPlugin::setEvent('onEntryRemove', self::PLUGIN_ID, array($this, "onEntryRemove"));
+		
+						CMSPlugin::addCustomFieldFunction(self::PLUGIN_ID, "Entry.Detail", array($this, "onCallCustomField"));
+						CMSPlugin::addCustomFieldFunction(self::PLUGIN_ID, "Blog.Entry", array($this, "onCallCustomField_inBlog"));
+					}
 				}
 			}
 		}
@@ -102,8 +131,7 @@ class SOYShopLoginCheckPlugin{
 		));
 		
 		/** ここから下は詳細ページでしか動作しません **/
-		if(isset($htmlObj->entryPageUri) && strpos($_SERVER["REQUEST_URI"], $htmlObj->entryPageUri) !== false){
-			
+		if($this->displayDetailPage($htmlObj)){
 			$htmlObj->addForm("login_form", array(
 				"soy2prefix" => "cms",
 				"action" => $this->loginPageUrl . "?r=" . rawurldecode($_SERVER["REQUEST_URI"]),
@@ -138,6 +166,12 @@ class SOYShopLoginCheckPlugin{
 		}
 	}
 	
+	function displayDetailPage($htmlObj){
+		if(!isset($htmlObj->entryPageUri)) return false;
+		$pageUri = substr($_SERVER["REQUEST_URI"], 0, strrpos($_SERVER["REQUEST_URI"], "/") + 1);
+		return (strpos($htmlObj->entryPageUri, $pageUri) !== false);
+	}
+	
 	function onPageOutput($obj){
 		
 		//リダイレクトの対象ページか調べる。
@@ -145,6 +179,20 @@ class SOYShopLoginCheckPlugin{
 			$redirectLogic = SOY2Logic::createInstance("site_include.plugin.soyshop_login_check.logic.RedirectLogic", array("loginPageUrl" => $this->loginPageUrl, "configPerBlog" => $this->config_per_blog));
 			$mode = isset($obj->mode) ? $obj->mode : null;
 			$redirectLogic->redirectLoginForm($obj->page, $mode);
+		}
+		
+		//商品ごとに調べる
+		if(
+			property_exists($obj, "mode") && 
+			$obj->mode == "_entry_" && 
+			$this->allowBrowseEntryByPurchased == self::ALLOW_BROWSE && 
+			$this->isLoggedIn
+		){
+			$entryId = (int)$obj->entry->getId();
+			if(!class_exists("RedirectLogic")){
+				$redirectLogic = SOY2Logic::createInstance("site_include.plugin.soyshop_login_check.logic.RedirectLogic", array("loginPageUrl" => $this->loginPageUrl, "configPerBlog" => $this->config_per_blog));
+			}
+			$redirectLogic->redirectItemDetailPage($entryId, $this->siteId);
 		}
 		
 		/** ここからフォーム **/
@@ -157,7 +205,6 @@ class SOYShopLoginCheckPlugin{
 			"soy2prefix" => "s_block",
 			"visible" => (!$this->isLoggedIn)
 		));
-		
 			
 		$obj->addForm("login_form", array(
 			"soy2prefix" => "s_block",
@@ -195,6 +242,31 @@ class SOYShopLoginCheckPlugin{
 			"soy2prefix" => "s_block",
 			"link" => $this->logoutPageUrl
 		));
+		
+		/** コメントフォーム **/
+		if($this->isInsertCommentForm && $this->isLoggedIn && $this->userId){
+			$userLogic = SOY2Logic::createInstance("site_include.plugin.soyshop_login_check.logic.UserLogic", array("siteId" => $this->siteId, "userId" => $this->userId));
+			$info = $userLogic->getAuthorInfo();
+		}else{
+			$info = array("author" => null, "mailAddress" => null, "url" => null);
+		}
+		$obj->addInput("author_login", array(
+			"soy2prefix" => "cms",
+			"name" => "author",
+			"value" => $info["author"]
+		));
+		
+		$obj->addInput("mail_address_login", array(
+			"soy2prefix" => "cms",
+			"name" => "mail_address",
+			"value" => $info["mailAddress"]
+		));
+		
+		$obj->addInput("url_login", array(
+			"soy2prefix" => "cms",
+			"name" => "url",
+			"value" => $info["url"]
+		));
 	}
 	
 	//コメント投稿時のポイント付与
@@ -208,6 +280,201 @@ class SOYShopLoginCheckPlugin{
 		//ポイント付与
 		$pointLogic = SOY2Logic::createInstance("site_include.plugin.soyshop_login_check.logic.PointLogic", array("siteId" => $this->siteId, "point" => $this->point, "entry" => $entry));
 		$pointLogic->addPoint();
+	}
+	
+	function onCallCustomField(){
+		
+		$arg = SOY2PageController::getArguments();
+		$entryId = (isset($arg[0])) ? (int)$arg[0] : null;
+		
+		return $this->buildForm($entryId);
+	}
+	
+	function onCallCustomField_inBlog(){
+		
+		$arg = SOY2PageController::getArguments();
+		$entryId = (isset($arg[1])) ? (int)$arg[1] : null;
+		
+		return $this->buildForm($entryId);
+	}
+	
+	function buildForm($entryId){
+		
+		$attributeDao = SOY2DAOFactory::create("cms.EntryAttributeDAO");
+		try{
+			$field = $attributeDao->get($entryId, self::PLUGIN_ID);
+		}catch(Exception $e){
+			$field = new EntryAttribute();
+		}
+		
+		$itemLogic = SOY2Logic::createInstance("site_include.plugin.soyshop_login_check.logic.ItemLogic", array("siteId" => $this->siteId));
+		
+		$html = array();
+		$html[] = "<div class=\"section custom_field\">";
+		$html[] = "<p class=\"sub\">";
+		$html[] = "<label for=\"" . self::PLUGIN_ID . "_item\">アクセス許可商品</label>";
+		$html[] = "</p>";
+		$html[] = "<div style=\"margin:-0.5ex 0px 0.5ex 1em;\">";
+		
+		//カスタムフィールドの値から配列を生成
+		$array = explode(",", $field->getValue());
+		if(isset($array[0]) && strlen($array[0]) > 0) array_push($array, "");
+		
+		//SOY Shopに登録されている商品を取得して、ここに表示する	
+		foreach($array as $code){
+			$html[] = "<select name=\"" . self::PLUGIN_ID . "[]\">";
+			$html[] = "<option value=\"\"></option>";
+
+			$items = $itemLogic->getItems();
+			foreach($items as $item){
+				if($code == $item->getCode()){
+					$html[] = "<option value=\"" .$item->getCode() . "\" selected=\"selected\">" . $item->getName() . "(" . $item->getCode() . ")</option>";
+				}else{
+					$html[] = "<option value=\"" .$item->getCode() . "\">" . $item->getName() . "(" . $item->getCode() . ")</option>";
+				}
+			}
+				
+			$html[] = "</select><br>";
+		}
+			
+		$html[] = "</div>";
+		$html[] = "<div style=\"margin:-0.5ex 0px 0.5ex 1em;\">";
+		
+		try{
+			$typeField = $attributeDao->get($entryId, self::PLUGIN_ID . "Type");
+		}catch(Exception $e){
+			$typeField = new EntryAttribute();
+		}
+		
+		if($typeField->getValue() == "or" || is_null($typeField->getValue())){
+			$html[] = "<label><input type=\"radio\" name=\"" . self::PLUGIN_ID . "Type\" value=\"or\" checked=\"checked\">どれか一つ購入</label> ";
+		}else{
+			$html[] = "<label><input type=\"radio\" name=\"" . self::PLUGIN_ID . "Type\" value=\"or\">どれか一つ購入</label> ";
+		}
+		
+		if($typeField->getValue() == "and"){
+			$html[] = "<label><input type=\"radio\" name=\"" . self::PLUGIN_ID . "Type\" value=\"and\" checked=\"checked\">すべて購入</label> ";
+		}else{
+			$html[] = "<label><input type=\"radio\" name=\"" . self::PLUGIN_ID . "Type\" value=\"and\">すべて購入</label> ";
+		}
+		
+		$html[] = "</div>";
+		$html[] = "</div>";
+		
+		return implode("\n", $html);
+	}
+	
+	/**
+	 * 記事作成時、記事更新時
+	 */
+	function onEntryUpdate($arg){
+		$dao = SOY2DAOFactory::create("cms.EntryAttributeDAO");
+		
+		$entry = $arg["entry"];
+
+		$arg = SOY2PageController::getArguments();
+		$entryId = (isset($arg[0])) ? (int)$arg[0] : null;
+		$postFields = (isset($_POST[self::PLUGIN_ID]) && count($_POST[self::PLUGIN_ID]) > 0) ? $_POST[self::PLUGIN_ID] : null;
+		
+		//値の整理
+		for($i = 0; $i < count($postFields); $i++){
+			if(strlen($postFields[$i]) === 0){
+				unset($postFields[$i]);
+			}
+		}
+				
+		$values = implode(",", array_unique($postFields));
+		
+		$flag = false;
+		
+		//更新の場合
+		try{
+			$obj = $dao->get($entry->getId(), self::PLUGIN_ID);
+			$obj->setValue($values);
+			$dao->update($obj);
+			$flag = true;
+		}catch(Exception $e){
+			//
+		}
+			
+		if(!$flag){
+			//新規作成の場合
+			try{
+				$obj = new EntryAttribute();
+				$obj->setEntryId($entry->getId());
+				$obj->setFieldId(self::PLUGIN_ID);
+				$obj->setValue($values);
+				$dao->insert($obj);
+			}catch(Exception $e){
+				//
+			}
+		}
+		
+		if(!isset($_POST[self::PLUGIN_ID . "Type"])) return;
+		
+		try{
+			$dao->delete($entryId, self::PLUGIN_ID . "Type");
+		}catch(Exception $e){
+			
+		}
+		
+		try{
+			$obj = new EntryAttribute();
+			$obj->setEntryId($entry->getId());
+			$obj->setFieldId(self::PLUGIN_ID . "Type");
+			$obj->setValue($_POST[self::PLUGIN_ID . "Type"]);
+			$dao->insert($obj);
+		}catch(Exception $e){
+			//
+		}
+	}
+	
+	/**
+	 * 記事複製時
+	 */
+	function onEntryCopy($args){
+		list($old, $new) = $args;
+		
+		$dao = SOY2DAOFactory::create("cms.EntryAttributeDAO");
+		$keys = array(self::PLUGIN_ID, self::PLUGIN_ID . "Type");
+		
+		foreach($keys as $key){
+			try{
+				$custom = $dao->get($old, $key);
+			}catch(Exception $e){
+				$custom = null;
+			}
+			
+			if(isset($custom)){
+				try{
+					$obj = new EntryAttribute();
+					$obj->setEntryId($new);
+					$obj->setFieldId($custom->getFieldId());
+					$obj->setValue($custom->getValue());
+					$obj->setExtraValuesArray($custom->getExtraValues());
+					$dao->insert($obj);
+				}catch(Exception $e){
+					
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 記事削除時
+	 * @param array $args エントリーID
+	 */
+	function onEntryRemove($args){
+		$dao = SOY2DAOFactory::create("cms.EntryAttributeDAO");
+		foreach($args as $entryId){
+			try{
+				$dao->deleteByEntryId($entryId);
+			}catch(Exception $e){
+				//
+			}
+		}
+		
+		return true;
 	}
 	
 	function config_page(){	
@@ -248,6 +515,22 @@ class SOYShopLoginCheckPlugin{
 	}
 	function setPoint($point){
 		$this->point = $point;
+	}
+	
+	function getIsInsertCommentForm(){
+		return $this->isInsertCommentForm;
+	}
+	
+	function setIsInsertCommentForm($isInsertCommentForm){
+		$this->isInsertCommentForm = $isInsertCommentForm;
+	}
+	
+	function getAllowBrowseEntryByPurchased(){
+		return $this->allowBrowseEntryByPurchased;
+	}
+	
+	function setAllowBrowseEntryByPurchased($allowBrowseEntryByPurchased){
+		$this->allowBrowseEntryByPurchased = $allowBrowseEntryByPurchased;
 	}
 }
 ?>

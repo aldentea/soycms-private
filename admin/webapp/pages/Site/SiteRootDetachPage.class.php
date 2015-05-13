@@ -117,6 +117,30 @@ class SiteRootDetachPage extends CMSUpdatePageBase {
     	}catch(Exception $e){
 			//
     	}
+    	
+    	//サイトURLの更新、サイト用DB SiteConfigに同期
+		$dsn = SOY2DAOConfig::Dsn();
+		try{
+			$siteDAO = SOY2DAOFactory::create("admin.SiteDAO");
+			$site = $siteDAO->getById($id);
+			$defaultLink = UserInfoUtil::getSiteURLBySiteId($site->getSiteId());
+			$site->setUrl($defaultLink);
+			$siteDAO->update($site);
+			
+			SOY2DAOConfig::Dsn($site->getDataSourceName());
+			
+			$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+			$siteConfig = $siteConfigDao->get();
+			$siteConfig->setConfigValue("url", $defaultLink);
+			$siteConfigDao->updateSiteConfig($siteConfig);
+			
+		}catch(Exeption $e){
+			
+		}
+		
+		SOY2DAOConfig::Dsn($dsn);
+    	
+    	
 
 		//キャッシュ削除
 		$SiteLogic = SOY2Logic::createInstance("logic.admin.Site.SiteLogic");

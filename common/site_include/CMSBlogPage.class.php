@@ -148,10 +148,13 @@ class CMSBlogPage extends CMSPage{
 		$pageDao = SOY2DAOFactory::create("cms.BlogPageDAO");
 		$this->page = $pageDao->getById($id);
 		$this->id = $id;
+		
+		//サイトのURL
+		$this->siteUrl = $this->getSiteUrl();
 
 		//ページのURL
 		$this->pageUrl = $this->getPageUrl();
-
+		
 		//モードの取得、モード別の動作など
 		$arguments = implode("/",$this->arguments);
 
@@ -546,7 +549,7 @@ class CMSBlogPage extends CMSPage{
 			"soy2prefix"=>"b_block")
 		);
 		$this->createAdd("blog_url","HTMLLink",array(
-			"link" => $this->getTopPageURL(),
+			"link" => $this->getTopPageURL(true),
 			"soy2prefix"=>"b_block")
 		);
 		$this->createAdd("blog_description","CMSLabel",array(
@@ -575,10 +578,17 @@ class CMSBlogPage extends CMSPage{
 				$pageUrl .= $this->page->getUri() ."/";
 			}
 		}else{
-			if(strlen($this->page->getUri()) >0){
-				$pageUrl = CMSPageController::createRelativeLink($this->page->getUri(), $isAbsoluteUrl);
+			
+			//絶対パスの場合
+			if($isAbsoluteUrl){
+				$pageUrl = $this->siteUrl. $this->page->getUri();
+				
 			}else{
-				$pageUrl = preg_replace('/\/\$/',"",CMSPageController::createRelativeLink(".", $isAbsoluteUrl));
+				if(strlen($this->page->getUri()) >0){
+					$pageUrl = CMSPageController::createRelativeLink($this->page->getUri(), false);
+				}else{
+					$pageUrl = preg_replace('/\/\$/',"",CMSPageController::createRelativeLink(".", false));
+				}
 			}
 			if(strlen($pageUrl) ==0 OR $pageUrl[strlen($pageUrl)-1] != "/") $pageUrl .= "/";
 		}

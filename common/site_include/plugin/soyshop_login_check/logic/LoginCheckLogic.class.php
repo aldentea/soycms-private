@@ -3,20 +3,16 @@
 class LoginCheckLogic extends SOY2LogicBase{
 	
 	private $siteId;
+	private $userId;
 	
-	function LoginCheckLogic(){
-		SOY2::import("site_include.plugin.soyshop_login_check.common.SOYShopLoginCheckCommon");
-	}
+	function LoginCheckLogic(){}
 	
 	function isLoggedIn(){
 		
 		static $isLoggedIn;
 		
-		//SOY Shopがインストールされていない場合は必ずfalse
-		if(!SOYShopLoginCheckCommon::checkSOYShopInstall()) return false;
-
 		if(is_null($isLoggedIn)){
-			$old = SOYShopLoginCheckCommon::switchShopDsn($this->siteId);
+			$old = SOYShopUtil::switchShopMode($this->siteId);
 				
 			SOY2::import("domain.config.SOYShop_DataSets");
 			include_once(SOY2::RootDir() . "base/func/common.php");
@@ -26,11 +22,31 @@ class LoginCheckLogic extends SOY2LogicBase{
 			$mypage = MyPageLogic::getMyPage();
 				
 			$isLoggedIn = $mypage->getIsLoggedin();
+			$this->userId = (int)$mypage->getUserId();
 		
-			SOYShopLoginCheckCommon::resetShopDsn($old);
+			SOYShopUtil::resetShopMode($old);
 		}
 		
 		return $isLoggedIn;
+	}
+	
+	function getUserId(){
+			
+		if($this->isLoggedIn()){
+			$old = SOYShopUtil::switchShopMode($this->siteId);
+				
+			SOY2::import("domain.config.SOYShop_DataSets");
+			include_once(SOY2::RootDir() . "base/func/common.php");
+			if(!defined("SOYSHOP_CURRENT_MYPAGE_ID")) define("SOYSHOP_CURRENT_MYPAGE_ID", soyshop_get_mypage_id());
+				
+			SOY2::import("logic.mypage.MyPageLogic");
+			$mypage = MyPageLogic::getMyPage();				
+			$userId = $mypage->getUserId();
+
+			SOYShopUtil::resetShopMode($old);
+			
+			return $userId;
+		}
 	}
 	
 	function setSiteId($siteId){
