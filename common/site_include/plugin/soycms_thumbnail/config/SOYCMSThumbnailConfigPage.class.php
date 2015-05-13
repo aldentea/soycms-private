@@ -19,6 +19,8 @@ class SOYCMSThumbnailConfigPage extends WebPage{
 			$this->pluginObj->setResizeW((int)$config["resize_w"]);
 			$this->pluginObj->setResizeH((int)$config["resize_h"]);
 			
+			$this->pluginObj->setNoThumbnailPath(trim($config["no_thumbnail_path"]));
+			
 			CMSPlugin::savePluginConfig($this->pluginObj->getId(), $this->pluginObj);
 			CMSPlugin::redirectConfigPage();
 		}
@@ -47,6 +49,12 @@ class SOYCMSThumbnailConfigPage extends WebPage{
 		$this->addInput("resize_h", array(
 			"name" => "Config[resize_h]",
 			"value" => $this->pluginObj->getResizeH()
+		));
+		
+		$this->addInput("no_thumbnail_path", array(
+			"name" => "Config[no_thumbnail_path]",
+			"value" => $this->pluginObj->getNoThumbnailPath(),
+			"style" => "width:60%"
 		));
 	}
 	

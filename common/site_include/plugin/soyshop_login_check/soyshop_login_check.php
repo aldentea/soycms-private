@@ -18,6 +18,12 @@ class SOYShopLoginCheckPlugin{
 	private $isLoggedIn;
 	private $loginPageUrl;
 	private $logoutPageUrl;
+	private $remindPageUrl;
+	
+	private $doRedirectAfterLogin = 1;
+	private $doRedirectAfterLogout = 1;
+	private $doRedirectAfterRemind = 1;
+	
 	
 	//特定の商品を購入していないと記事詳細を閲覧できないモード
 	private $allowBrowseEntryByPurchased = self::NOT_ALLOW_BROWSE;
@@ -43,11 +49,11 @@ class SOYShopLoginCheckPlugin{
 	function init(){
 		CMSPlugin::addPluginMenu(self::PLUGIN_ID,array(
 			"name"=>"SOYShopログインチェックプラグイン",
-			"description"=>"SOY Shopサイトでのログインの有無をチェックする",
+			"description"=>"SOY Shopサイトでのログインの有無をチェックする<br />このプラグインを使用する時はSOY Shop1.15.0以降のバージョンをご利用ください。",
 			"author"=>"日本情報化農業研究所",
 			"url"=>"http://www.n-i-agroinformatics.com",
 			"mail"=>"info@n-i-agroinformatics.com",
-			"version"=>"0.8"
+			"version"=>"1.0"
 		));
 		
 		if(CMSPlugin::activeCheck($this->getId())){
@@ -73,10 +79,22 @@ class SOYShopLoginCheckPlugin{
 					//ログインページのURLもここで取得する
 					if(!$this->isLoggedIn){
 						$this->loginPageUrl = $loginLogic->getLoginPageUrl();
+						if($this->doRedirectAfterLogin){
+							$this->loginPageUrl .= "?r=" . rawurldecode($_SERVER["REQUEST_URI"]);
+						}
+						
+						//パスワードリマインダの設定
+						$this->remindPageUrl = str_replace("/login", "/remind/input", $this->loginPageUrl);
+						if($this->doRedirectAfterRemind){
+							$this->remindPageUrl .= "?r=" . rawurldecode($_SERVER["REQUEST_URI"]);
+						}
 					
 					//ログアウトページのURLをここで取得する
 					}else{
 						$this->logoutPageUrl = $loginLogic->getLogoutPageUrl();
+						if($this->doRedirectAfterLogout){
+							$this->logoutPageUrl .= "?r=" . rawurldecode($_SERVER["REQUEST_URI"]);
+						}
 						$this->userId = $checkLogic->getUserId();
 					}
 					
@@ -121,7 +139,7 @@ class SOYShopLoginCheckPlugin{
 		//ログインリンク
 		$htmlObj->addLink("login_link", array(
 			"soy2prefix" => "cms",
-			"link" => $this->loginPageUrl . "?r=" . rawurldecode($_SERVER["REQUEST_URI"])
+			"link" => $this->loginPageUrl
 		));
 		
 		//ログアウトリンク
@@ -134,14 +152,22 @@ class SOYShopLoginCheckPlugin{
 		if($this->displayDetailPage($htmlObj)){
 			$htmlObj->addForm("login_form", array(
 				"soy2prefix" => "cms",
-				"action" => $this->loginPageUrl . "?r=" . rawurldecode($_SERVER["REQUEST_URI"]),
+				"action" => $this->loginPageUrl,
 				"method" => "post"
 			));
 			
+			$htmlObj->addInput("login_id", array(
+				"soy2prefix" => "cms",
+				"type" => "text",
+				"name" => "loginId",
+				"value" => ""
+			));
+			
+			//後方互換
 			$htmlObj->addInput("login_email", array(
 				"soy2prefix" => "cms",
 				"type" => "email",
-				"name" => "mail",
+				"name" => "loginId",
 				"value" => ""
 			));
 			
@@ -205,17 +231,29 @@ class SOYShopLoginCheckPlugin{
 			"soy2prefix" => "s_block",
 			"visible" => (!$this->isLoggedIn)
 		));
+		
+		$obj->addModel("login_error", array(
+			"soy2prefix" => "s_block",
+			"visible" => (isset($_GET["login"]) && $_GET["login"] == "error")
+		));
 			
 		$obj->addForm("login_form", array(
 			"soy2prefix" => "s_block",
-			"action" => $this->loginPageUrl . "?r=" . rawurldecode($_SERVER["REQUEST_URI"]),
+			"action" => $this->loginPageUrl,
 			"method" => "post"
 		));
-			
+		
+		$obj->addInput("login_id", array(
+			"soy2prefix" => "s_block",
+			"type" => "text",
+			"name" => "loginId",
+			"value" => ""
+		));
+		
 		$obj->addInput("login_email", array(
 			"soy2prefix" => "s_block",
 			"type" => "email",
-			"name" => "mail",
+			"name" => "loginId",
 			"value" => ""
 		));
 			
@@ -241,6 +279,33 @@ class SOYShopLoginCheckPlugin{
 		$obj->addLink("logout_link", array(
 			"soy2prefix" => "s_block",
 			"link" => $this->logoutPageUrl
+		));
+		
+		/** パスワードリマインド **/
+		$obj->addForm("remind_form", array(
+			"soy2prefix" => "s_block",
+			"action" => $this->remindPageUrl,
+			"method" => "post"
+		));
+		
+		$obj->addInput("remind_mail_input", array(
+			"soy2prefix" => "s_block",
+			"name" => "mail"
+		));
+		
+		$obj->addModel("remind_before", array(
+			"soy2prefix" => "s_block",
+			"visible" => (!isset($_GET["send"]) || (isset($_GET["send"]) && $_GET["send"] != "complete"))
+		));
+		
+		$obj->addModel("remind_error", array(
+			"soy2prefix" => "s_block",
+			"visible" => (isset($_GET["send"]) && $_GET["send"] == "error")
+		));
+		
+		$obj->addModel("remind_after", array(
+			"soy2prefix" => "s_block",
+			"visible" => (isset($_GET["send"]) && $_GET["send"] == "complete")
 		));
 		
 		/** コメントフォーム **/
@@ -531,6 +596,27 @@ class SOYShopLoginCheckPlugin{
 	
 	function setAllowBrowseEntryByPurchased($allowBrowseEntryByPurchased){
 		$this->allowBrowseEntryByPurchased = $allowBrowseEntryByPurchased;
+	}
+	
+	function getDoRedirectAfterLogin(){
+		return $this->doRedirectAfterLogin;
+	}
+	function setDoRedirectAfterLogin($doRedirectAfterLogin){
+		$this->doRedirectAfterLogin = $doRedirectAfterLogin;
+	}
+	
+	function getDoRedirectAfterLogout(){
+		return $this->doRedirectAfterLogout;
+	}
+	function setDoRedirectAfterLogout($doRedirectAfterLogout){
+		$this->doRedirectAfterLogout = $doRedirectAfterLogout;
+	}
+	
+	function getDoRedirectAfterRemind(){
+		return $this->doRedirectAfterRemind;
+	}
+	function setDoRedirectAfterRemind($doRedirectAfterRemind){
+		$this->doRedirectAfterRemind = $doRedirectAfterRemind;
 	}
 }
 ?>

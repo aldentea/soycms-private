@@ -29,8 +29,7 @@ class RedirectLogic extends SOY2LogicBase{
 			}
 			
 			if($redirectFlag){
-				$url = rawurldecode($_SERVER["REQUEST_URI"]);
-				$this->execRedirect($url);
+				$this->execRedirect();
 			}
 		}
 	}
@@ -84,8 +83,8 @@ class RedirectLogic extends SOY2LogicBase{
 		}
 	}
 	
-	function execRedirect($url){
-		header("Location:" . $this->loginPageUrl . "?r=" . $url);
+	function execRedirect(){
+		header("Location:" . $this->loginPageUrl);
 	}
 		
 	function setLoginPageUrl($loginPageUrl){

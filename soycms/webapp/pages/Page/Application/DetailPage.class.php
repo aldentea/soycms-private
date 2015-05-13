@@ -57,8 +57,8 @@ class DetailPage extends CMSWebPageBase{
     	
     	$page = $this->getPageObject($id);
     	
-    	//アプリケーションじゃなかった場合はページ詳細へ飛ばす
-    	if($page->getPageType() != Page::PAGE_TYPE_APPLICATION){
+    	//アプリケーションじゃなかった場合はページ詳細へ飛ばす(オブジェクトの取得の失敗の場合も加味する)
+    	if(!method_exists($page, "getPageType") || $page->getPageType() != Page::PAGE_TYPE_APPLICATION){
     		$this->jump("Page.Detail.".$id);
     	}
     	

@@ -24,6 +24,7 @@ class CMSBlogPage extends CMSPage{
 	var $offset = 0;
 	var $limit;
 	var $entryComment;
+	var $currentAbsoluteURL;
 
 	function doPost(){
 		//comment
@@ -148,13 +149,13 @@ class CMSBlogPage extends CMSPage{
 		$pageDao = SOY2DAOFactory::create("cms.BlogPageDAO");
 		$this->page = $pageDao->getById($id);
 		$this->id = $id;
-		
+
 		//サイトのURL
 		$this->siteUrl = $this->getSiteUrl();
 
 		//ページのURL
 		$this->pageUrl = $this->getPageUrl();
-		
+
 		//モードの取得、モード別の動作など
 		$arguments = implode("/",$this->arguments);
 
@@ -191,6 +192,9 @@ class CMSBlogPage extends CMSPage{
 				);
 				list($this->entry,$this->nextEntry,$this->prevEntry) = $this->getEntry($entryId);
 
+				//表示しているページの絶対URL
+				$this->currentAbsoluteURL = $this->getEntryPageURL(true) . rawurlencode($this->entry->getAlias());
+
 				/*
 				 * Entry.idでアクセスしてきたときはエイリアスのURLに飛ばす
 				 * ただし、エイリアスがEntry.idのときはそのまま
@@ -200,14 +204,13 @@ class CMSBlogPage extends CMSPage{
 				    && $entryId == $this->entry->getId()
 				    && $entryId != $this->entry->getAlias()
 				){
-					header("Location: ".$this->getEntryPageURL(true) . rawurlencode($this->entry->getAlias()));
+					header("Location: ".$this->currentAbsoluteURL);
 				}
 
 				$pageFormat = $this->page->getEntryTitleFormat();
 				$pageFormat = preg_replace('/%SITE%/',$this->siteConfig->getName(),$pageFormat);
 				$pageFormat = preg_replace('/%BLOG%/',$this->page->getTitle(),$pageFormat);
 				$pageFormat = preg_replace('/%ENTRY%/',$this->entry->getTitle(),$pageFormat);
-
 				$this->title = $pageFormat;
 				break;
 
@@ -236,8 +239,10 @@ class CMSBlogPage extends CMSPage{
 				$pageFormat = preg_replace('/%SITE%/',$this->siteConfig->getName(),$pageFormat);
 				$pageFormat = preg_replace('/%BLOG%/',$this->page->getTitle(),$pageFormat);
 				$pageFormat = preg_replace('/%CATEGORY%/',$this->label->getCaption(),$pageFormat);
-
 				$this->title = $pageFormat;
+
+				//表示しているページの絶対URL
+				$this->currentAbsoluteURL = $this->getCategoryPageURL(true) . rawurlencode($this->label->getAlias());
 
 				break;
 
@@ -272,6 +277,9 @@ class CMSBlogPage extends CMSPage{
 				$pageFormat = preg_replace('/%D:([^%]*)%/e',"strlen(\$this->day)    ? date('\\1',\$time) : ''",$pageFormat);
 
 				$this->title = $pageFormat;
+
+				//表示しているページの絶対URL
+				$this->currentAbsoluteURL = $this->getCategoryPageURL(true) . implode("/",$date);
 
 				break;
 
@@ -339,6 +347,9 @@ class CMSBlogPage extends CMSPage{
 				$pageFormat = preg_replace('/%BLOG%/',$this->page->getTitle(),$pageFormat);
 
 				$this->title = $pageFormat;
+
+				//表示しているページの絶対URL
+				$this->currentAbsoluteURL = $this->getTopPageURL(true);
 
 				break;
 
@@ -513,7 +524,6 @@ class CMSBlogPage extends CMSPage{
 
 			//現在選択されている年月またはカテゴリーを表示
 			soy_cms_blog_output_current_category_or_archive($this);
-
 		}
 
 		//カテゴリリンクを出力 category
@@ -556,9 +566,14 @@ class CMSBlogPage extends CMSPage{
 			"html"=>str_replace(array("\r\n","\r","\n"),"<br />",htmlspecialchars($this->page->getDescription())),
 			"soy2prefix"=>"b_block"
 		));
+		$this->createAdd("blog_current_absolute_url","HTMLLink",array(
+			"link" => $this->currentAbsoluteURL,
+			"soy2prefix"=>"b_block"
+		));
 
 		$this->addMessageProperty("blog_name",'<?php echo $'.$this->_soy2_pageParam.'["blog_name"]; ?>');
 		$this->addMessageProperty("blog_url",'<?php echo $'.$this->_soy2_pageParam.'["blog_url_attribute"]["href"]; ?>');
+		$this->addMessageProperty("blog_current_absolute_url",'<?php echo $'.$this->_soy2_pageParam.'["blog_current_absolute_url_attribute"]["href"]; ?>');
 
 
 		parent::main();
@@ -578,11 +593,11 @@ class CMSBlogPage extends CMSPage{
 				$pageUrl .= $this->page->getUri() ."/";
 			}
 		}else{
-			
+
 			//絶対パスの場合
 			if($isAbsoluteUrl){
 				$pageUrl = $this->siteUrl. $this->page->getUri();
-				
+
 			}else{
 				if(strlen($this->page->getUri()) >0){
 					$pageUrl = CMSPageController::createRelativeLink($this->page->getUri(), false);
@@ -748,7 +763,7 @@ class CMSBlogPage extends CMSPage{
 		//表示件数を指定
 		$logic->setLimit($this->page->getTopDisplayCount());
 		$logic->setOffset($this->offset * $this->limit);
-		
+
 		//表示順の変更
 		if($this->page->getTopEntrySort() == BlogPage::ENTRY_SORT_ASC){
 			$logic->setReverse(true);
@@ -834,7 +849,7 @@ class CMSBlogPage extends CMSPage{
 		//表示件数を指定
 		$logic->setLimit($this->page->getMonthDisplayCount());
 		$logic->setOffset($this->offset * $this->limit);
-		
+
 		//表示順の変更
 		if($this->page->getMonthEntrySort() == BlogPage::ENTRY_SORT_ASC){
 			$logic->setReverse(true);

@@ -15,7 +15,7 @@
 			<div id="login_main"> 
 				<div class="user">
 					<p>ログインID（管理者ID）</p>
-					<input type="text" soy:id="username" />
+					<input id="login-id" type="text" soy:id="username" />
 				</div>
 				<div class="password">
 					<p>パスワード <span soy:id="reminder"></span soy:id="reminder"></p>
@@ -31,6 +31,11 @@
 
 <script type="text/JavaScript">
 if (top != self) { top.location.href =self.location.href }
+
+$(function(){
+	$("#login-id").focus();
+});
+
 </script>
 </body>
 

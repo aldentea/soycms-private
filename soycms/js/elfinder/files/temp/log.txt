@@ -103,3 +103,75 @@
   array (
   ),
 ) 
+[Mon, 03 Nov 2014 11:29:43 +0900] UPLOAD: array (
+  'added' => 
+  array (
+    0 => 
+    array (
+      'mime' => 'image/jpeg',
+      'ts' => 1414981783,
+      'read' => 1,
+      'write' => 1,
+      'size' => 172355,
+      'hash' => 'l1_dGhlbWVzXHBob3Rvc1xrZXl2aXN1YWwuanBnLmpwZw',
+      'name' => 'keyvisual.jpg.jpg',
+      'phash' => 'l1_dGhlbWVzXHBob3Rvcw',
+      'tmb' => 1,
+    ),
+  ),
+  'header' => false,
+  'removed' => 
+  array (
+  ),
+) 
+[Mon, 03 Nov 2014 11:30:02 +0900] RM: array (
+  'removed' => 
+  array (
+    0 => 
+    array (
+      'mime' => 'image/jpeg',
+      'ts' => 1414981488,
+      'read' => 1,
+      'write' => 1,
+      'size' => 99208,
+      'hash' => 'l1_dGhlbWVzXHBob3Rvc1xrZXl2aXN1YWwuanBn',
+      'name' => 'keyvisual.jpg',
+      'phash' => 'l1_dGhlbWVzXHBob3Rvcw',
+      'tmb' => 'l1_dGhlbWVzXHBob3Rvc1xrZXl2aXN1YWwuanBn1414981488.png',
+      'realpath' => 'C:/Users/saito/htdocs/developing/giftshop\\themes\\photos\\keyvisual.jpg',
+    ),
+  ),
+) 
+[Mon, 03 Nov 2014 11:30:08 +0900] RENAME: array (
+  'added' => 
+  array (
+    0 => 
+    array (
+      'mime' => 'image/jpeg',
+      'ts' => 1414981783,
+      'read' => 1,
+      'write' => 1,
+      'size' => 172355,
+      'hash' => 'l1_dGhlbWVzXHBob3Rvc1xrZXl2aXN1YWwuanBn',
+      'name' => 'keyvisual.jpg',
+      'phash' => 'l1_dGhlbWVzXHBob3Rvcw',
+      'tmb' => 1,
+    ),
+  ),
+  'removed' => 
+  array (
+    0 => 
+    array (
+      'mime' => 'image/jpeg',
+      'ts' => 1414981783,
+      'read' => 1,
+      'write' => 1,
+      'size' => 172355,
+      'hash' => 'l1_dGhlbWVzXHBob3Rvc1xrZXl2aXN1YWwuanBnLmpwZw',
+      'name' => 'keyvisual.jpg.jpg',
+      'phash' => 'l1_dGhlbWVzXHBob3Rvcw',
+      'tmb' => 'l1_dGhlbWVzXHBob3Rvc1xrZXl2aXN1YWwuanBnLmpwZw1414981783.png',
+      'realpath' => 'C:/Users/saito/htdocs/developing/giftshop\\themes\\photos\\keyvisual.jpg.jpg',
+    ),
+  ),
+) 

@@ -26,6 +26,10 @@ class SOYShopLoginCheckConfigFormPage extends WebPage{
 			
 			$allowBrowseEntryByPurchased = (isset($_POST["Config"]["allowBrowseEntryByPurchased"]) && $_POST["Config"]["allowBrowseEntryByPurchased"] == 1) ? 1 : 0;
 			$this->pluginObj->setAllowBrowseEntryByPurchased($allowBrowseEntryByPurchased);
+				
+			$this->pluginObj->setDoRedirectAfterLogin($_POST["Config"]["doRedirectAfterLogin"]);
+			$this->pluginObj->setDoRedirectAfterLogout($_POST["Config"]["doRedirectAfterLogout"]);
+			$this->pluginObj->setDoRedirectAfterRemind($_POST["Config"]["doRedirectAfterRemind"]);
 			
 			if(isset($_POST["config_per_page"])){
 				$this->pluginObj->config_per_page = $_POST["config_per_page"];
@@ -62,6 +66,42 @@ class SOYShopLoginCheckConfigFormPage extends WebPage{
 			"name" => "Config[point]",
 			"value" => $this->pluginObj->getPoint(),
 			"style" => "width: 40px;padding:3px;text-align:right;ime-mode:inactive;"
+		));
+		
+		$this->addInput("do_redirect_after_login_hidden", array(
+			"name" => "Config[doRedirectAfterLogin]",
+			"value" => 0,
+		));
+		
+		$this->addCheckBox("do_redirect_after_login", array(
+			"name" => "Config[doRedirectAfterLogin]",
+			"value" => 1,
+			"selected" => $this->pluginObj->getDoRedirectAfterLogin(),
+			"label" => "ログイン後に元のページに戻る"
+		));
+		
+		$this->addInput("do_redirect_after_logout_hidden", array(
+			"name" => "Config[doRedirectAfterLogout]",
+			"value" => 0,
+		));
+		
+		$this->addCheckBox("do_redirect_after_logout", array(
+			"name" => "Config[doRedirectAfterLogout]",
+			"value" => 1,
+			"selected" => $this->pluginObj->getDoRedirectAfterLogout(),
+			"label" => "ログアウト後に元のページに戻る"
+		));
+		
+		$this->addInput("do_redirect_after_remind_hidden", array(
+			"name" => "Config[doRedirectAfterRemind]",
+			"value" => 0,
+		));
+		
+		$this->addCheckBox("do_redirect_after_remind", array(
+			"name" => "Config[doRedirectAfterRemind]",
+			"value" => 1,
+			"selected" => $this->pluginObj->getDoRedirectAfterRemind(),
+			"label" => "パスワードリマインダの送信後に元のページに戻る"
 		));
 		
 		

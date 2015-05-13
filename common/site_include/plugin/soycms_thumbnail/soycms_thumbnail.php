@@ -9,6 +9,9 @@ class SOYCMSThumbnailPlugin{
 	const TRIMMING_IMAGE = "soycms_thumbnail_plugin_trimming";
 	const RESIZE_IMAGE = "soycms_thumbnail_plugin_resize";
 	const PREFIX_IMAGE = "soycms_thumbnail_plugin_";
+	
+	const THUMBNAIL_CONFIG = "soycms_thumbnail_plugin_config";
+	const THUMBNAIL_ALT = "soycms_thumbnail_plugin_alt";
 
 	private $entryAttributeDao;
 	
@@ -17,6 +20,8 @@ class SOYCMSThumbnailPlugin{
 	
 	private $resize_w = 120;
 	private $resize_h = 90;
+	
+	private $no_thumbnail_path;
 
 	function getId(){
 		return self::PLUGIN_ID;
@@ -29,7 +34,7 @@ class SOYCMSThumbnailPlugin{
 			"author"=>"日本情報化農業研究所",
 			"url"=>"http://www.n-i-agroinformatics.com/",
 			"mail"=>"soycms@soycms.net",
-			"version"=>"0.5"
+			"version"=>"0.6.1"
 		));
 
 		if(CMSPlugin::activeCheck($this->getId())){
@@ -66,9 +71,16 @@ class SOYCMSThumbnailPlugin{
 			$obj = new EntryAttribute();
 		}
 		
+		if(strlen($obj->getValue()) > 0){
+			$thumbnailPath = $obj->getValue();
+		}else{
+			$thumbnailPath = $this->no_thumbnail_path;
+		}
+		
 		$htmlObj->addImage("thumbnail", array(
 			"soy2prefix" => "cms",
-			"src" => $obj->getValue()
+			"src" => $thumbnailPath,
+			"alt" => $this->getAlt($entryId)
 		));
 	}
 	
@@ -84,6 +96,8 @@ class SOYCMSThumbnailPlugin{
 			$this->entryAttributeDao->delete($entryId, self::UPLOAD_IMAGE);
 			$this->entryAttributeDao->delete($entryId, self::TRIMMING_IMAGE);
 			$this->entryAttributeDao->delete($entryId, self::RESIZE_IMAGE);
+			$this->entryAttributeDao->delete($entryId, self::THUMBNAIL_CONFIG);
+			$this->entryAttributeDao->delete($entryId, self::THUMBNAIL_ALT);
 		}catch(Exception $e){
 			//
 		}
@@ -115,9 +129,9 @@ class SOYCMSThumbnailPlugin{
 			$h = (int)$imageInfoArray[1];
 			
 			//アスペクト比の維持
-			if($w > (int)$_POST["resize_w"]){
+			if($w > (int)$_POST["jcrop_resize_w"]){
 				$ratio = $w / $h;
-				$w = (int)$_POST["resize_w"];
+				$w = (int)$_POST["jcrop_resize_w"];
 				$h = $w / $ratio;
 			}
 			
@@ -147,6 +161,31 @@ class SOYCMSThumbnailPlugin{
 			}catch(Exception $e){
 				//
 			}
+		}
+		
+		//記事毎のリサイズ設定を配列に格納しておく
+		$config = array(
+					"ratio_w" => (int)$_POST["jcrop_ratio_w"],
+					"ratio_h" => (int)$_POST["jcrop_ratio_h"],
+					"resize_w" => (int)$_POST["jcrop_resize_w"],
+					"resize_h" => (int)$_POST["jcrop_resize_h"]
+					);
+		
+		$obj->setFieldId(self::THUMBNAIL_CONFIG);
+		$obj->setValue(soy2_serialize($config));
+		try{
+			$this->entryAttributeDao->insert($obj);
+		}catch(Exception $e){
+			//
+		}
+		
+		//alt
+		$obj->setFieldId(self::THUMBNAIL_ALT);
+		$obj->setValue($_POST["jcrop_thumbnail_alt"]);
+		try{
+			$this->entryAttributeDao->insert($obj);
+		}catch(Exception $e){
+			//
 		}
 	}
 	
@@ -208,12 +247,23 @@ class SOYCMSThumbnailPlugin{
 		return implode("\n", $htmls);
 	}
 	
+	/**
+	 * カスタムフィールドでフォームを出力
+	 * @param integer entryId
+	 * @return string html
+	 */
 	function buildFormHtml($entryId){
 		$objects = $this->getImageObjects($entryId);
+		$config = $this->getConfigObject($entryId);
 		
-		$action = SOY2ActionFactory::createInstance("SiteConfig.DetailAction");
-		$result = $action->run();
-		$entity = $result->getAttribute("entity");
+		
+		$siteConfigDao = SOY2DAOFactory::create("cms.SiteConfigDAO");
+		try{
+			$siteConfig = $siteConfigDao->get();
+		}catch(Exception $e){
+			$siteConfig = new SiteConfig();
+		}
+		
 				
 		$htmls = array();
 		$htmls[] = "<p class=\"sub\">";
@@ -240,15 +290,15 @@ class SOYCMSThumbnailPlugin{
 		if(strlen($objects["trimming"]->getValue()) > 0){
 			$htmls[] = "<a href=\"#\" onclick=\"return preview_thumbnail_plugin(\$('#jcrop_trimming_field'));\">Preview</a>";
 		}
-		$htmls[] = "<br />アスペクト比:width:<input type=\"number\" id=\"ratio_w\" value=\"". (int)$this->ratio_w . "\">&nbsp;";
-		$htmls[] = "height:<input type=\"number\" id=\"ratio_h\" value=\"" . (int)$this->ratio_h . "\">";
+		$htmls[] = "<br />アスペクト比:width:<input type=\"number\" id=\"ratio_w\" name=\"jcrop_ratio_w\" value=\"". (int)$config["ratio_w"] . "\">&nbsp;";
+		$htmls[] = "height:<input type=\"number\" id=\"ratio_h\" name=\"jcrop_ratio_h\" value=\"" . (int)$config["ratio_h"] . "\">";
 		$htmls[] = "</td>";
 		$htmls[] = "</tr>";
 				
 		$htmls[] = "<tr>";
 		$htmls[] = "<th>";
 		$htmls[] = "サムネイルの<br>リサイズ";
-		$htmls[] = "<img src=\"" . SOY2PageController::createLink("") . "image/icon/help.gif\" class=\"help_icon\" onMouseOver=\"this.style.cursor='pointer'\" onMouseOut=\"this.style.cursor='auto'\" onclick=\"common_show_message_popup(this,'トリミングの画像があればリサイズして、トリミング画像がなければアップロードの画像をリサイズしてサムネイルを生成します')\" />";
+		$htmls[] = "<img src=\"" . SOY2PageController::createLink("") . "image/icon/help.gif\" class=\"help_icon\" onMouseOver=\"this.style.cursor='pointer'\" onMouseOut=\"this.style.cursor='auto'\" onclick=\"common_show_message_popup(this,'トリミングの画像があればリサイズして、トリミング画像がなければアップロードの画像をリサイズしてサムネイルを生成します<br>リサイズをし直す時は一度クリアを押してください。')\" />";
 		$htmls[] = "</th>";
 		$htmls[] = "<td>";
 		$htmls[] = "<input type=\"text\" style=\"width:70%;\" id=\"jcrop_resize_field\" name=\"jcrop_resize_field\" value=\"" . $objects["resize"]->getValue() . "\" readonly=\"readonly\">";
@@ -258,8 +308,9 @@ class SOYCMSThumbnailPlugin{
 		if(strlen($objects["resize"]->getValue()) > 0){
 			$htmls[] = "<a href=\"#\" onclick=\"return preview_thumbnail_plugin(\$('#jcrop_resize_field'));\">Preview</a>";
 		}
-		$htmls[] = "<br />リサイズ:width:<input type=\"number\" name=\"resize_w\" value=\"" . $this->resize_w . "\">&nbsp;";
-		$htmls[] = "height:<input type=\"number\" name=\"resize_h\" value=\"" . $this->resize_h . "\">&nbsp;";
+		$htmls[] = "<br />リサイズ:width:<input type=\"number\" name=\"jcrop_resize_w\" value=\"" . (int)$config["resize_w"] . "\">&nbsp;";
+		$htmls[] = "height:<input type=\"number\" name=\"jcrop_resize_h\" value=\"" . (int)$config["resize_h"] . "\"><br />";
+		$htmls[] = "alt:<input type=\"text\" name=\"jcrop_thumbnail_alt\" value=\"" . $this->getAlt($entryId) . "\" style=\"width:50%;\">";
 		$htmls[] = "</td>";
 		$htmls[] = "</tr>";
 		$htmls[] = "</table>";
@@ -277,14 +328,14 @@ class SOYCMSThumbnailPlugin{
 		$htmls[] = "}";
 		
 		$htmls[] = "function preview_thumbnail_plugin(\$form){";
-		$htmls[] = "	var publicURL = \"". $entity->getConfigValue("url") . "\";";
+		$htmls[] = "	var domainURL = \"". $this->getDomainUrl($siteConfig->getConfigValue("url")) . "\";";
 		$htmls[] = "	var siteURL = \"" . UserInfoUtil::getSiteUrl() . "\";";
 		$htmls[] = "";
 		$htmls[] = "	var url = \"\";";
 		$htmls[] = "	var href = \$form.val();";
 		$htmls[] = "";
 		$htmls[] = "	if(href && href.indexOf(\"/\") == 0){";
-		$htmls[] = "		url = publicURL + href.substring(1, href.length);";
+		$htmls[] = "		url = domainURL + href.substring(1, href.length);";
 		$htmls[] = "	}else{";
 		$htmls[] = "		url = siteURL + href;";
 		$htmls[] = "	}";
@@ -311,6 +362,22 @@ class SOYCMSThumbnailPlugin{
 		return implode("\n", $htmls);
 	}
 	
+	/**
+	 * 念の為にURLからサイトIDを除いておく
+	 * @param string url
+	 * @return string url
+	 */
+	function getDomainUrl($url){
+		
+		$siteId = UserInfoUtil::getSite()->getSiteId();
+		
+		if(strpos($url, "/" . $siteId . "/")){
+			$url = str_replace("/" . $siteId . "/", "/" , $url);
+		}
+		
+		return $url;
+	}
+	
 	function getImageObjects($entryId){
 		try{
 			$uploadImageObj = $this->entryAttributeDao->get($entryId, self::UPLOAD_IMAGE);
@@ -323,6 +390,43 @@ class SOYCMSThumbnailPlugin{
 		}
 		
 		return array("upload" => $uploadImageObj, "trimming" => $trimmingImageObj, "resize" => $resizeImageObj);
+	}
+	
+	/**
+	 * 記事毎のトリミング設定の取得
+	 */
+	function getConfigObject($entryId){
+		try{
+			$config = $this->entryAttributeDao->get($entryId, self::THUMBNAIL_CONFIG);
+		}catch(Exception $e){
+			$config = new EntryAttribute();
+		}
+		
+		if(!is_null($config->getValue())){
+			$configArray = soy2_unserialize($config->getValue());
+		}else{
+			$configArray = array(
+							"ratio_w" => $this->ratio_w,
+							"ratio_h" => $this->ratio_h,
+							"resize_w" => $this->resize_w,
+							"resize_h" => $this->resize_h
+							);
+		}
+		
+		return $configArray;
+	}
+	
+	/**
+	 * altの取得
+	 * @param integer entryId
+	 * @return string alt
+	 */
+	function getAlt($entryId){
+		try{
+			return $this->entryAttributeDao->get($entryId, self::THUMBNAIL_ALT)->getValue();
+		}catch(Exception $e){
+			return "";
+		}
 	}
 
 	/**
@@ -362,6 +466,13 @@ class SOYCMSThumbnailPlugin{
 	}
 	function setResizeH($resize_h){
 		$this->resize_h = $resize_h;
+	}
+	
+	function getNoThumbnailPath(){
+		return $this->no_thumbnail_path;
+	}
+	function setNoTHumbnailPath($no_thumbnail_path){
+		$this->no_thumbnail_path = $no_thumbnail_path;
 	}
 	
 	public static function register(){

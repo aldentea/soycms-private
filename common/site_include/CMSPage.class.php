@@ -10,7 +10,7 @@ class CMSPage extends WebPage{
 	var $siteRoot;
 	var $parseTime;
 	var $title;
-	
+
 	protected $siteUrl;
 	protected $pageUrl;
 
@@ -82,7 +82,7 @@ class CMSPage extends WebPage{
 		$pageFormat = preg_replace('/%PAGE%/',$this->page->getTitle(),$pageFormat);
 		$this->setTitle($pageFormat);
 
-		$this->createAdd("top_link", "HTMLLink", array(
+		$this->createAdd("site_url_link", "HTMLLink", array(
 			"link" => $this->siteUrl,
 			"soy2prefix" => "cms"
 		));
@@ -356,7 +356,7 @@ class CMSPage extends WebPage{
     function setPageUrl($pageUrl) {
     	$this->pageUrl = $pageUrl;
     }
-    
+
     /**
      * @return string リンク用 $page->siteRootを使わないで、このメソッドを用いる
      */
@@ -367,7 +367,7 @@ class CMSPage extends WebPage{
 			return $this->siteRoot;
 		}
     }
-    
+
     /**
      * @return string サイトURL
      */
@@ -378,7 +378,7 @@ class CMSPage extends WebPage{
 			return CMSPageController::createLink("", true);
 		}
     }
-    
+
     /**
      * @param string $path
      * @return string http~からの絶対パスをページURL
@@ -394,6 +394,9 @@ class CMSPage extends WebPage{
 }
 
 class CMSAppContainer extends SOY2HTML{
+
+	//出力はApplicationに任せるので何もしない
+	const SOY_TYPE = SOY2HTML::SKIP_BODY;
 
 	private $page;
 	private $config = array();

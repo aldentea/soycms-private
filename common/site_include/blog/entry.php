@@ -27,22 +27,22 @@
  *
  */
 function soy_cms_blog_output_entry($page,$entry){
-	
+
 	if(!class_exists("BlogPage_Entry_CategoryList")){
 		class BlogPage_Entry_CategoryList extends HTMLList{
 			var $categoryPageUri;
-	
+
 			function setCategoryPageUri($uri){
 				$this->categoryPageUri = $uri;
 			}
-	
+
 			protected function populateItem($entry){
-	
+
 				$this->createAdd("category_link","HTMLLink",array(
 					"link"=>$this->categoryPageUri . rawurlencode($entry->getAlias()),
 					"soy2prefix"=>"cms"
 				));
-	
+
 				$this->createAdd("category_name","CMSLabel",array(
 					"text"=>$entry->getCaption(),
 					"soy2prefix"=>"cms"
@@ -50,121 +50,121 @@ function soy_cms_blog_output_entry($page,$entry){
 			}
 		}
 	}
-	
+
 	if(!class_exists("BlogPage_EntryComponent")){
 		/**
 		 * 記事を表示するコンポーネント
 		 */
 		class BlogPage_EntryComponent extends SOYBodyComponentBase{
-	
+
 			var $entryPageUri;
 			var $categoryPageUri;
 			var $blogLabelId;
 			var $categoryLabelList;
-	
+
 			function setCategoryPageUri($uri){
 				$this->categoryPageUri = $uri;
 			}
-	
+
 			function setEntryPageUri($uri){
 				$this->entryPageUri = $uri;
 			}
-			
+
 			function setBlogLabelId($blogLabelId){
 				$this->blogLabelId = $blogLabelId;
 			}
-			
+
 			function setCategoryLabelList($categoryLabelList){
 				$this->categoryLabelList = $categoryLabelList;
 			}
-	
+
 			function setEntry($entry){
 				$link = $this->entryPageUri . rawurlencode($entry->getAlias());
-	
+
 				$this->createAdd("entry_id","CMSLabel",array(
 					"text"=>$entry->getId(),
 					"soy2prefix"=>"cms"
 				));
-	
+
 				$this->createAdd("title","CMSLabel",array(
 					"html"=> "<a href=\"$link\">".htmlspecialchars($entry->getTitle(), ENT_QUOTES, "UTF-8")."</a>",
 					"soy2prefix"=>"cms"
 				));
-				
+
 				$this->createAdd("title_plain","CMSLabel",array(
 					"text"=> $entry->getTitle(),
 					"soy2prefix"=>"cms"
 				));
-	
+
 				$this->createAdd("content","CMSLabel",array(
 					"html"=>$entry->getContent(),
 					"soy2prefix"=>"cms"
 				));
-	
+
 				$more = $entry->getMore();
-	
+
 				$this->createAdd("more","CMSLabel",array(
 					"html"=> '<a name="more"></a>'.$more,
 					"soy2prefix"=>"cms",
 				));
-	
+
 				$this->createAdd("create_date","DateLabel",array(
 					"text"=>$entry->getCdate(),
 					"soy2prefix"=>"cms"
 				));
-	
+
 				$this->createAdd("create_time","DateLabel",array(
 					"text"=>$entry->getCdate(),
 					"soy2prefix"=>"cms",
 					"defaultFormat"=>"H:i"
 				));
-	
+
 				$this->createAdd("entry_link","HTMLLink",array(
 					"soy2prefix"=>"cms",
 					"link" => $link
 				));
-	
+
 				$this->createAdd("more_link","HTMLLink",array(
 					"soy2prefix"=>"cms",
 					"link" => $link ."#more",
 					"visible"=>(strlen($entry->getMore()) != 0)
 				));
-				
+
 				$this->createAdd("more_link_no_anchor","HTMLLink",array(
 					"soy2prefix"=>"cms",
 					"link" => $link,
 					"visible"=>(strlen($entry->getMore()) != 0)
 				));
-	
+
 				$this->createAdd("trackback_link","HTMLLink",array(
 					"soy2prefix"=>"cms",
 					"link" => $link ."#trackback_list"
 				));
-	
+
 				$this->createAdd("trackback_count","CMSLabel",array(
 					"soy2prefix"=>"cms",
 					"text" => $entry->getTrackbackCount()
 				));
-	
+
 				$this->createAdd("comment_link","HTMLLink",array(
 					"soy2prefix"=>"cms",
 					"link" => $link ."#comment_list"
 				));
-	
+
 				$this->createAdd("comment_count","CMSLabel",array(
 					"soy2prefix"=>"cms",
 					"text" => $entry->getCommentCount()
 				));
-	
+
 				$this->createAdd("category_list","BlogPage_Entry_CategoryList",array(
 					"list" => $entry->getLabels(),
 					"categoryPageUri" => $this->categoryPageUri,
 					"soy2prefix" => "cms"
 				));
-	
-	
+
+
 				CMSPlugin::callEventFunc('onEntryOutput',array("entryId"=>$entry->getId(),"SOY2HTMLObject"=>$this,"entry"=>$entry));
-	
+
 				//Messageの追加
 				$this->addMessageProperty("entry_id",'<?php echo $'.$this->_soy2_id.'["entry_id"]; ?>');
 				$this->addMessageProperty("title",'<?php echo $'.$this->_soy2_id.'["title_plain"]; ?>');
@@ -176,16 +176,16 @@ function soy_cms_blog_output_entry($page,$entry){
 				$this->addMessageProperty("trackback_link",'<?php echo $'.$this->_soy2_id.'["trackback_link_attribute"]["href"]; ?>');
 				$this->addMessageProperty("comment_link",'<?php echo $'.$this->_soy2_id.'["comment_link_attribute"]["href"]; ?>');
 			}
-	
+
 			function getStartTag(){
-	
+
 				if(defined("CMS_PREVIEW_MODE")){
 					return parent::getStartTag() . CMSUtil::getEntryHiddenInputHTML('<?php echo $'.$this->_soy2_pageParam.'["'.$this->_soy2_id.'"]["entry_id"]; ?>','<?php echo strip_tags($'.$this->_soy2_pageParam.'["'.$this->_soy2_id.'"]["title"]); ?>');
 				}else{
 					return parent::getStartTag();
 				}
 			}
-	
+
 		}
 	}
 
@@ -203,54 +203,54 @@ function soy_cms_blog_output_entry($page,$entry){
 /**
  * 次の記事を出力
  * 次の記事が無い場合は表示されない
- * 
+ *
  * <div b_block:id="next_entry">
  * 	<a cms:id="entry_link"><!-- cms:id="title" --><!--/cms:id="title" --></a>
  * </div b_block:id="next_entry">
- * 
+ *
  * <div b_block:id="prev_entry">
  * 	<a cms:id="entry_link"><!-- cms:id="title" --><!--/cms:id="title" --></a>
  * </div b_block:id="prev_entry">
  */
 function soy_cms_blog_output_entry_navi($page,$next,$prev){
-	
+
 	if(!class_exists("BlogPage_Entry_Navigation")){
 		class BlogPage_Entry_Navigation extends SOYBodyComponentBase{
-			
+
 			var $entryPageUri;
-		
+
 			function setEntryPageUri($uri){
 				$this->entryPageUri = $uri;
 			}
-		
+
 			function setEntry($entry){
 				$this->createAdd("title","CMSLabel",array(
 					"text" => $entry->getTitle(),
 					"soy2prefix" => "cms"
 				));
-				
+
 				$this->createAdd("entry_link","HTMLLink",array(
 					"link" => $this->entryPageUri . rawurlencode($entry->getAlias()),
 					"soy2prefix" => "cms"
 				));
-			}		
+			}
 		}
 	}
-	
+
 	$page->createAdd("next_entry","BlogPage_Entry_Navigation",array(
 		"entryPageUri"=> $page->getEntryPageURL(true),
 		"entry" => $next,
 		"soy2prefix" => "b_block",
 		"visible" => $next->getId()
 	));
-	
+
 	$page->createAdd("prev_entry","BlogPage_Entry_Navigation",array(
 		"entryPageUri"=> $page->getEntryPageURL(true),
 		"entry" => $prev,
 		"soy2prefix" => "b_block",
 		"visible" => $prev->getId()
 	));
-	
+
 }
 
 
@@ -275,54 +275,54 @@ function soy_cms_blog_output_entry_navi($page,$next,$prev){
 </form b_block:id="comment_form">
  */
 function soy_cms_blog_output_comment_form($page,$entry,$entryComment){
-	
+
 	if(!class_exists("BlogPage_CommentForm")){
 		class BlogPage_CommentForm extends HTMLForm{
-	
+
 			const SOY_TYPE = SOY2HTML::HTML_BODY;
-			
+
 			private $entryComment;
-	
+
 			function execute(){
-				
+
 				//cookieから読みだす：高速化キャッシュ対応のため廃止
 				$array = array();
 				//@parse_str($_COOKIE["soycms_comment"],$array);
-				
+
 				$this->createAdd("title","HTMLInput",array(
 					"name" => "title",
 					"value" => $this->entryComment->getTitle(),
 					"soy2prefix" => "cms"
 				));
-	
+
 				$this->createAdd("author","HTMLInput",array(
 					"name" => "author",
 					"value" => (strlen($this->entryComment->getAuthor()) > 0) ? $this->entryComment->getAuthor() : @$array["author"],
 					"soy2prefix" => "cms"
 				));
-	
+
 				$this->createAdd("body","HTMLTextArea",array(
 					"name" => "body",
 					"value" => $this->entryComment->getBody(),
 					"soy2prefix" => "cms"
 				));
-	
+
 				$this->createAdd("mail_address","HTMLInput",array(
 					"name" => "mail_address",
 					"value" => (strlen($this->entryComment->getMailAddress()) > 0) ? $this->entryComment->getMailAddress() : @$array["mailaddress"],
 					"soy2prefix" => "cms"
 				));
-	
+
 				$this->createAdd("url","HTMLInput",array(
 					"name" => "url",
 					"value" => (strlen($this->entryComment->getUrl()) > 0) ? $this->entryComment->getUrl() : @$array["url"],
 					"soy2prefix" => "cms"
 				));
-	
+
 				parent::execute();
 			}
-	
-	
+
+
 			function getEntryComment() {
 				return $this->entryComment;
 			}
@@ -331,7 +331,7 @@ function soy_cms_blog_output_comment_form($page,$entry,$entryComment){
 			}
 		}
 	}
-	
+
 	$page->createAdd("comment_form","BlogPage_CommentForm",array(
 		"action" => $page->getEntryPageURL(true) . $entry->getId() ."?comment",
 		"soy2prefix" => "b_block",
@@ -361,16 +361,16 @@ function soy_cms_blog_output_comment_form($page,$entry,$entryComment){
 
 */
 function soy_cms_blog_output_comment_list($page,$entry){
-	
+
 	if(!class_exists("Blog_CommentList")){
 		class Blog_CommentList extends HTMLList{
-	
+
 			function getStartTag(){
 				return '<a name="comment_list"></a>'.parent::getStartTag();
 			}
-	
+
 			function populateItem($comment){
-	
+
 				$this->createAdd("title","CMSLabel",array(
 					"text" => $comment->getTitle(),
 					"soy2prefix" => "cms"
@@ -379,18 +379,18 @@ function soy_cms_blog_output_comment_list($page,$entry){
 					"text" => $comment->getAuthor(),
 					"soy2prefix" => "cms"
 				));
-	
+
 				$comment_body = str_replace("\n","@@@@__BR__MARKER__@@@@",$comment->getBody());
 				$comment_body = htmlspecialchars($comment_body, ENT_QUOTES, "UTF-8");
 				$comment_body = str_replace("@@@@__BR__MARKER__@@@@","<br>",$comment_body);
-	
+
 				$this->createAdd("body","CMSLabel",array(
 					"html" => $comment_body,
 					"soy2prefix" => "cms"
 				));
-	
-	
-	
+
+
+
 				$this->createAdd("submit_date","DateLabel",array(
 					"text" => $comment->getSubmitDate(),
 					"soy2prefix" => "cms"
@@ -421,6 +421,11 @@ function soy_cms_blog_output_comment_list($page,$entry){
 		"visible" => ($entry->getId())
 	));
 
+	$page->addModel("has_comment",array(
+		"visible" => count($commentList),
+		"soy2prefix" => "b_block",
+	));
+
 }
 
 /*
@@ -447,13 +452,13 @@ function soy_cms_blog_output_trackback_list($page,$entry){
 
 	if(!class_exists("Blog_TrackbackList")){
 		class Blog_TrackbackList extends HTMLList{
-	
+
 			function getStartTag(){
 				return '<a name="trackback_list"></a>'.parent::getStartTag();
 			}
-	
+
 			function populateItem($trackback){
-	
+
 				$this->createAdd("title","CMSLabel",array(
 					"text"=>$trackback->getTitle(),
 					"soy2prefix" => "cms"
@@ -479,7 +484,7 @@ function soy_cms_blog_output_trackback_list($page,$entry){
 					"soy2prefix"=>"cms",
 					"defaultFormat"=>"H:i"
 				));
-	
+
 			}
 		}
 	}
@@ -491,6 +496,11 @@ function soy_cms_blog_output_trackback_list($page,$entry){
 		"list" => $trackbackList,
 		"soy2prefix" => "b_block",
 		"visible" => ($entry->getId())
+	));
+
+	$page->addModel("has_trackback",array(
+		"visible" => count($trackbackList),
+		"soy2prefix" => "b_block",
 	));
 
 }
@@ -506,19 +516,19 @@ function soy_cms_blog_output_trackback_list($page,$entry){
 <input b_block:id="trackback_link">
  */
 function soy_cms_blog_output_trackback_link($page,$entry){
-	
+
 	/**
 	 * 絶対URL（http://～）
 	 */
 	$trackbackUrl = $page->getEntryPageURL(true) . $entry->getId() ."?trackback";
-	
+
 	if(!class_exists("Blog_TrackbackURL")){
 		class Blog_TrackbackURL extends HTMLLabel{
-			
+
 			function execute(){
-				
+
 				parent::execute();
-				
+
 				if($this->tag == "input"){
 					$this->setInnerHTML("");
 				}else{

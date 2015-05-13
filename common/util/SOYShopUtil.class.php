@@ -20,7 +20,6 @@ class SOYShopUtil {
 	public static function switchShopMode($siteId){
 		
 		//SOYShop_ShopConfig::saveをするために必要な定数の設定をしておく
-		if(!defined("SOYSHOP_ID")) define("SOYSHOP_ID", $siteId);
 		if(!defined("SOYSHOP_ROOT")) define("SOYSHOP_ROOT", str_replace("common", "soyshop", SOY2::RootDir()));
 		if(!defined("SOYSHOP_ADMIN_URL")) define("SOYSHOP_ADMIN_URL", SOY2PageController::createRelativeLink("../soyshop/") . "index.php");
 		

@@ -101,9 +101,9 @@ function soy_cms_blog_output_entry_list($page,$entries){
 
 			var $entryPageUrl;
 			var $categoryPageUrl;
-			
+
 			var $blogLabelId;
-			
+
 			var $categoryLabelList;
 
 			var $_commentDAO;
@@ -186,7 +186,7 @@ function soy_cms_blog_output_entry_list($page,$entries){
 					"link" => $link ."#more",
 					"visible"=>(strlen($entry->getMore()) != 0)
 				));
-				
+
 				$this->createAdd("more_link_no_anchor", "HTMLLink", array(
 					"soy2prefix"=>"cms",
 					"link" => $link,
@@ -244,7 +244,7 @@ function soy_cms_blog_output_entry_list($page,$entries){
 
 		}
 	}
-	
+
 	$page->createAdd("entry_list","BlogPage_EntryList",array(
 		"list" => $entries,
 		"entryPageUrl" => $page->getEntryPageURL(true),
@@ -394,7 +394,7 @@ function soy_cms_blog_output_entry_list_pager($page,$offset,$limit,$total){
 	//今のページ番号
 	$current = max(1, $offset + 1);
 	//最大ページ数=ページの数
-	$last_page_number = max(1, ceil($total / $limit));
+	$last_page_number = $limit ? max(1, ceil($total / $limit)) : 1;
 
 	$page->createAdd("pager","BlogPage_EntryListPager",array(
 		"list" => array(),
@@ -441,7 +441,7 @@ function soy_cms_blog_output_first_page_link($page,$offset,$limit,$total){
 <a b_block:id="last_page">&gt;&gt;</a b_block:id="last_page">
 */
 function soy_cms_blog_output_last_page_link($page,$offset,$limit,$total){
-	$last_page = max(1, ceil($total / $limit));
+	$last_page = $limit ? max(1, ceil($total / $limit)) : 1;
 
 	$url = soy_cms_blog_get_current_url($page, $last_page -1);
 
@@ -477,7 +477,7 @@ SOY Shopのtotal_pagesも使えるようにする
 <!-- b_block:id="total_pages" /-->ページ中<!-- b_block:id="current_page" /-->ページ目
 */
 function soy_cms_blog_output_pages($page, $limit,$total){
-	$last_page = max(1, ceil($total / $limit));
+	$last_page = $limit ? max(1, ceil($total / $limit)) : 1;
 
 	$page->createAdd("pages","HTMLLabel",array(
 		"soy2prefix" => "b_block",
