@@ -13,6 +13,7 @@ class TabPage extends CMSHTMLPageBase {
 		'^Blog' => 'page',
 		'^Plugin' => 'plugin',
 		'^Template' => 'page',
+		'^Module' => 'page',
 		
 		//以下、シンプルモードのタブ
 		'^Simple$' => 'dashboard',

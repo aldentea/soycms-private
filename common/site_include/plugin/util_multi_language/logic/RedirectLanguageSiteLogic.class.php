@@ -10,8 +10,8 @@ class RedirectLanguageSiteLogic extends SOY2LogicBase{
 		$lang = trim($_GET["language"]);
 		$language = SOYCMSUtilMultiLanguageUtil::LANGUAGE_JP;
 		
-		foreach($config as $conf){
-			if($conf["is_use"] == SOYCMSUtilMultiLanguageUtil::IS_USE && $lang == $conf["prefix"]){
+		foreach($config as $key => $conf){
+			if($conf["is_use"] == SOYCMSUtilMultiLanguageUtil::IS_USE && $lang == $key){
 				$language = $lang;
 				break;
 			}

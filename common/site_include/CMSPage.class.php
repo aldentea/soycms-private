@@ -122,6 +122,8 @@ class CMSPage extends WebPage{
 			"page" => $this,
 			"soy2prefix" => "cms"
 		));
+		
+		$this->buildModules();
 
 	}
 
@@ -286,6 +288,32 @@ class CMSPage extends WebPage{
 		}
 		return $html;
 	}
+	
+	function buildModules(){
+    	
+		SOY2::import("site_include.CMSPageModulePlugin");
+		$plugin = new CMSPageModulePlugin();
+		
+		while(true){
+			list($tag, $line, $innerHTML, $outerHTML, $value, $suffix, $skipendtag) =
+				$plugin->parse("module", "[a-zA-Z0-9\.\_]+", $this->_soy2_content);
+				
+			if(!strlen($tag)) break;
+
+			$plugin->_attribute = array();
+
+			$plugin->setTag($tag);
+			$plugin->parseAttributes($line);
+			$plugin->setInnerHTML($innerHTML);
+			$plugin->setOuterHTML($outerHTML);
+			$plugin->setParent($this);
+			$plugin->setSkipEndTag($skipendtag);
+			$plugin->setSoyValue($value);
+			$plugin->execute();
+
+			$this->_soy2_content = $this->getContent($plugin, $this->_soy2_content);
+		}
+    }
 
 	/**
 	 * コメントを消去します。
