@@ -28,7 +28,11 @@
 				<div class="section" id="entry_editor">
 										
 					<div id="entry_content_wrapper">
-						<textarea id="entry_content" soy:id="module_content"></textarea>
+						<textarea id="entry_content" soy:id="module_content" class="editor"></textarea>
+
+<script>
+	
+</script>
 					</div>
 				</div>
 								
@@ -36,7 +40,6 @@
 					<input id="update_button" type="submit" value="更新" />
 				</div>
 			</div>
-			
 		</form>
 		
 		<div class="prepend-1 span-22 last" style="margin-top:20px;">
@@ -57,5 +60,7 @@
 	<div soy:page="_common.FooterPage"></div>
 
 </div>
+<script soy:src="./js/tools/advanced_textarea.js" type="text/javascript" charset="utf-8"></script>
+<script soy:src="./js/tools/insert_tab.js" type="text/javascript" charset="utf-8"></script>
 </body>
 </html>

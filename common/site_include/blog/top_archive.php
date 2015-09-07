@@ -367,7 +367,12 @@ function soy_cms_blog_output_entry_list_pager($page,$offset,$limit,$total){
 				$html .= ">";
 				$html .= htmlspecialchars($pager_list["display_number"], ENT_QUOTES, "UTF-8");
 				$html .= "</a>";
-
+				
+				$this->createAdd("pager_item_link", "HTMLLink", array(
+					"link" => htmlspecialchars($pager_list["url"], ENT_QUOTES, "UTF-8"),
+					"text" => htmlspecialchars($pager_list["display_number"], ENT_QUOTES, "UTF-8"),
+					"soy2prefix" => "cms"
+				));
 				$this->createAdd("pager_item","HTMLLabel",array(
 					"html" => $html,
 					"soy2prefix" => "cms"
